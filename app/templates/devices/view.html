@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}{{ device.hostname }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="mb-1">
+            {{ device.hostname }}
+            {% if not device.is_active %}<span class="badge bg-secondary">inactive</span>{% endif %}
+        </h1>
+        {% if device.human_readable_name %}
+        <div class="text-muted">{{ device.human_readable_name }}</div>
+        {% endif %}
+    </div>
+    <div>
+        <a href="/devices" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>Back
+        </a>
+        {% if current_user.role == 'admin' or current_user.can_edit %}
+        <a href="/devices/{{ device.id }}/edit" class="btn btn-outline-primary">
+            <i class="fa-solid fa-pen me-1"></i>Edit
+        </a>
+        {% endif %}
+        {% if current_user.role == 'admin' %}
+        <form method="post" action="/devices/{{ device.id }}/delete" class="d-inline"
+              onsubmit="return confirm('Delete device {{ device.hostname }}? This cannot be undone.');">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="fa-solid fa-trash me-1"></i>Delete
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- Basic ---------- #}
+<div class="card info-card section-basic mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Basic</span>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Hostname</dt>
+                    <dd class="col-sm-8">{{ device.hostname }}</dd>
+
+                    <dt class="col-sm-4">Human name</dt>
+                    <dd class="col-sm-8">{{ device.human_readable_name or '—' }}</dd>
+
+                    <dt class="col-sm-4">Device type</dt>
+                    <dd class="col-sm-8">
+                        {{ device.device_type.name if device.device_type else '—' }}
+                        {% if device.device_type %}
+                            {% if device.device_type.is_active %}
+                            <span class="badge bg-success">active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">passive</span>
+                            {% endif %}
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Vendor</dt>
+                    <dd class="col-sm-8">{{ device.vendor.name if device.vendor else '—' }}</dd>
+
+                    <dt class="col-sm-4">Model</dt>
+                    <dd class="col-sm-8">{{ device.model.name if device.model else '—' }}</dd>
+
+                    <dt class="col-sm-4">Location</dt>
+                    <dd class="col-sm-8">{{ device.location.name if device.location else '—' }}</dd>
+
+                    <dt class="col-sm-4">Network</dt>
+                    <dd class="col-sm-8">
+                        {% if device.network %}
+                            {{ device.network.name }}
+                            ({{ device.network.network_address }}/{{ device.network.mask }})
+                        {% else %}
+                            —
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Created</dt>
+                    <dd class="col-sm-8">{{ device.created_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+
+                    <dt class="col-sm-4">Updated</dt>
+                    <dd class="col-sm-8">{{ device.updated_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ---------- Interfaces ---------- #}
+<div class="card info-card section-interfaces mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-ethernet"></i>
+        <span>Interfaces</span>
+        <span class="section-count">({{ interfaces|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not interfaces %}
+        <div class="text-muted small">No interfaces.</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>MAC</th>
+                    <th>IP</th>
+                    <th>Mask</th>
+                    <th>Address type</th>
+                    <th>Gateway</th>
+                    <th>DNS</th>
+                    <th>Connected Wi-Fi</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for iface in interfaces %}
+                    {% set ips = iface.ip_addresses %}
+                    {% if ips %}
+                        {% for ip in ips %}
+                        <tr>
+                            {% if loop.first %}
+                            <td rowspan="{{ ips|length }}"><code>{{ iface.name }}</code></td>
+                            <td rowspan="{{ ips|length }}">{{ iface.type }}</td>
+                            <td rowspan="{{ ips|length }}">{{ iface.mac or '—' }}</td>
+                            {% endif %}
+                            <td>{{ ip.address }}</td>
+                            <td>{{ ip.mask }}</td>
+                            <td>{{ ip.address_type }}</td>
+                            <td>{{ ip.gateway or '—' }}</td>
+                            <td>{{ ip.dns or '—' }}</td>
+                            {% if loop.first %}
+                            <td rowspan="{{ ips|length }}">
+                                {% if iface.connected_wifi_network %}
+                                    {{ iface.connected_wifi_network.ssid }}
+                                {% else %}—{% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td><code>{{ iface.name }}</code></td>
+                        <td>{{ iface.type }}</td>
+                        <td>{{ iface.mac or '—' }}</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>
+                            {% if iface.connected_wifi_network %}
+                                {{ iface.connected_wifi_network.ssid }}
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- Ports ---------- #}
+<div class="card info-card section-ports mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-plug"></i>
+        <span>Ports</span>
+        <span class="section-count">({{ ports|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not ports %}
+        <div class="text-muted small">No ports.</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Interface</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in ports %}
+                <tr>
+                    <td><code>{{ p.name }}</code></td>
+                    <td><code>{{ p.interface.name }}</code></td>
+                    <td>{{ p.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- Wi-Fi networks ---------- #}
+<div class="card info-card section-wifi mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-wifi"></i>
+        <span>Wi-Fi networks (this device broadcasts)</span>
+        <span class="section-count">({{ wifi_networks|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not wifi_networks %}
+        <div class="text-muted small">No Wi-Fi networks.</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>SSID</th>
+                    <th>Band</th>
+                    <th>Encryption</th>
+                    <th>Password</th>
+                    <th>Guest</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for w in wifi_networks %}
+                <tr>
+                    <td>{{ w.ssid }}</td>
+                    <td>{{ w.band or '—' }}</td>
+                    <td>{{ w.encryption or '—' }}</td>
+                    <td>
+                        {% if w.password %}
+                            {% if current_user.role == 'admin' or current_user.can_view_passwords %}
+                            <span class="password-cell" data-password="{{ w.password }}">
+                                <span class="password-mask">••••••••</span>
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">show</button>
+                            </span>
+                            {% else %}
+                            <span class="text-muted">••••••••</span>
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{% if w.is_guest %}yes{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- DHCP pools ---------- #}
+<div class="card info-card section-dhcp mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-server"></i>
+        <span>DHCP pools (this device serves)</span>
+        <span class="section-count">({{ dhcp_pools|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not dhcp_pools %}
+        <div class="text-muted small">No DHCP pools.</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Range</th>
+                    <th>Gateway</th>
+                    <th>DNS</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in dhcp_pools %}
+                <tr>
+                    <td>{{ p.name or '—' }}</td>
+                    <td>{{ p.type }}</td>
+                    <td>{{ p.start_ip }} – {{ p.end_ip }}</td>
+                    <td>{{ p.gateway or '—' }}</td>
+                    <td>{{ p.dns or '—' }}</td>
+                    <td>{{ p.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- Credentials ---------- #}
+<div class="card info-card section-credentials mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-key"></i>
+        <span>Credentials</span>
+        <span class="section-count">({{ credentials|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not credentials %}
+        <div class="text-muted small">No credentials.</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in credentials %}
+                <tr>
+                    <td>{{ c.type.name if c.type else '—' }}</td>
+                    <td>{{ c.username or '—' }}</td>
+                    <td>
+                        {% if c.password %}
+                            {% if current_user.role == 'admin' or current_user.can_view_passwords %}
+                            <span class="password-cell" data-password="{{ c.password }}">
+                                <span class="password-mask">••••••••</span>
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">show</button>
+                            </span>
+                            {% else %}
+                            <span class="text-muted">••••••••</span>
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{{ c.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- Services ---------- #}
+<div class="card info-card section-services mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-cogs"></i>
+        <span>Services</span>
+        <span class="section-count">({{ services|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not services %}
+        <div class="text-muted small">No services.</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Protocol</th>
+                    <th>Port</th>
+                    <th>URL</th>
+                    <th>Path</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in services %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.protocol or '—' }}</td>
+                    <td>{{ s.port if s.port is not none else '—' }}</td>
+                    <td>
+                        {% if s.url %}
+                            {% if s.url.startswith('http://') or s.url.startswith('https://') or s.url.startswith('rtsp://') %}
+                            <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url }}</a>
+                            {% else %}
+                            {{ s.url }}
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{{ s.path or '—' }}</td>
+                    <td>{{ s.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- Connections ---------- #}
+<div class="card info-card section-connections mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-link"></i>
+        <span>Connections</span>
+        <span class="section-count">({{ connections|length }})</span>
+        {% if current_user.role == 'admin' or current_user.can_edit %}
+        <a href="/connections/new" class="btn btn-sm btn-outline-primary ms-auto">
+            <i class="fa-solid fa-plus me-1"></i>Add connection
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if not connections %}
+        <div class="text-muted small">No connections.</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Direction</th>
+                    <th>This port</th>
+                    <th>Other port</th>
+                    <th>Type</th>
+                    <th>Cable</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in connections %}
+                <tr class="{% if not c.is_active %}text-muted{% endif %}">
+                    {% if c.source_port.device_id == device.id %}
+                    <td><i class="fa-solid fa-arrow-right text-success"></i> outgoing</td>
+                    <td>
+                        <code>{{ c.source_port.name }}</code>
+                        <span class="text-muted small">({{ c.source_port.interface.name }})</span>
+                    </td>
+                    <td>
+                        <a href="/devices/{{ c.target_port.device.id }}">{{ c.target_port.device.hostname }}</a>
+                        / <code>{{ c.target_port.name }}</code>
+                        <span class="text-muted small">({{ c.target_port.interface.name }})</span>
+                    </td>
+                    {% else %}
+                    <td><i class="fa-solid fa-arrow-left text-primary"></i> incoming</td>
+                    <td>
+                        <code>{{ c.target_port.name }}</code>
+                        <span class="text-muted small">({{ c.target_port.interface.name }})</span>
+                    </td>
+                    <td>
+                        <a href="/devices/{{ c.source_port.device.id }}">{{ c.source_port.device.hostname }}</a>
+                        / <code>{{ c.source_port.name }}</code>
+                        <span class="text-muted small">({{ c.source_port.interface.name }})</span>
+                    </td>
+                    {% endif %}
+                    <td>{{ c.connection_type }}</td>
+                    <td>{{ c.cable_type or '—' }}</td>
+                    <td>{{ c.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ---------- Remarks ---------- #}
+{% if device.remarks %}
+<div class="card info-card section-remarks mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-note-sticky"></i>
+        <span>Remarks</span>
+    </div>
+    <div class="card-body">
+        <pre class="mb-0" style="white-space: pre-wrap;">{{ device.remarks }}</pre>
+    </div>
+</div>
+{% endif %}
+
+<script src="/static/js/password-toggle.js"></script>
+{% endblock %}

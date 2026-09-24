@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Edit {{ form_data.hostname or '' }}{% else %}{{ t('devices.add') }}{% endif %}{% endblock %}
+
+{% block content %}
+{% set fd = form_data or {} %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">
+        {% if is_edit %}
+        <i class="fa-solid fa-pen me-2"></i>Edit device
+        {% else %}
+        <i class="fa-solid fa-plus me-2"></i>{{ t('devices.add') }}
+        {% endif %}
+    </h1>
+    <div>
+        <a href="{% if is_edit %}/devices/{{ device_id }}{% else %}/devices{% endif %}"
+           class="btn btn-outline-secondary">
+            <i class="fa-solid fa-xmark me-1"></i>{{ t('common.cancel') }}
+        </a>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    <i class="fa-solid fa-circle-exclamation me-1"></i>{{ error }}
+</div>
+{% endif %}
+
+<form method="post" action="{{ form_action }}" id="device-form">
+    {# ---------- Basic ---------- #}
+    <div class="card info-card section-basic mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Basic</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="hostname" class="form-label">Hostname *</label>
+                    <input type="text" class="form-control" id="hostname" name="hostname"
+                           value="{{ fd.hostname or '' }}" required maxlength="100">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="human_readable_name" class="form-label">Human readable name</label>
+                    <input type="text" class="form-control" id="human_readable_name"
+                           name="human_readable_name"
+                           value="{{ fd.human_readable_name or '' }}" maxlength="60">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="device_type_id" class="form-label">Device type</label>
+                    <select class="form-select" id="device_type_id" name="device_type_id">
+                        <option value="">—</option>
+                        {% for t_item in device_types %}
+                        <option value="{{ t_item.id }}"
+                                data-is-active="{{ '1' if t_item.is_active else '0' }}"
+                                {% if fd.device_type_id and fd.device_type_id|string == t_item.id|string %}selected{% endif %}>
+                            {{ t_item.name }}{% if not t_item.is_active %} (passive){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="vendor_id" class="form-label">Vendor</label>
+                    <select class="form-select" id="vendor_id" name="vendor_id">
+                        <option value="">—</option>
+                        {% for v in vendors %}
+                        <option value="{{ v.id }}"
+                                {% if fd.vendor_id and fd.vendor_id|string == v.id|string %}selected{% endif %}>
+                            {{ v.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="model_id" class="form-label">Model</label>
+                    <select class="form-select" id="model_id" name="model_id"
+                            data-selected="{{ fd.model_id or '' }}">
+                        <option value="">—</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="location_id" class="form-label">Location</label>
+                    <select class="form-select" id="location_id" name="location_id">
+                        <option value="">—</option>
+                        {% for l in locations %}
+                        <option value="{{ l.id }}"
+                                {% if fd.location_id and fd.location_id|string == l.id|string %}selected{% endif %}>
+                            {{ l.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="network_id" class="form-label">Network</label>
+                    <select class="form-select" id="network_id" name="network_id">
+                        <option value="">—</option>
+                        {% for n in networks %}
+                        <option value="{{ n.id }}"
+                                {% if fd.network_id and fd.network_id|string == n.id|string %}selected{% endif %}>
+                            {{ n.name }} ({{ n.network_address }}/{{ n.mask }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                               {% if fd.is_active is not defined or fd.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Interfaces ---------- #}
+    <div class="card info-card section-interfaces mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-ethernet"></i>
+            <span>Interfaces</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-interface-btn">
+                <i class="fa-solid fa-plus me-1"></i>Add interface
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="interfaces-container">
+                {% for iface in fd.interfaces or [] %}
+                    {% include "devices/_interface_row.html" with context %}
+                {% endfor %}
+            </div>
+            <div id="interfaces-empty" class="text-muted small {% if fd.interfaces %}d-none{% endif %}">
+                No interfaces added yet.
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Ports (только при редактировании) ---------- #}
+    {% if is_edit %}
+    <div class="card info-card section-ports mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-plug"></i>
+            <span>Ports</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-port-btn"
+                    {% if not interfaces %}disabled title="Add an interface first"{% endif %}>
+                <i class="fa-solid fa-plus me-1"></i>Add port
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="ports-container">
+                {% for p in fd.ports or [] %}
+                    {% with port = p %}
+                        {% include "devices/_port_row.html" with context %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div id="ports-empty" class="text-muted small {% if fd.ports %}d-none{% endif %}">
+                No ports added yet.
+            </div>
+            {% if not interfaces %}
+            <div class="text-muted small mt-2">
+                Ports can be added after at least one interface is saved.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ---------- Wi-Fi networks ---------- #}
+    <div class="card info-card section-wifi mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-wifi"></i>
+            <span>Wi-Fi networks (this device broadcasts)</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-wifi-btn">
+                <i class="fa-solid fa-plus me-1"></i>Add Wi-Fi network
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="wifi-container">
+                {% for w in fd.wifi_networks or [] %}
+                    {% with wifi = w %}
+                        {% include "devices/_wifi_row.html" with context %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div id="wifi-empty" class="text-muted small {% if fd.wifi_networks %}d-none{% endif %}">
+                No Wi-Fi networks added yet.
+            </div>
+        </div>
+    </div>
+
+    {# ---------- DHCP pools ---------- #}
+    <div class="card info-card section-dhcp mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-server"></i>
+            <span>DHCP pools (this device serves)</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-dhcp-btn">
+                <i class="fa-solid fa-plus me-1"></i>Add DHCP pool
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="dhcp-container">
+                {% for p in fd.dhcp_pools or [] %}
+                    {% with pool = p %}
+                        {% include "devices/_dhcp_row.html" with context %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div id="dhcp-empty" class="text-muted small {% if fd.dhcp_pools %}d-none{% endif %}">
+                No DHCP pools added yet.
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Credentials ---------- #}
+    <div class="card info-card section-credentials mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-key"></i>
+            <span>Credentials</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-credential-btn">
+                <i class="fa-solid fa-plus me-1"></i>Add credential
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="credentials-container">
+                {% for c in fd.credentials or [] %}
+                    {% with cred = c %}
+                        {% include "devices/_credential_row.html" with context %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div id="credentials-empty" class="text-muted small {% if fd.credentials %}d-none{% endif %}">
+                No credentials added yet.
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Services ---------- #}
+    <div class="card info-card section-services mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-cogs"></i>
+            <span>Services</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-service-btn">
+                <i class="fa-solid fa-plus me-1"></i>Add service
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="services-container">
+                {% for s in fd.services or [] %}
+                    {% with svc = s %}
+                        {% include "devices/_service_row.html" with context %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div id="services-empty" class="text-muted small {% if fd.services %}d-none{% endif %}">
+                No services added yet.
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Remarks ---------- #}
+    <div class="card info-card section-remarks mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-note-sticky"></i>
+            <span>Remarks</span>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" id="remarks" name="remarks" rows="3">{{ fd.remarks or '' }}</textarea>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <a href="{% if is_edit %}/devices/{{ device_id }}{% else %}/devices{% endif %}"
+           class="btn btn-outline-secondary">
+            <i class="fa-solid fa-xmark me-1"></i>{{ t('common.cancel') }}
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk me-1"></i>{{ t('common.save') }}
+        </button>
+    </div>
+</form>
+
+{# Шаблоны строк для клонирования через JS #}
+<template id="interface-row-template">
+    {% with iface = None %}
+        {% include "devices/_interface_row.html" with context %}
+    {% endwith %}
+</template>
+
+{% if is_edit %}
+<template id="port-row-template">
+    {% with port = None %}
+        {% include "devices/_port_row.html" with context %}
+    {% endwith %}
+</template>
+{% endif %}
+
+<template id="wifi-row-template">
+    {% with wifi = None %}
+        {% include "devices/_wifi_row.html" with context %}
+    {% endwith %}
+</template>
+
+<template id="dhcp-row-template">
+    {% with pool = None %}
+        {% include "devices/_dhcp_row.html" with context %}
+    {% endwith %}
+</template>
+
+<template id="credential-row-template">
+    {% with cred = None %}
+        {% include "devices/_credential_row.html" with context %}
+    {% endwith %}
+</template>
+
+<template id="service-row-template">
+    {% with svc = None %}
+        {% include "devices/_service_row.html" with context %}
+    {% endwith %}
+</template>
+
+<script src="/static/js/devices.js"></script>
+{% endblock %}
+

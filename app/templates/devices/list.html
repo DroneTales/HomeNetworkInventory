@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('devices.title') }}{% endblock %}
+
+{% block content %}
+{% if warning %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ warning }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">
+        <i class="fa-solid fa-desktop me-2"></i>{{ t('devices.title') }}
+    </h1>
+    {% if current_user.role == 'admin' or current_user.can_edit %}
+    <a href="/devices/new" class="btn btn-primary">
+        <i class="fa-solid fa-plus me-1"></i>{{ t('devices.add') }}
+    </a>
+    {% endif %}
+</div>
+
+{% if not rows %}
+<div class="alert alert-info">
+    <i class="fa-solid fa-circle-info me-1"></i>{{ t('devices.empty') }}
+</div>
+{% else %}
+
+{# Десктопная таблица #}
+<div class="table-responsive d-none d-md-block">
+    <table class="table table-hover align-middle">
+        <thead>
+        <tr>
+            <th>Hostname</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Vendor</th>
+            <th>Model</th>
+            <th>Location</th>
+            <th>Local IP</th>
+            <th>Gateway</th>
+            <th>MAC</th>
+            <th class="text-end">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+        {% set d = row.device %}
+        {% set ip = row.primary_ip %}
+        <tr class="{% if not d.is_active %}text-muted{% endif %}">
+            <td>
+                <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
+                {% if not d.is_active %}
+                <span class="badge bg-secondary ms-1">inactive</span>
+                {% endif %}
+            </td>
+            <td>{{ d.human_readable_name or '—' }}</td>
+            <td>{{ d.device_type.name if d.device_type else '—' }}</td>
+            <td>{{ d.vendor.name if d.vendor else '—' }}</td>
+            <td>{{ d.model.name if d.model else '—' }}</td>
+            <td>{{ d.location.name if d.location else '—' }}</td>
+            <td>{{ ip.address if ip else '—' }}</td>
+            <td>{{ ip.gateway if ip and ip.gateway else '—' }}</td>
+            <td>
+                {% set macs = [] %}
+                {% for iface in d.interfaces %}
+                    {% if iface.mac %}{% set _ = macs.append(iface.mac) %}{% endif %}
+                {% endfor %}
+                {{ macs | join(', ') if macs else '—' }}
+            </td>
+            <td class="text-end">
+                <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-eye"></i>
+                </a>
+                {% if current_user.role == 'admin' or current_user.can_edit %}
+                <a href="/devices/{{ d.id }}/edit" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Мобильные карточки #}
+<div class="d-md-none">
+    {% for row in rows %}
+    {% set d = row.device %}
+    {% set ip = row.primary_ip %}
+    <div class="card info-card section-interfaces mb-2 {% if not d.is_active %}text-muted{% endif %}">
+        <div class="card-body">
+            <h5 class="card-title mb-1">
+                <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
+                {% if not d.is_active %}
+                <span class="badge bg-secondary ms-1">inactive</span>
+                {% endif %}
+            </h5>
+            {% if d.human_readable_name %}
+            <p class="card-subtitle mb-2 text-muted small">{{ d.human_readable_name }}</p>
+            {% endif %}
+
+            <div class="row small">
+                <div class="col-5 text-muted"><i class="fa-solid fa-globe me-1"></i>IP</div>
+                <div class="col-7">{{ ip.address if ip else '—' }}</div>
+
+                <div class="col-5 text-muted"><i class="fa-solid fa-door-open me-1"></i>Gateway</div>
+                <div class="col-7">{{ ip.gateway if ip and ip.gateway else '—' }}</div>
+
+                <div class="col-5 text-muted"><i class="fa-solid fa-list me-1"></i>Type</div>
+                <div class="col-7">{{ d.device_type.name if d.device_type else '—' }}</div>
+
+                <div class="col-5 text-muted"><i class="fa-solid fa-location-dot me-1"></i>Location</div>
+                <div class="col-7">{{ d.location.name if d.location else '—' }}</div>
+            </div>
+
+            <div class="mt-2">
+                <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-eye"></i> View
+                </a>
+                {% if current_user.role == 'admin' or current_user.can_edit %}
+                <a href="/devices/{{ d.id }}/edit" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-pen"></i> Edit
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endif %}
+{% endblock %}

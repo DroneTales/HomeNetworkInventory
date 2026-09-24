@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Reference{% endblock %}
+
+{% block content %}
+<h1 class="mb-3">Reference</h1>
+
+<div class="row g-3">
+    {# ---------- Локальные (в контексте дома) ---------- #}
+    <div class="col-12 col-md-6 col-lg-4">
+        <a href="/reference/locations" class="card text-decoration-none h-100 info-card section-basic">
+            <div class="card-body">
+                <h5 class="card-title mb-1">
+                    <i class="fa-solid fa-location-dot me-1 text-primary"></i>Locations
+                </h5>
+                <p class="card-text text-muted small mb-0">Rooms of the current home</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <a href="/reference/networks" class="card text-decoration-none h-100 info-card section-basic">
+            <div class="card-body">
+                <h5 class="card-title mb-1">
+                    <i class="fa-solid fa-network-wired me-1 text-primary"></i>Networks
+                </h5>
+                <p class="card-text text-muted small mb-0">Subnets of the current home</p>
+            </div>
+        </a>
+    </div>
+
+    {# ---------- Глобальные (только admin) ---------- #}
+    {% if current_user.role == 'admin' %}
+    <div class="col-12">
+        <hr class="my-2">
+        <div class="text-muted small mb-2">
+            <i class="fa-solid fa-globe me-1"></i>Global lists — shared across all homes (admin only)
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+        <a href="/reference/device-types" class="card text-decoration-none h-100 info-card section-basic">
+            <div class="card-body">
+                <h5 class="card-title mb-1">
+                    <i class="fa-solid fa-list me-1 text-primary"></i>Device Types
+                </h5>
+                <p class="card-text text-muted small mb-0">Types of devices (active/passive)</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <a href="/reference/vendors" class="card text-decoration-none h-100 info-card section-basic">
+            <div class="card-body">
+                <h5 class="card-title mb-1">
+                    <i class="fa-solid fa-industry me-1 text-primary"></i>Vendors
+                </h5>
+                <p class="card-text text-muted small mb-0">Manufacturers</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <a href="/reference/models" class="card text-decoration-none h-100 info-card section-basic">
+            <div class="card-body">
+                <h5 class="card-title mb-1">
+                    <i class="fa-solid fa-microchip me-1 text-primary"></i>Models
+                </h5>
+                <p class="card-text text-muted small mb-0">Hardware models per vendor</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <a href="/reference/credential-types" class="card text-decoration-none h-100 info-card section-basic">
+            <div class="card-body">
+                <h5 class="card-title mb-1">
+                    <i class="fa-solid fa-key me-1 text-primary"></i>Credential Types
+                </h5>
+                <p class="card-text text-muted small mb-0">Types of credentials (admin, ssh, ...)</p>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

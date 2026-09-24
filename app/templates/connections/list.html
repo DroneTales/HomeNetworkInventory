@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('nav.connections') }}{% endblock %}
+
+{% block content %}
+{% if warning %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ warning }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">{{ t('nav.connections') }}</h1>
+    {% if current_user.role == 'admin' or current_user.can_edit %}
+    <a href="/connections/new" class="btn btn-primary">Add connection</a>
+    {% endif %}
+</div>
+
+{% if not connections %}
+<div class="alert alert-info">No connections yet.</div>
+{% else %}
+
+{# Десктопная таблица #}
+<div class="table-responsive d-none d-md-block">
+    <table class="table table-hover align-middle">
+        <thead>
+        <tr>
+            <th>Source device</th>
+            <th>Source port</th>
+            <th>Target device</th>
+            <th>Target port</th>
+            <th>Type</th>
+            <th>Cable</th>
+            <th>Description</th>
+            <th class="text-end">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in connections %}
+        <tr class="{% if not c.is_active %}text-muted{% endif %}">
+            <td>
+                <a href="/devices/{{ c.source_port.device.id }}">
+                    {{ c.source_port.device.hostname }}
+                </a>
+            </td>
+            <td>
+                <code>{{ c.source_port.name }}</code>
+                <span class="text-muted small">({{ c.source_port.interface.name }})</span>
+            </td>
+            <td>
+                <a href="/devices/{{ c.target_port.device.id }}">
+                    {{ c.target_port.device.hostname }}
+                </a>
+            </td>
+            <td>
+                <code>{{ c.target_port.name }}</code>
+                <span class="text-muted small">({{ c.target_port.interface.name }})</span>
+            </td>
+            <td>{{ c.connection_type }}</td>
+            <td>{{ c.cable_type or '—' }}</td>
+            <td>{{ c.description or '—' }}</td>
+            <td class="text-end">
+                {% if current_user.role == 'admin' %}
+                <form method="post" action="/connections/{{ c.id }}/delete" class="d-inline"
+                      onsubmit="return confirm('Delete this connection?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Мобильные карточки #}
+<div class="d-md-none">
+    {% for c in connections %}
+    <div class="card mb-2 {% if not c.is_active %}text-muted{% endif %}">
+        <div class="card-body">
+            <div class="mb-2">
+                <a href="/devices/{{ c.source_port.device.id }}" class="fw-bold text-decoration-none">
+                    {{ c.source_port.device.hostname }}
+                </a>
+                <span class="text-muted">/</span>
+                <code>{{ c.source_port.name }}</code>
+                <span class="text-muted">→</span>
+                <a href="/devices/{{ c.target_port.device.id }}" class="fw-bold text-decoration-none">
+                    {{ c.target_port.device.hostname }}
+                </a>
+                <span class="text-muted">/</span>
+                <code>{{ c.target_port.name }}</code>
+            </div>
+
+            <div class="row small">
+                <div class="col-5 text-muted">Source interface</div>
+                <div class="col-7">{{ c.source_port.interface.name }}</div>
+
+                <div class="col-5 text-muted">Target interface</div>
+                <div class="col-7">{{ c.target_port.interface.name }}</div>
+
+                <div class="col-5 text-muted">Type</div>
+                <div class="col-7">{{ c.connection_type }}</div>
+
+                {% if c.cable_type %}
+                <div class="col-5 text-muted">Cable</div>
+                <div class="col-7">{{ c.cable_type }}</div>
+                {% endif %}
+
+                {% if c.description %}
+                <div class="col-5 text-muted">Description</div>
+                <div class="col-7">{{ c.description }}</div>
+                {% endif %}
+            </div>
+
+            {% if current_user.role == 'admin' %}
+            <div class="mt-2">
+                <form method="post" action="/connections/{{ c.id }}/delete" class="d-inline"
+                      onsubmit="return confirm('Delete this connection?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endif %}
+{% endblock %}
+

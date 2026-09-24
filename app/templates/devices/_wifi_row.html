@@ -1,0 +1,67 @@
+<div class="wifi-row border rounded p-2 mb-2">
+    <input type="hidden" name="wifi_id" class="wifi-id"
+           value="{{ wifi.id if wifi and wifi.id else '' }}">
+
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-3">
+            <label class="form-label small mb-0">SSID</label>
+            <input type="text" class="form-control form-control-sm wifi-ssid"
+                   name="wifi_ssid" value="{{ wifi.ssid if wifi else '' }}"
+                   placeholder="homekit2" required>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Band</label>
+            <select class="form-select form-select-sm wifi-band" name="wifi_band">
+                <option value="">—</option>
+                {% set cur_band = wifi.band if wifi else '' %}
+                <option value="2.4" {% if cur_band == '2.4' %}selected{% endif %}>2.4</option>
+                <option value="5" {% if cur_band == '5' %}selected{% endif %}>5</option>
+                <option value="6" {% if cur_band == '6' %}selected{% endif %}>6</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label small mb-0">Encryption</label>
+            <select class="form-select form-select-sm wifi-encryption" name="wifi_encryption">
+                <option value="">—</option>
+                {% set cur_enc = wifi.encryption if wifi else '' %}
+                <option value="WPA2-PSK/AES" {% if cur_enc == 'WPA2-PSK/AES' %}selected{% endif %}>WPA2-PSK/AES</option>
+                <option value="WPA3-PSK/AES" {% if cur_enc == 'WPA3-PSK/AES' %}selected{% endif %}>WPA3-PSK/AES</option>
+                <option value="WPA2/WPA3-PSK/AES" {% if cur_enc == 'WPA2/WPA3-PSK/AES' %}selected{% endif %}>WPA2/WPA3-PSK/AES</option>
+                <option value="WPA-PSK/AES" {% if cur_enc == 'WPA-PSK/AES' %}selected{% endif %}>WPA-PSK/AES</option>
+                <option value="WEP" {% if cur_enc == 'WEP' %}selected{% endif %}>WEP</option>
+                <option value="Open" {% if cur_enc == 'Open' %}selected{% endif %}>Open</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label small mb-0">
+                Password
+                {% if not can_change_passwords %}
+                <i class="fa-solid fa-lock text-muted ms-1" title="You cannot change this password"></i>
+                {% endif %}
+            </label>
+            {% if can_view_passwords %}
+            <input type="text" class="form-control form-control-sm wifi-password"
+                   name="wifi_password"
+                   value="{{ wifi.password if wifi and wifi.password else '' }}"
+                   {% if not can_change_passwords %}readonly{% endif %}>
+            {% else %}
+            <input type="password" class="form-control form-control-sm wifi-password"
+                   name="wifi_password"
+                   value=""
+                   placeholder="••••••••"
+                   readonly>
+            {% endif %}
+        </div>
+        <div class="col-6 col-md-1">
+            <div class="form-check">
+                <input class="form-check-input wifi-is-guest" type="checkbox" name="wifi_is_guest"
+                       {% if wifi and wifi.is_guest %}checked{% endif %}>
+                <label class="form-check-label small">Guest</label>
+            </div>
+        </div>
+        <div class="col-6 col-md-12 text-end mt-1">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-btn">Remove</button>
+        </div>
+    </div>
+</div>
+

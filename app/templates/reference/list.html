@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% if request.query_params.get('error') %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ request.query_params.get('error') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="/reference" class="text-decoration-none small text-muted">← Reference</a>
+        <h1 class="mb-0">{{ title }}</h1>
+    </div>
+    <a href="{{ add_url }}" class="btn btn-primary">Add</a>
+</div>
+
+{% if not rows %}
+<div class="alert alert-info">Nothing here yet.</div>
+{% else %}
+
+<div class="table-responsive d-none d-md-block">
+    <table class="table table-hover align-middle">
+        <thead>
+        <tr>
+            {% for col in columns %}
+            <th>{{ col }}</th>
+            {% endfor %}
+            <th class="text-end">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+        <tr>
+            {% for value in row.cells %}
+            <td>{{ value }}</td>
+            {% endfor %}
+            <td class="text-end">
+                <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <form method="post" action="{{ delete_url_prefix }}{{ row.id }}/delete" class="d-inline"
+                      onsubmit="return confirm('Delete this item?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="d-md-none">
+    {% for row in rows %}
+    <div class="card mb-2">
+        <div class="card-body">
+            {% for col in columns %}
+            <div class="row small">
+                <div class="col-5 text-muted">{{ col }}</div>
+                <div class="col-7">{{ row.cells[loop.index0] }}</div>
+            </div>
+            {% endfor %}
+            <div class="mt-2">
+                <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <form method="post" action="{{ delete_url_prefix }}{{ row.id }}/delete" class="d-inline"
+                      onsubmit="return confirm('Delete this item?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Add connection{% endblock %}
+
+{% block content %}
+{% set fd = form_data or {} %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Add connection</h1>
+    <a href="/connections" class="btn btn-outline-secondary">{{ t('common.cancel') }}</a>
+</div>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">{{ error }}</div>
+{% endif %}
+
+<form method="post" action="{{ form_action }}" id="connection-form">
+    <div class="card mb-3">
+        <div class="card-header">Source</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="source_device_id" class="form-label">Device *</label>
+                    <select class="form-select" id="source_device_id">
+                        <option value="">—</option>
+                        {% for d in devices_payload %}
+                        <option value="{{ d.id }}">{{ d.hostname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="source_port_id" class="form-label">Port *</label>
+                    <select class="form-select" id="source_port_id" name="source_port_id" required>
+                        <option value="">—</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Target</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="target_device_id" class="form-label">Device *</label>
+                    <select class="form-select" id="target_device_id">
+                        <option value="">—</option>
+                        {% for d in devices_payload %}
+                        <option value="{{ d.id }}">{{ d.hostname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="target_port_id" class="form-label">Port *</label>
+                    <select class="form-select" id="target_port_id" name="target_port_id" required>
+                        <option value="">—</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Details</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <label for="connection_type" class="form-label">Type</label>
+                    {% set cur_type = fd.connection_type or 'physical' %}
+                    <select class="form-select" id="connection_type" name="connection_type">
+                        <option value="physical" {% if cur_type == 'physical' %}selected{% endif %}>physical</option>
+                        <option value="logical" {% if cur_type == 'logical' %}selected{% endif %}>logical</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label for="cable_type" class="form-label">Cable</label>
+                    <input type="text" class="form-control" id="cable_type" name="cable_type"
+                           value="{{ fd.cable_type or '' }}" maxlength="50">
+                </div>
+                <div class="col-12">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="description" name="description"
+                           value="{{ fd.description or '' }}" maxlength="255">
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                               {% if fd.is_active is not defined or fd.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <a href="/connections" class="btn btn-outline-secondary">{{ t('common.cancel') }}</a>
+        <button type="submit" class="btn btn-primary">{{ t('common.save') }}</button>
+    </div>
+</form>
+
+<script id="devices-payload" type="application/json">{{ devices_payload | tojson }}</script>
+<script src="/static/js/connections.js"></script>
+{% endblock %}
+

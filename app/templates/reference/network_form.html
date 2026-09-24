@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Edit network{% else %}Add network{% endif %}{% endblock %}
+
+{% block content %}
+{% set fd = form_data or {} %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="/reference/networks" class="text-decoration-none small text-muted">← Networks</a>
+        <h1 class="mb-0">{% if is_edit %}Edit network{% else %}Add network{% endif %}</h1>
+    </div>
+    <a href="/reference/networks" class="btn btn-outline-secondary">Cancel</a>
+</div>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">{{ error }}</div>
+{% endif %}
+
+<form method="post" action="{{ form_action }}">
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="name" class="form-label">Name *</label>
+                    <input type="text" class="form-control" id="name" name="name"
+                           value="{{ fd.name or '' }}" required maxlength="100">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="network_address" class="form-label">Network address *</label>
+                    <input type="text" class="form-control" id="network_address" name="network_address"
+                           value="{{ fd.network_address or '' }}" required placeholder="192.168.1.0">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="mask" class="form-label">Mask *</label>
+                    <input type="text" class="form-control" id="mask" name="mask"
+                           value="{{ fd.mask or '255.255.255.0' }}" required>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="gateway" class="form-label">Gateway</label>
+                    <input type="text" class="form-control" id="gateway" name="gateway"
+                           value="{{ fd.gateway or '' }}" placeholder="192.168.1.1">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="vlan" class="form-label">VLAN</label>
+                    <input type="number" class="form-control" id="vlan" name="vlan"
+                           value="{{ fd.vlan or '' }}">
+                </div>
+                <div class="col-12">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="description" name="description"
+                           value="{{ fd.description or '' }}" maxlength="255">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+        <a href="/reference/networks" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>
+{% endblock %}
+

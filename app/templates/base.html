@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" data-bs-theme="{{ 'light' if bs_theme == 'auto' else bs_theme }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ t('app_name') }}{% endblock %}</title>
+    {% if bs_theme == "auto" %}
+    <script>
+    (function () {
+        try {
+            var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.setAttribute("data-bs-theme", prefersDark ? "dark" : "light");
+        } catch (e) {
+            // оставляем light по умолчанию
+        }
+    })();
+    </script>
+    {% endif %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary mb-3">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <i class="fa-solid fa-network-wired me-2"></i>{{ t('app_name') }}
+        </a>
+
+        {% if current_user %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if current_site %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="fa-solid fa-desktop me-1"></i>{{ t('nav.devices') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/connections">
+                        <i class="fa-solid fa-link me-1"></i>{{ t('nav.connections') }}
+                    </a>
+                </li>
+                {% if current_user.role == 'admin' or current_user.can_edit %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/reference">
+                        <i class="fa-solid fa-book me-1"></i>Reference
+                    </a>
+                </li>
+                {% endif %}
+                {% endif %}
+                {% if current_user.role == 'admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/users">
+                        <i class="fa-solid fa-users me-1"></i>{{ t('nav.users') }}
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">
+                        <i class="fa-solid fa-user-gear me-1"></i>{{ t('nav.profile') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/help">
+                        <i class="fa-solid fa-circle-question me-1"></i>{{ t('nav.help') }}
+                    </a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                {% if current_site %}
+                <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">
+                    <i class="fa-solid fa-house me-1"></i>{{ current_site.name }}
+                </span>
+                <form method="post" action="/sites/switch" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                        <i class="fa-solid fa-right-left me-1"></i>
+                        {% if lang == 'ru' %}Сменить дом{% else %}Switch home{% endif %}
+                    </button>
+                </form>
+                {% endif %}
+                <span class="text-muted small">
+                    <i class="fa-solid fa-user me-1"></i>{{ current_user.username }}
+                </span>
+                <form method="post" action="/logout" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i>{{ t('nav.logout') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</nav>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

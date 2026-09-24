@@ -1,0 +1,42 @@
+# Example systemd unit for Home Network Inventory.
+#
+# Adjust:
+#   - User / Group          — the Linux user that owns the project directory
+#   - WorkingDirectory      — the absolute path to the project
+#   - ExecStart             — the absolute path to the venv's uvicorn
+#
+# Install:
+#   sudo cp docs/systemd.service.example /etc/systemd/system/hni.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now hni.service
+#   sudo systemctl status hni.service
+#
+# Logs:
+#   sudo journalctl -u hni.service -f
+
+[Unit]
+Description=Home Network Inventory
+After=network.target
+
+[Service]
+Type=simple
+User=hni
+Group=hni
+WorkingDirectory=/opt/hni
+
+# Bind to localhost only. In production, put nginx in front.
+# --proxy-headers makes uvicorn trust X-Forwarded-* from nginx on localhost.
+ExecStart=/opt/hni/venv/bin/uvicorn app.main:app \
+    --host 127.0.0.1 \
+    --port 8420 \
+    --proxy-headers \
+    --forwarded-allow-ips=127.0.0.1
+
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+

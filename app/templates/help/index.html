@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'ru' %}Справка{% else %}Help{% endif %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">
+        <i class="fa-solid fa-circle-question me-2"></i>{% if lang == 'ru' %}Справка{% else %}Help{% endif %}
+    </h1>
+</div>
+
+<div class="row">
+    {# ---------- Оглавление (sticky) ---------- #}
+    <div class="col-lg-3 d-none d-lg-block">
+        <nav class="sticky-top pt-2" style="top: 1rem;">
+            <div class="card info-card section-basic">
+                <div class="card-header">
+                    <i class="fa-solid fa-list-ul"></i>
+                    <span>{% if lang == 'ru' %}Содержание{% else %}Contents{% endif %}</span>
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-unstyled small mb-0">
+                        <li class="py-1"><a class="text-decoration-none" href="#about"><i class="fa-solid fa-circle-info me-1 text-muted"></i>{% if lang == 'ru' %}1. О приложении{% else %}1. About{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#login"><i class="fa-solid fa-right-to-bracket me-1 text-muted"></i>{% if lang == 'ru' %}2. Первый вход{% else %}2. First sign-in{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#sites"><i class="fa-solid fa-house me-1 text-muted"></i>{% if lang == 'ru' %}3. Дома{% else %}3. Homes{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#nav"><i class="fa-solid fa-bars me-1 text-muted"></i>{% if lang == 'ru' %}4. Навигация{% else %}4. Navigation{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#devices"><i class="fa-solid fa-desktop me-1 text-muted"></i>{% if lang == 'ru' %}5. Устройства{% else %}5. Devices{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#connections"><i class="fa-solid fa-link me-1 text-muted"></i>{% if lang == 'ru' %}6. Связи{% else %}6. Connections{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#reference"><i class="fa-solid fa-book me-1 text-muted"></i>{% if lang == 'ru' %}7. Справочники{% else %}7. Reference{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#users"><i class="fa-solid fa-users me-1 text-muted"></i>{% if lang == 'ru' %}8. Пользователи{% else %}8. Users{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#profile"><i class="fa-solid fa-user-gear me-1 text-muted"></i>{% if lang == 'ru' %}9. Профиль{% else %}9. Profile{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#permissions"><i class="fa-solid fa-shield-halved me-1 text-muted"></i>{% if lang == 'ru' %}10. Права и роли{% else %}10. Permissions{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#tips"><i class="fa-solid fa-lightbulb me-1 text-muted"></i>{% if lang == 'ru' %}11. Полезные советы{% else %}11. Tips{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#problems"><i class="fa-solid fa-triangle-exclamation me-1 text-muted"></i>{% if lang == 'ru' %}12. Проблемы{% else %}12. Problems{% endif %}</a></li>
+                        <li class="py-1"><a class="text-decoration-none" href="#hotkeys"><i class="fa-solid fa-keyboard me-1 text-muted"></i>{% if lang == 'ru' %}13. Клавиши{% else %}13. Hotkeys{% endif %}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    {# ---------- Контент ---------- #}
+    <div class="col-lg-9">
+        <div class="card info-card section-interfaces">
+            <div class="card-body">
+                {% if lang == 'ru' %}
+                    {% include "help/_ru.html" %}
+                {% else %}
+                    {% include "help/_en.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

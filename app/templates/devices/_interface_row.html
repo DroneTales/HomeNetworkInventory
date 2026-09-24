@@ -1,0 +1,93 @@
+<div class="interface-row border rounded p-2 mb-2">
+    <input type="hidden" name="interface_id" class="iface-id"
+           value="{{ iface.id if iface and iface.id else '' }}">
+
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-3">
+            <label class="form-label small mb-0">Name</label>
+            <input type="text" class="form-control form-control-sm iface-name"
+                   name="interface_name" value="{{ iface.name if iface else '' }}"
+                   placeholder="eth0" required>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label small mb-0">Type</label>
+            <select class="form-select form-select-sm iface-type" name="interface_type">
+                {% set cur_type = iface.type if iface else 'ethernet' %}
+                <option value="ethernet" {% if cur_type == 'ethernet' %}selected{% endif %}>ethernet</option>
+                <option value="wifi" {% if cur_type == 'wifi' %}selected{% endif %}>wifi</option>
+                <option value="wan" {% if cur_type == 'wan' %}selected{% endif %}>wan</option>
+                <option value="virtual" {% if cur_type == 'virtual' %}selected{% endif %}>virtual</option>
+                <option value="port" {% if cur_type == 'port' %}selected{% endif %}>port</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-4">
+            <label class="form-label small mb-0">MAC</label>
+            <input type="text" class="form-control form-control-sm iface-mac"
+                   name="interface_mac" value="{{ iface.mac if iface and iface.mac else '' }}"
+                   placeholder="AA:BB:CC:DD:EE:FF">
+        </div>
+        <div class="col-12 col-md-2 text-end">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-iface-btn">Remove</button>
+        </div>
+    </div>
+
+    {# Блок IP: показывается для всех типов, кроме 'port' #}
+    <div class="row g-2 mt-1 iface-ip-block {% if iface and iface.type == 'port' %}d-none{% endif %}">
+        <div class="col-12 col-md-3">
+            <label class="form-label small mb-0">IP address</label>
+            <input type="text" class="form-control form-control-sm iface-address"
+                   name="interface_address"
+                   value="{{ iface.address if iface and iface.address else '' }}"
+                   placeholder="192.168.1.10">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Mask</label>
+            <input type="text" class="form-control form-control-sm iface-mask"
+                   name="interface_mask"
+                   value="{{ iface.mask if iface and iface.mask else '255.255.255.0' }}">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Type</label>
+            {% set cur_at = iface.address_type if iface else 'static' %}
+            <select class="form-select form-select-sm iface-address-type" name="interface_address_type">
+                <option value="static" {% if cur_at == 'static' %}selected{% endif %}>static</option>
+                <option value="dhcp" {% if cur_at == 'dhcp' %}selected{% endif %}>dhcp</option>
+                <option value="external" {% if cur_at == 'external' %}selected{% endif %}>external</option>
+                <option value="reserved" {% if cur_at == 'reserved' %}selected{% endif %}>reserved</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Gateway</label>
+            <input type="text" class="form-control form-control-sm iface-gateway"
+                   name="interface_gateway"
+                   value="{{ iface.gateway if iface and iface.gateway else '' }}"
+                   placeholder="192.168.1.1">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">DNS</label>
+            <input type="text" class="form-control form-control-sm iface-dns"
+                   name="interface_dns"
+                   value="{{ iface.dns if iface and iface.dns else '' }}"
+                   placeholder="192.168.1.1">
+        </div>
+    </div>
+
+    {# Блок Wi-Fi: показывается только для типа 'wifi' #}
+    {% set cur_type = iface.type if iface else 'ethernet' %}
+    <div class="row g-2 mt-1 iface-wifi-block {% if cur_type != 'wifi' %}d-none{% endif %}">
+        <div class="col-12 col-md-6">
+            <label class="form-label small mb-0">Connected Wi-Fi network</label>
+            {% set cur_wifi = iface.connected_wifi_network_id if iface else '' %}
+            <select class="form-select form-select-sm iface-connected-wifi"
+                    name="interface_connected_wifi">
+                <option value="">—</option>
+                {% for w in all_wifi_networks %}
+                <option value="{{ w.id }}"
+                        {% if cur_wifi and cur_wifi|string == w.id|string %}selected{% endif %}>
+                    {{ w.ssid }}{% if w.band %} ({{ w.band }}){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>

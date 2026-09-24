@@ -1,0 +1,58 @@
+<div class="service-row border rounded p-2 mb-2">
+    <input type="hidden" name="service_id" class="service-id"
+           value="{{ svc.id if svc and svc.id else '' }}">
+
+    <div class="row g-2 align-items-end">
+        <div class="col-6 col-md-3">
+            <label class="form-label small mb-0">Name</label>
+            <input type="text" class="form-control form-control-sm service-name"
+                   name="service_name"
+                   value="{{ svc.name if svc else '' }}"
+                   placeholder="HomeBridge" maxlength="100">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Protocol</label>
+            <select class="form-select form-select-sm service-protocol" name="service_protocol">
+                <option value="">—</option>
+                {% set cur_p = svc.protocol if svc and svc.protocol else '' %}
+                <option value="http" {% if cur_p == 'http' %}selected{% endif %}>http</option>
+                <option value="https" {% if cur_p == 'https' %}selected{% endif %}>https</option>
+                <option value="rtsp" {% if cur_p == 'rtsp' %}selected{% endif %}>rtsp</option>
+                <option value="ssh" {% if cur_p == 'ssh' %}selected{% endif %}>ssh</option>
+                <option value="other" {% if cur_p == 'other' %}selected{% endif %}>other</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-1">
+            <label class="form-label small mb-0">Port</label>
+            <input type="number" class="form-control form-control-sm service-port"
+                   name="service_port"
+                   value="{{ svc.port if svc and svc.port else '' }}"
+                   min="1" max="65535">
+        </div>
+        <div class="col-12 col-md-4">
+            <label class="form-label small mb-0">URL</label>
+            <input type="text" class="form-control form-control-sm service-url"
+                   name="service_url"
+                   value="{{ svc.url if svc and svc.url else '' }}"
+                   placeholder="http://192.168.1.13" maxlength="255">
+        </div>
+        <div class="col-6 col-md-2 text-end">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-service-btn">Remove</button>
+        </div>
+        <div class="col-12">
+            <label class="form-label small mb-0">Path</label>
+            <input type="text" class="form-control form-control-sm service-path"
+                   name="service_path"
+                   value="{{ svc.path if svc and svc.path else '' }}"
+                   placeholder="/api/v1" maxlength="255">
+        </div>
+        <div class="col-12">
+            <label class="form-label small mb-0">Description</label>
+            <input type="text" class="form-control form-control-sm service-description"
+                   name="service_description"
+                   value="{{ svc.description if svc and svc.description else '' }}"
+                   maxlength="255">
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,59 @@
+<div class="dhcp-row border rounded p-2 mb-2">
+    <input type="hidden" name="dhcp_id" class="dhcp-id"
+           value="{{ pool.id if pool and pool.id else '' }}">
+
+    <div class="row g-2 align-items-end">
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Name</label>
+            <input type="text" class="form-control form-control-sm dhcp-name"
+                   name="dhcp_name" value="{{ pool.name if pool and pool.name else '' }}"
+                   placeholder="Fixed">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Type</label>
+            {% set cur_type = pool.type if pool else 'dynamic' %}
+            <select class="form-select form-select-sm dhcp-type" name="dhcp_type">
+                <option value="dynamic" {% if cur_type == 'dynamic' %}selected{% endif %}>dynamic</option>
+                <option value="fixed" {% if cur_type == 'fixed' %}selected{% endif %}>fixed</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Start IP</label>
+            <input type="text" class="form-control form-control-sm dhcp-start-ip"
+                   name="dhcp_start_ip"
+                   value="{{ pool.start_ip if pool and pool.start_ip else '' }}"
+                   placeholder="192.168.1.20">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">End IP</label>
+            <input type="text" class="form-control form-control-sm dhcp-end-ip"
+                   name="dhcp_end_ip"
+                   value="{{ pool.end_ip if pool and pool.end_ip else '' }}"
+                   placeholder="192.168.1.199">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">Gateway</label>
+            <input type="text" class="form-control form-control-sm dhcp-gateway"
+                   name="dhcp_gateway"
+                   value="{{ pool.gateway if pool and pool.gateway else '' }}"
+                   placeholder="192.168.1.1">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">DNS</label>
+            <input type="text" class="form-control form-control-sm dhcp-dns"
+                   name="dhcp_dns"
+                   value="{{ pool.dns if pool and pool.dns else '' }}"
+                   placeholder="192.168.1.1">
+        </div>
+        <div class="col-12 col-md-10">
+            <label class="form-label small mb-0">Description</label>
+            <input type="text" class="form-control form-control-sm dhcp-description"
+                   name="dhcp_description"
+                   value="{{ pool.description if pool and pool.description else '' }}">
+        </div>
+        <div class="col-12 col-md-2 text-end">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-dhcp-btn">Remove</button>
+        </div>
+    </div>
+</div>
+

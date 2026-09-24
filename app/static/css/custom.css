@@ -1,0 +1,115 @@
+/* ============================================================
+   Custom styling for Home Network Inventory
+   ============================================================ */
+
+/* ---- Info cards with colored left border and icon ---- */
+
+.info-card {
+    border-left: 4px solid var(--section-color, #dee2e6);
+}
+
+.info-card .card-header {
+    background-color: var(--section-bg, transparent);
+    border-bottom: 1px solid var(--section-border, rgba(0, 0, 0, 0.125));
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.info-card .card-header i {
+    color: var(--section-color, inherit);
+    font-size: 1.05em;
+}
+
+.info-card .card-header .section-count {
+    color: var(--bs-secondary-color);
+    font-weight: 400;
+    font-size: 0.9em;
+    margin-left: 0.25rem;
+}
+
+/* ---- Section colors ---- */
+
+.section-basic {
+    --section-color: #6c757d;
+    --section-bg: rgba(108, 117, 125, 0.08);
+    --section-border: rgba(108, 117, 125, 0.2);
+}
+
+.section-interfaces {
+    --section-color: #0d6efd;
+    --section-bg: rgba(13, 110, 253, 0.08);
+    --section-border: rgba(13, 110, 253, 0.2);
+}
+
+.section-ports {
+    --section-color: #0dcaf0;
+    --section-bg: rgba(13, 202, 240, 0.1);
+    --section-border: rgba(13, 202, 240, 0.25);
+}
+
+.section-wifi {
+    --section-color: #6f42c1;
+    --section-bg: rgba(111, 66, 193, 0.08);
+    --section-border: rgba(111, 66, 193, 0.2);
+}
+
+.section-dhcp {
+    --section-color: #fd7e14;
+    --section-bg: rgba(253, 126, 20, 0.08);
+    --section-border: rgba(253, 126, 20, 0.2);
+}
+
+.section-credentials {
+    --section-color: #dc3545;
+    --section-bg: rgba(220, 53, 69, 0.08);
+    --section-border: rgba(220, 53, 69, 0.2);
+}
+
+.section-services {
+    --section-color: #198754;
+    --section-bg: rgba(25, 135, 84, 0.08);
+    --section-border: rgba(25, 135, 84, 0.2);
+}
+
+.section-connections {
+    --section-color: #6610f2;
+    --section-bg: rgba(102, 16, 242, 0.08);
+    --section-border: rgba(102, 16, 242, 0.2);
+}
+
+.section-remarks {
+    --section-color: #ffc107;
+    --section-bg: rgba(255, 193, 7, 0.12);
+    --section-border: rgba(255, 193, 7, 0.3);
+}
+
+/* Dark theme tweaks: softer backgrounds */
+[data-bs-theme="dark"] .section-basic,
+[data-bs-theme="dark"] .section-interfaces,
+[data-bs-theme="dark"] .section-ports,
+[data-bs-theme="dark"] .section-wifi,
+[data-bs-theme="dark"] .section-dhcp,
+[data-bs-theme="dark"] .section-credentials,
+[data-bs-theme="dark"] .section-services,
+[data-bs-theme="dark"] .section-connections,
+[data-bs-theme="dark"] .section-remarks {
+    --section-bg: rgba(255, 255, 255, 0.04);
+    --section-border: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Table headers with subtle icon spacing ---- */
+
+.table thead th i {
+    color: var(--bs-secondary-color);
+    margin-right: 0.25rem;
+    font-weight: 400;
+}
+
+/* ---- Mobile cards: same accent as info-card ---- */
+
+.mobile-card {
+    border-left: 4px solid var(--section-color, #dee2e6);
+}
+

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Edit user{% else %}Add user{% endif %}{% endblock %}
+
+{% block content %}
+{% set fd = form_data or {} %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">{% if is_edit %}Edit user{% else %}Add user{% endif %}</h1>
+    <a href="/users" class="btn btn-outline-secondary">{{ t('common.cancel') }}</a>
+</div>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">{{ error }}</div>
+{% endif %}
+
+{# ---------- Основная форма пользователя ---------- #}
+<form method="post" action="{{ form_action }}" id="user-form">
+    <div class="card info-card section-basic mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="username" class="form-label">Username *</label>
+                    <input type="text" class="form-control" id="username" name="username"
+                           value="{{ fd.username or '' }}" required maxlength="100">
+                </div>
+
+                {% if not is_edit %}
+                <div class="col-12 col-md-6">
+                    <label for="password" class="form-label">Password *</label>
+                    <input type="password" class="form-control" id="password" name="password"
+                           required autocomplete="new-password">
+                    <div class="form-text">Minimum 5 characters is recommended.</div>
+                </div>
+                {% endif %}
+
+                <div class="col-12 col-md-6">
+                    <label for="role" class="form-label">Role</label>
+                    {% set cur_role = fd.role or 'user' %}
+                    <select class="form-select" id="role" name="role">
+                        <option value="user" {% if cur_role == 'user' %}selected{% endif %}>user</option>
+                        <option value="admin" {% if cur_role == 'admin' %}selected{% endif %}>admin</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="language" class="form-label">Language</label>
+                    {% set cur_lang = fd.language or 'en' %}
+                    <select class="form-select" id="language" name="language">
+                        <option value="en" {% if cur_lang == 'en' %}selected{% endif %}>English</option>
+                        <option value="ru" {% if cur_lang == 'ru' %}selected{% endif %}>Русский</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="theme" class="form-label">Theme</label>
+                    {% set cur_theme = fd.theme or 'auto' %}
+                    <select class="form-select" id="theme" name="theme">
+                        <option value="auto" {% if cur_theme == 'auto' %}selected{% endif %}>Auto</option>
+                        <option value="light" {% if cur_theme == 'light' %}selected{% endif %}>Light</option>
+                        <option value="dark" {% if cur_theme == 'dark' %}selected{% endif %}>Dark</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                               {% if fd.is_active is not defined or fd.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">Active</label>
+                    </div>
+                    {% if not is_edit %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="must_change_password"
+                               name="must_change_password"
+                               {% if fd.must_change_password %}checked{% endif %}>
+                        <label class="form-check-label" for="must_change_password">
+                            Must change password on next login
+                        </label>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card info-card section-interfaces mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Permissions (only for role=user)</span>
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="can_edit" name="can_edit"
+                       {% if fd.can_edit %}checked{% endif %}>
+                <label class="form-check-label" for="can_edit">
+                    Can edit devices and connections
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="can_view_passwords"
+                       name="can_view_passwords"
+                       {% if fd.can_view_passwords %}checked{% endif %}>
+                <label class="form-check-label" for="can_view_passwords">
+                    Can view device passwords
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="can_change_passwords"
+                       name="can_change_passwords"
+                       {% if fd.can_change_passwords %}checked{% endif %}>
+                <label class="form-check-label" for="can_change_passwords">
+                    Can change existing device passwords
+                </label>
+            </div>
+            <div class="form-text mt-2">
+                For role=admin, all permissions are implied and these flags are ignored.
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <a href="/users" class="btn btn-outline-secondary">{{ t('common.cancel') }}</a>
+        <button type="submit" class="btn btn-primary">{{ t('common.save') }}</button>
+    </div>
+</form>
+
+{# ---------- Homes (вне основной формы, чтобы не было вложенных форм) ---------- #}
+{% if is_edit and target_user and target_user.role != 'admin' %}
+<div class="card info-card section-ports mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-house"></i>
+        <span>Homes</span>
+        <span class="section-count">({{ assigned_sites|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if assigned_sites %}
+        <div class="table-responsive mb-3">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in assigned_sites %}
+                <tr>
+                    <td>
+                        <i class="fa-solid fa-house me-1 text-muted"></i>{{ s.name }}
+                    </td>
+                    <td>{{ s.address or '—' }}</td>
+                    <td class="text-end">
+                        <form method="post" action="/users/{{ target_user.id }}/sites/{{ s.id }}/remove"
+                              class="d-inline"
+                              onsubmit="return confirm('Remove home &quot;{{ s.name }}&quot; from this user?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fa-solid fa-xmark"></i> Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-muted small mb-3">
+            No homes assigned yet. This user will not see any devices until a home is assigned.
+        </div>
+        {% endif %}
+
+        {% set available = all_sites | rejectattr('id', 'in', assigned_sites | map(attribute='id') | list) | list %}
+        {% if available %}
+        <form method="post" action="/users/{{ target_user.id }}/sites/add"
+              class="row g-2 align-items-end">
+            <div class="col-12 col-md-6">
+                <label for="site_id" class="form-label small mb-0">Assign a home</label>
+                <select class="form-select form-select-sm" id="site_id" name="site_id" required>
+                    <option value="">—</option>
+                    {% for s in available %}
+                    <option value="{{ s.id }}">
+                        {{ s.name }}{% if s.address %} — {{ s.address }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <button type="submit" class="btn btn-sm btn-primary w-100">
+                    <i class="fa-solid fa-plus me-1"></i>Assign
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <div class="text-muted small">
+            All available homes are already assigned to this user.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% elif is_edit and target_user and target_user.role == 'admin' %}
+<div class="card info-card section-ports mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-house"></i>
+        <span>Homes</span>
+    </div>
+    <div class="card-body">
+        <div class="text-muted small">
+            Admins always have access to all homes. Assignment is not required.
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

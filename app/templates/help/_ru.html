@@ -1,0 +1,323 @@
+{# Русская справка. Подключается из help/index.html по lang='ru'. #}
+
+<section id="about" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-circle-info me-2 text-primary"></i>1. О приложении</h2>
+    <p><strong>Home Network Inventory</strong> — веб-приложение для учёта устройств домашней сети. Оно хранит информацию об устройствах, их сетевых интерфейсах, IP-адресах, Wi-Fi-сетях, портах, логинах и связях между устройствами.</p>
+    <p>Приложение поддерживает <strong>несколько домов</strong> (квартира, загородный дом, офис — любое количество). Каждый дом имеет свой изолированный инвентарь: устройства, подсети, комнаты и связи не пересекаются между домами.</p>
+    <p>Все изменения сохраняются в базе данных на Raspberry Pi. Доступ — только после входа.</p>
+</section>
+
+<section id="login" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-right-to-bracket me-2 text-primary"></i>2. Первый вход</h2>
+    <p>Открой адрес приложения, введи <strong>Username</strong> и <strong>Password</strong> и нажми <strong>Sign in</strong>.</p>
+    <p>При первом входе или после сброса пароля администратором приложение <strong>принудительно</strong> попросит сменить пароль. Заполни три поля — текущий, новый, подтверждение — и нажми <strong>Save</strong>.</p>
+    <p>Выход — кнопка <strong>Logout</strong> в правом верхнем углу. Сессия автоматически истекает после длительного бездействия.</p>
+</section>
+
+<section id="sites" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-house me-2 text-primary"></i>3. Дома</h2>
+    <p>Приложение поддерживает работу с несколькими домами. У каждого дома — свой набор устройств, локаций, сетей и связей.</p>
+
+    <h3 class="h6 mt-3">3.1. Выбор дома после входа</h3>
+    <p>После входа, если доступно несколько домов, показывается страница <strong>Choose a home</strong> с карточками домов. На каждой карточке — название, адрес и кнопка <strong>Enter</strong> для входа.</p>
+    <p>Если у пользователя доступен ровно один дом, приложение автоматически переходит в него, минуя страницу выбора.</p>
+
+    <h3 class="h6 mt-3">3.2. Работа в выбранном доме</h3>
+    <p>Выбранный дом отображается в шапке рядом с именем пользователя. Все действия (просмотр, создание, редактирование) происходят в контексте этого дома.</p>
+    <p>Чтобы вернуться к списку домов и выбрать другой — нажми <strong>Switch home</strong> в шапке.</p>
+
+    <h3 class="h6 mt-3">3.3. Создание и редактирование домов</h3>
+    <p>Создавать, редактировать и удалять дома может <strong>только администратор</strong>. На странице <strong>Choose a home</strong> для админа доступна кнопка <strong>Add home</strong>, а на карточках — кнопки <strong>Edit</strong> и <strong>Delete</strong>.</p>
+    <p>При создании дома задаются:</p>
+    <ul>
+        <li><strong>Name</strong> — название (обязательно, уникальное).</li>
+        <li><strong>Address</strong> — адрес или местоположение (опционально).</li>
+        <li><strong>Photo</strong> — фотография дома (JPEG или PNG, до 2 МБ). Показывается на карточке.</li>
+        <li><strong>Active</strong> — галка, дом доступен для выбора.</li>
+    </ul>
+    <p><strong>Удалить дом можно только если он пуст</strong> — в нём нет устройств, локаций и сетей. Сначала перенеси или удали всё содержимое.</p>
+
+    <h3 class="h6 mt-3">3.4. Назначение пользователей на дома</h3>
+    <p>Обычные пользователи видят только <strong>назначенные им дома</strong>. Если пользователь не назначен ни на один дом, он не увидит никаких устройств — только сообщение о необходимости обратиться к администратору.</p>
+    <p>Назначение делается в форме редактирования пользователя (<strong>Users</strong> → <strong>Edit</strong>):</p>
+    <ul>
+        <li>В блоке <strong>Homes</strong> показан список назначенных домов с кнопкой <strong>Remove</strong>.</li>
+        <li>Ниже — выпадающий список неназначенных домов и кнопка <strong>Assign</strong>, чтобы добавить дом.</li>
+        <li>Администратору дома назначать не нужно — он всегда видит все.</li>
+    </ul>
+</section>
+
+<section id="nav" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-bars me-2 text-primary"></i>4. Навигация</h2>
+    <p>В верхней панели — разделы:</p>
+    <ul>
+        <li><strong>Devices</strong> — устройства текущего дома (главный раздел).</li>
+        <li><strong>Connections</strong> — связи между устройствами текущего дома.</li>
+        <li><strong>Reference</strong> — справочники. Только для пользователей с правом редактирования.</li>
+        <li><strong>Users</strong> — управление пользователями приложения. Только для admin.</li>
+        <li><strong>Profile</strong> — свой профиль: язык, тема, смена пароля.</li>
+        <li><strong>Help</strong> — эта справка.</li>
+    </ul>
+    <p>Разделы <strong>Devices</strong>, <strong>Connections</strong> и <strong>Reference</strong> появляются в шапке только когда дом выбран. Справа — бейдж выбранного дома, кнопка <strong>Switch home</strong>, имя пользователя и <strong>Logout</strong>.</p>
+    <p>На мобильном меню сворачивается в «гамбургер».</p>
+</section>
+
+<section id="devices" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-desktop me-2 text-primary"></i>5. Устройства</h2>
+
+    <h3 class="h6 mt-3">5.1. Список устройств</h3>
+    <p>Показывает все устройства <strong>текущего дома</strong> в виде таблицы (на десктопе) или карточек (на телефоне). Колонки: Hostname, Name, Type, Vendor, Model, Location, Local IP, Gateway, MAC, Actions.</p>
+    <p>Устройства отсортированы <strong>по IP-адресу</strong>. Устройства без IP — в конце. Неактивные показываются серым с бейджем <code>inactive</code>.</p>
+
+    <h3 class="h6 mt-3">5.2. Создание устройства</h3>
+    <p>Кнопка <strong>Add device</strong> в правом верхнем углу. Форма разбита на цветные блоки.</p>
+
+    <p><strong>Basic (серый):</strong></p>
+    <ul>
+        <li><strong>Hostname</strong> — обязательно. Без пробелов, уникально <em>в пределах дома</em>.</li>
+        <li><strong>Human readable name</strong> — короткое понятное имя.</li>
+        <li><strong>Device type</strong> — тип из справочника. Тип может быть <em>активным</em> (должен иметь IP) или <em>пассивным</em> (хаб, неуправляемый свитч).</li>
+        <li><strong>Vendor</strong> и <strong>Model</strong> — производитель и модель. После выбора вендора список моделей обновляется автоматически.</li>
+        <li><strong>Location</strong> — где физически находится <em>в текущем доме</em>.</li>
+        <li><strong>Network</strong> — к какой подсети дома относится.</li>
+        <li><strong>Active</strong> — галка, если устройство работает.</li>
+    </ul>
+
+    <p><strong>Interfaces (синий):</strong></p>
+    <p>Сетевые интерфейсы устройства. Кнопка <strong>+ Add interface</strong> добавляет строку. Поля строки:</p>
+    <ul>
+        <li><strong>Name</strong> — <code>eth0</code>, <code>wan0</code>, <code>wlan0</code>. Обязательно.</li>
+        <li><strong>Type</strong> — <code>ethernet</code>, <code>wifi</code>, <code>wan</code>, <code>virtual</code>, <code>port</code>. Тип <code>port</code> — «тупой» порт без IP (для пассивных устройств).</li>
+        <li><strong>MAC</strong> — MAC-адрес. Может быть пустым для <code>static</code>, <strong>обязателен</strong> для <code>dhcp</code> и <code>reserved</code>.</li>
+        <li><strong>IP address</strong> — адрес. Для типа <code>port</code> не заполняется.</li>
+        <li><strong>Mask</strong> — маска подсети. Для <code>external</code> можно оставить пустой.</li>
+        <li><strong>Type</strong> (тип адреса):
+            <ul>
+                <li><code>static</code> — прописан вручную на устройстве. MAC не обязателен.</li>
+                <li><code>dhcp</code> — выдаётся автоматически. MAC обязателен.</li>
+                <li><code>reserved</code> — закреплён за MAC-адресом. MAC обязателен.</li>
+                <li><code>external</code> — внешний IP от провайдера. MAC, маска, шлюз не обязательны.</li>
+            </ul>
+        </li>
+        <li><strong>Gateway</strong> — шлюз. Если заполнен, должен быть в той же подсети, что и IP (кроме <code>external</code>).</li>
+        <li><strong>DNS</strong> — сервер имён. Обычно совпадает со шлюзом.</li>
+        <li><strong>Connected Wi-Fi network</strong> — только для интерфейса типа <code>wifi</code>. Выбор сети, к которой подключено устройство.</li>
+    </ul>
+    <p>Интерфейсов может быть <strong>несколько</strong> — например, LAN и WAN у роутера.</p>
+
+    <p><strong>Ports (голубой):</strong></p>
+    <p><strong>Доступно только при редактировании существующего устройства.</strong> Физические порты (разъёмы) на корпусе. Используются для связей.</p>
+    <ul>
+        <li><strong>Name</strong> — <code>WAN</code>, <code>LAN1</code>, <code>LAN2</code>. Обязательно, уникально в пределах устройства.</li>
+        <li><strong>Interface</strong> — на какой интерфейс работает порт. Обязательно.</li>
+        <li><strong>Description</strong> — короткое описание.</li>
+    </ul>
+    <p>Порт не появится, если у устройства ещё нет ни одного интерфейса. Сначала сохрани устройство с интерфейсами, потом открой редактирование и добавь порты.</p>
+
+    <p><strong>Wi-Fi networks (фиолетовый):</strong></p>
+    <p>Сети, которые <strong>раздаёт</strong> это устройство (роутер, точка доступа).</p>
+    <ul>
+        <li><strong>SSID</strong> — имя сети. Обязательно.</li>
+        <li><strong>Band</strong> — диапазон: <code>2.4</code>, <code>5</code>, <code>6</code>.</li>
+        <li><strong>Encryption</strong> — тип шифрования.</li>
+        <li><strong>Password</strong> — пароль. Хранится в открытом виде.</li>
+        <li><strong>Guest</strong> — это гостевая сеть.</li>
+    </ul>
+    <p>Одна точка доступа может раздавать <strong>несколько</strong> сетей.</p>
+
+    <p><strong>DHCP pools (оранжевый):</strong></p>
+    <p>Пулы адресов, которые <strong>выдаёт</strong> это устройство (модем, роутер).</p>
+    <ul>
+        <li><strong>Name</strong> — имя пула.</li>
+        <li><strong>Type</strong> — <code>dynamic</code> или <code>fixed</code>.</li>
+        <li><strong>Start IP</strong>, <strong>End IP</strong> — диапазон.</li>
+        <li><strong>Gateway</strong>, <strong>DNS</strong> — параметры для клиентов.</li>
+        <li><strong>Description</strong> — описание.</li>
+    </ul>
+    <p>Если новый <code>static</code> IP устройства попадёт в диапазон пула — появится <strong>жёлтый баннер</strong> после сохранения. Это предупреждение, а не ошибка.</p>
+
+    <p><strong>Credentials (красный):</strong></p>
+    <p>Логины и пароли устройства.</p>
+    <ul>
+        <li><strong>Type</strong> — <code>admin</code>, <code>ssh</code>, <code>wifi</code>, <code>camera</code>, <code>matter</code>, <code>other</code>.</li>
+        <li><strong>Username</strong>, <strong>Password</strong> — учётные данные.</li>
+        <li><strong>Description</strong> — зачем нужен.</li>
+    </ul>
+    <p>Можно добавить несколько записей. Пароли показываются как <code>••••••••</code> с кнопкой <strong>show</strong> — но только если у тебя есть право <em>can_view_passwords</em>.</p>
+
+    <p><strong>Services (зелёный):</strong></p>
+    <p>Сервисы, работающие на устройстве (веб-интерфейсы, RTSP-потоки, HomeBridge и т.п.).</p>
+    <ul>
+        <li><strong>Name</strong>, <strong>Protocol</strong> (<code>http</code>, <code>https</code>, <code>rtsp</code>, <code>ssh</code>, <code>other</code>), <strong>Port</strong>.</li>
+        <li><strong>URL</strong> — полный адрес. Если начинается с <code>http://</code>, <code>https://</code> или <code>rtsp://</code> — станет кликабельным.</li>
+        <li><strong>Path</strong>, <strong>Description</strong>.</li>
+    </ul>
+
+    <p><strong>Remarks (жёлтый):</strong> свободный текст для всего, что не поместилось.</p>
+
+    <h3 class="h6 mt-3">5.3. Карточка устройства</h3>
+    <p>Клик по hostname в списке открывает карточку. Все данные — в цветных блоках. Кнопки сверху: <strong>Back</strong>, <strong>Edit</strong>, <strong>Delete</strong> (только admin).</p>
+
+    <h3 class="h6 mt-3">5.4. Редактирование</h3>
+    <p>Та же форма, что при создании, но с заполненными полями. Если удалить интерфейс, к которому привязаны порты и связи — они удалятся автоматически. Изменения применяются только после нажатия <strong>Save</strong>.</p>
+
+    <h3 class="h6 mt-3">5.5. Удаление</h3>
+    <p>Удаление устройства удаляет <strong>всё</strong>, что с ним связано: интерфейсы, IP, Wi-Fi, DHCP-пулы, credentials, services, порты, связи. <strong>Отменить нельзя.</strong></p>
+</section>
+
+<section id="connections" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-link me-2 text-primary"></i>6. Связи</h2>
+    <p>Раздел показывает все физические и логические связи между портами устройств <strong>текущего дома</strong>.</p>
+
+    <h3 class="h6 mt-3">6.1. Создание связи</h3>
+    <p>Кнопка <strong>Add connection</strong>. Сначала выбери <strong>устройство</strong>, потом <strong>порт</strong> этого устройства — в Source и в Target. В выпадающих списках только устройства и порты текущего дома.</p>
+    <p>Дополнительные поля: <strong>Type</strong> (<code>physical</code> или <code>logical</code>), <strong>Cable</strong> (цвет или тип), <strong>Description</strong>, <strong>Active</strong>.</p>
+
+    <h3 class="h6 mt-3">6.2. Ограничения</h3>
+    <ul>
+        <li>Source и Target не могут быть одним и тем же портом.</li>
+        <li>Связь A→B и B→A — <strong>одна и та же физическая связь</strong>. Дубликаты запрещены.</li>
+        <li>Оба порта должны быть из устройств <strong>одного дома</strong>. Межсайтовые связи не допускаются.</li>
+        <li>Двойной клик по Delete безопасен — второй запрос тихо проигнорируется.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">6.3. Связи в карточке устройства</h3>
+    <p>Блок <strong>Connections</strong> в карточке показывает:</p>
+    <ul>
+        <li><span class="text-success"><i class="fa-solid fa-arrow-right"></i> outgoing</span> — связи, где это устройство источник.</li>
+        <li><span class="text-primary"><i class="fa-solid fa-arrow-left"></i> incoming</span> — связи, где это устройство назначение.</li>
+    </ul>
+</section>
+
+<section id="reference" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-book me-2 text-primary"></i>7. Справочники</h2>
+    <p>Раздел <strong>Reference</strong> — список справочников. Доступен пользователям с правом редактирования. Часть справочников привязана к дому, часть — глобальные.</p>
+
+    <p><strong>Привязаны к дому</strong> (доступны всем с правом <em>Can edit</em>):</p>
+    <ul>
+        <li><strong>Locations</strong> — комнаты (Зал, Спальня, Кухня, Стойка). У каждого дома свой набор. Одинаковые названия в разных домах разрешены.</li>
+        <li><strong>Networks</strong> — подсети дома с адресом, маской, шлюзом, VLAN. У каждого дома свои.</li>
+    </ul>
+
+    <p><strong>Глобальные, только для администратора</strong> (общие для всех домов):</p>
+    <ul>
+        <li><strong>Device Types</strong> — типы устройств. <strong>Active = да</strong> — «умное» устройство (должно иметь IP). <strong>Active = нет</strong> — пассивное (хаб, свитч без управления), не должно иметь IP.</li>
+        <li><strong>Vendors</strong> — производители.</li>
+        <li><strong>Models</strong> — модели. Привязаны к вендору.</li>
+        <li><strong>Credential Types</strong> — типы учётных данных.</li>
+    </ul>
+
+    <p><strong>Что важно:</strong></p>
+    <ul>
+        <li>Удаление невозможно, если на запись ссылаются устройства. Появится красный баннер с объяснением.</li>
+        <li>Названия Locations и Networks уникальны <em>в пределах дома</em>, остальные — глобально.</li>
+    </ul>
+</section>
+
+<section id="users" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-users me-2 text-primary"></i>8. Пользователи</h2>
+    <p>Раздел <strong>Users</strong> доступен только администратору.</p>
+
+    <h3 class="h6 mt-3">8.1. Роли</h3>
+    <ul>
+        <li><strong>admin</strong> — полный доступ, включая управление пользователями, домами и удаление устройств. Видит все дома.</li>
+        <li><strong>user</strong> — обычный пользователь с тремя флагами прав. Видит только назначенные дома.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.2. Три флага прав (для user)</h3>
+    <ul>
+        <li><strong>Can edit</strong> — создавать, редактировать, удалять устройства и связи.</li>
+        <li><strong>Can view passwords</strong> — видеть пароли устройств.</li>
+        <li><strong>Can change passwords</strong> — менять пароли существующих устройств.</li>
+    </ul>
+    <p><strong>Запрещённые комбинации:</strong></p>
+    <ul>
+        <li>Нельзя дать <em>Can change passwords</em>, если снят <em>Can edit</em>.</li>
+        <li>Нельзя дать <em>Can change passwords</em>, если снят <em>Can view passwords</em>.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.3. Назначение домов</h3>
+    <p>В форме редактирования пользователя есть блок <strong>Homes</strong>:</p>
+    <ul>
+        <li>Таблица назначенных домов с кнопкой <strong>Remove</strong>.</li>
+        <li>Выпадающий список неназначенных домов и кнопка <strong>Assign</strong>, чтобы добавить.</li>
+        <li>Если пользователь не назначен ни на один дом, он не увидит никаких устройств.</li>
+        <li>Для <em>admin</em> блок показывает сообщение о том, что администратор видит все дома.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.4. Действия</h3>
+    <ul>
+        <li><strong>Add user</strong> — создать пользователя.</li>
+        <li><strong>Edit</strong> — изменить имя, роль, права, язык, тему, назначение домов.</li>
+        <li><strong>Reset password</strong> — сбросить пароль и (опционально) обязать сменить при следующем входе.</li>
+        <li><strong>Delete</strong> — удалить пользователя. <strong>Default Admin удалить нельзя.</strong></li>
+    </ul>
+</section>
+
+<section id="profile" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-user-gear me-2 text-primary"></i>9. Профиль</h2>
+    <p>Раздел <strong>Profile</strong> — твоя личная страница.</p>
+    <ul>
+        <li><strong>Account</strong> — имя, роль, права.</li>
+        <li><strong>Preferences</strong> — <em>Language</em> (English/Русский) и <em>Theme</em> (Auto/Light/Dark). Применяются сразу после Save.</li>
+        <li><strong>Change password</strong> — смена своего пароля (текущий + новый + подтверждение).</li>
+    </ul>
+</section>
+
+<section id="permissions" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>10. Права и роли</h2>
+    <p><strong>Admin</strong> видит всё и может всё.</p>
+    <p><strong>User</strong> видит:</p>
+    <ul>
+        <li>Только назначенные ему дома.</li>
+        <li>Список устройств и карточки этих домов — всегда.</li>
+        <li>Связи — всегда.</li>
+        <li>Справочники — если есть <em>Can edit</em>.</li>
+        <li>Раздел Users — <strong>никогда</strong>.</li>
+    </ul>
+    <p>Кнопки Add/Edit/Delete показываются только при праве <em>Can edit</em>. Пароли видны только при <em>Can view passwords</em>. Поле пароля в форме редактирования доступно только при <em>Can change passwords</em>.</p>
+</section>
+
+<section id="tips" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-lightbulb me-2 text-primary"></i>11. Полезные советы</h2>
+    <ul>
+        <li><strong>Сначала дома.</strong> Перед созданием устройств заведи дом (если у тебя их несколько). Админ создаёт дома на странице выбора.</li>
+        <li><strong>Потом справочники.</strong> Внутри дома заполни локации и сети. Глобальные справочники (типы, вендоры, модели, credential-типы) — один раз для всех домов.</li>
+        <li><strong>Порты — при редактировании.</strong> Создай устройство с интерфейсами, сохрани, открой Edit, добавь порты.</li>
+        <li><strong>Тип IP-адреса:</strong> <code>static</code> — вручную, <code>dhcp</code> — автоматически, <code>reserved</code> — за MAC, <code>external</code> — от провайдера.</li>
+        <li><strong>Внешний IP модема</strong> добавляется как отдельный интерфейс типа <code>wan</code> с типом адреса <code>external</code>. Маска, шлюз, MAC можно не указывать.</li>
+        <li><strong>Wi-Fi: раздача vs подключение.</strong> Сети, которые устройство раздаёт — в блоке Wi-Fi networks. Подключение — в интерфейсе типа <code>wifi</code> через поле Connected Wi-Fi network.</li>
+        <li><strong>Предупреждение про DHCP.</strong> Если <code>static</code> IP попал в диапазон пула — жёлтый баннер. Это не ошибка, но проверь на конфликт.</li>
+        <li><strong>Уникальность в доме.</strong> Hostname, Local IP, имена локаций и сетей уникальны в пределах дома. MAC — глобально.</li>
+    </ul>
+</section>
+
+<section id="problems" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-triangle-exclamation me-2 text-primary"></i>12. Возможные проблемы</h2>
+
+    <p><strong>«Safari не может найти страницу».</strong> Редко. Это особенность Safari с долгими паузами между открытием формы и сохранением. Нажми Back и сохрани заново — сработает.</p>
+
+    <p><strong>«Internal Server Error».</strong> Ошибка на стороне сервера. Сообщи администратору.</p>
+
+    <p><strong>Не вижу ни одного дома.</strong> Обратись к администратору — тебя нужно назначить хотя бы на один дом.</p>
+
+    <p><strong>Не могу удалить дом.</strong> Удалить можно только пустой дом. Удали или перенеси все устройства, локации и сети из него.</p>
+
+    <p><strong>Не могу удалить запись справочника.</strong> На неё ссылаются устройства. Сначала убери ссылки.</p>
+
+    <p><strong>Забыл пароль.</strong> Пароль приложения может сбросить admin через раздел Users. Пароли устройств хранятся в открытом виде в карточке — их видно.</p>
+
+    <p><strong>IP-адрес не сохраняется.</strong> Проверь: адрес уникален <em>в пределах дома</em>, шлюз в той же подсети (кроме <code>external</code>), MAC заполнен для <code>dhcp</code> и <code>reserved</code>, интерфейс не типа <code>port</code>.</p>
+
+    <p><strong>Связь не создаётся.</strong> Проверь: Source и Target — разные порты, такая связь ещё не существует, оба порта из устройств одного дома, у обоих устройств есть порты.</p>
+</section>
+
+<section id="hotkeys" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-keyboard me-2 text-primary"></i>13. Горячие клавиши</h2>
+    <ul>
+        <li><strong>Cmd+Shift+R</strong> (Mac) / <strong>Ctrl+Shift+R</strong> (Windows) — жёсткая перезагрузка страницы. Полезно после обновлений.</li>
+        <li><strong>Cmd+Shift+N</strong> (Safari) — приватное окно. Помогает, если браузер кэширует старое.</li>
+        <li>Показать пароль — кнопка <strong>show</strong> рядом с <code>••••••••</code>.</li>
+    </ul>
+</section>
+

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('nav.profile') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">{{ t('nav.profile') }}</h1>
+</div>
+
+{% if warning %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ warning }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-danger" role="alert">{{ error }}</div>
+{% endif %}
+
+{# ---------- Информация ---------- #}
+<div class="card mb-3">
+    <div class="card-header">Account</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Username</dt>
+            <dd class="col-sm-9">{{ current_user.username }}</dd>
+
+            <dt class="col-sm-3">Role</dt>
+            <dd class="col-sm-9">
+                {% if current_user.role == 'admin' %}
+                <span class="badge bg-primary">admin</span>
+                {% else %}
+                user
+                {% endif %}
+            </dd>
+
+            {% if current_user.role != 'admin' %}
+            <dt class="col-sm-3">Can edit</dt>
+            <dd class="col-sm-9">{% if current_user.can_edit %}yes{% else %}no{% endif %}</dd>
+
+            <dt class="col-sm-3">View passwords</dt>
+            <dd class="col-sm-9">{% if current_user.can_view_passwords %}yes{% else %}no{% endif %}</dd>
+
+            <dt class="col-sm-3">Change passwords</dt>
+            <dd class="col-sm-9">{% if current_user.can_change_passwords %}yes{% else %}no{% endif %}</dd>
+            {% endif %}
+        </dl>
+    </div>
+</div>
+
+{# ---------- Preferences ---------- #}
+<div class="card mb-3">
+    <div class="card-header">Preferences</div>
+    <div class="card-body">
+        <form method="post" action="/profile/preferences">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="language" class="form-label">Language</label>
+                    <select class="form-select" id="language" name="language">
+                        <option value="en" {% if current_user.language == 'en' %}selected{% endif %}>English</option>
+                        <option value="ru" {% if current_user.language == 'ru' %}selected{% endif %}>Русский</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="theme" class="form-label">Theme</label>
+                    <select class="form-select" id="theme" name="theme">
+                        <option value="auto" {% if current_user.theme == 'auto' %}selected{% endif %}>Auto</option>
+                        <option value="light" {% if current_user.theme == 'light' %}selected{% endif %}>Light</option>
+                        <option value="dark" {% if current_user.theme == 'dark' %}selected{% endif %}>Dark</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">{{ t('common.save') }}</button>
+        </form>
+    </div>
+</div>
+
+{# ---------- Change password ---------- #}
+<div class="card mb-3">
+    <div class="card-header">{{ t('auth.change_password') }}</div>
+    <div class="card-body">
+        <form method="post" action="/profile/change-password">
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <label for="old_password" class="form-label">{{ t('auth.old_password') }}</label>
+                    <input type="password" class="form-control" id="old_password" name="old_password"
+                           required autocomplete="current-password">
+                </div>
+                <div class="col-12 col-md-4">
+                    <label for="new_password" class="form-label">{{ t('auth.new_password') }}</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password"
+                           required autocomplete="new-password">
+                </div>
+                <div class="col-12 col-md-4">
+                    <label for="confirm_password" class="form-label">{{ t('auth.confirm_password') }}</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+                           required autocomplete="new-password">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">{{ t('auth.change_password') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

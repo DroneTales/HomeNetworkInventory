@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('auth.sign_in') }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-8 col-md-5 col-lg-4">
+        <h1 class="mb-4">{{ t('auth.sign_in') }}</h1>
+
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/login">
+            <div class="mb-3">
+                <label for="username" class="form-label">{{ t('auth.username') }}</label>
+                <input type="text" class="form-control" id="username" name="username"
+                       value="{{ username or '' }}" required autofocus autocomplete="username">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">{{ t('auth.password') }}</label>
+                <input type="password" class="form-control" id="password" name="password"
+                       required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">{{ t('auth.sign_in') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

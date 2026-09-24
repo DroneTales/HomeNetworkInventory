@@ -1,0 +1,62 @@
+# Example nginx configuration for Home Network Inventory.
+#
+# This assumes:
+#   - the application runs on 127.0.0.1:8420 (see app/config.py)
+#   - you have a domain pointing to this server
+#   - you use Certbot for TLS (https://certbot.eff.org/)
+#
+# Replace `hni.example.com` with your real domain.
+#
+# Put this file as /etc/nginx/sites-available/hni.example.com
+# and symlink it:
+#   sudo ln -s /etc/nginx/sites-available/hni.example.com /etc/nginx/sites-enabled/
+#
+# Then, to obtain a certificate:
+#   sudo certbot --nginx -d hni.example.com
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name hni.example.com;
+
+    # ACME challenge for Certbot
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    server_name hni.example.com;
+
+    # Keep-alive tuning. Disabling it for Safari avoids rare but annoying
+    # "Safari cannot open the page" errors after form submissions.
+    keepalive_disable safari;
+    keepalive_timeout 30s;
+    keepalive_requests 100;
+
+    location / {
+        proxy_pass http://127.0.0.1:8420;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+        client_max_body_size 4m;
+        client_body_buffer_size 256k;
+    }
+
+    # --- The lines below are added by Certbot on first run ---
+    # listen 443 ssl; # managed by Certbot
+    # ssl_certificate     /etc/letsencrypt/live/hni.example.com/fullchain.pem; # managed by Certbot
+    # ssl_certificate_key /etc/letsencrypt/live/hni.example.com/privkey.pem;   # managed by Certbot
+    # include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;   # managed by Certbot
+}
+

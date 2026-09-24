@@ -1,0 +1,323 @@
+{# English help. Included by help/index.html when lang='en'. #}
+
+<section id="about" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-circle-info me-2 text-primary"></i>1. About</h2>
+    <p><strong>Home Network Inventory</strong> is a web application for tracking devices on a home network. It stores information about devices, their network interfaces, IP addresses, Wi-Fi networks, ports, credentials, and connections between devices.</p>
+    <p>The application supports <strong>multiple homes</strong> (an apartment, a country house, an office — any number). Each home has its own isolated inventory: devices, subnets, rooms, and connections do not cross between homes.</p>
+    <p>All changes are saved to a database on a Raspberry Pi. Access requires signing in.</p>
+</section>
+
+<section id="login" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-right-to-bracket me-2 text-primary"></i>2. First sign-in</h2>
+    <p>Open the application URL, enter your <strong>Username</strong> and <strong>Password</strong>, and click <strong>Sign in</strong>.</p>
+    <p>On the first sign-in, or after an administrator resets your password, the application will <strong>force</strong> you to change the password. Fill in three fields — current password, new password, confirmation — and click <strong>Save</strong>.</p>
+    <p>To sign out, use the <strong>Logout</strong> button in the top-right corner. The session expires automatically after a period of inactivity.</p>
+</section>
+
+<section id="sites" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-house me-2 text-primary"></i>3. Homes</h2>
+    <p>The application supports multiple homes. Each home has its own set of devices, locations, networks, and connections.</p>
+
+    <h3 class="h6 mt-3">3.1. Choosing a home after sign-in</h3>
+    <p>After signing in, if more than one home is available, the <strong>Choose a home</strong> page is shown with cards for each home. Each card has a name, an address, and an <strong>Enter</strong> button.</p>
+    <p>If a user has access to exactly one home, the application goes straight into it, skipping the selection page.</p>
+
+    <h3 class="h6 mt-3">3.2. Working in the selected home</h3>
+    <p>The selected home is shown in the header next to the username. All actions (viewing, creating, editing) happen in the context of that home.</p>
+    <p>To go back to the list of homes and pick another one — click <strong>Switch home</strong> in the header.</p>
+
+    <h3 class="h6 mt-3">3.3. Creating and editing homes</h3>
+    <p>Only an <strong>administrator</strong> can create, edit, and delete homes. On the <strong>Choose a home</strong> page, admins see an <strong>Add home</strong> button and <strong>Edit</strong> / <strong>Delete</strong> buttons on each card.</p>
+    <p>When creating a home you provide:</p>
+    <ul>
+        <li><strong>Name</strong> — required, unique.</li>
+        <li><strong>Address</strong> — optional.</li>
+        <li><strong>Photo</strong> — a picture of the home (JPEG or PNG, up to 2 MB). Shown on the card.</li>
+        <li><strong>Active</strong> — whether the home is selectable.</li>
+    </ul>
+    <p><strong>A home can be deleted only if it is empty</strong> — no devices, locations, or networks inside. Remove or move everything first.</p>
+
+    <h3 class="h6 mt-3">3.4. Assigning users to homes</h3>
+    <p>Regular users see only the homes they are <strong>assigned to</strong>. If a user is not assigned to any home, they see nothing — just a message suggesting they contact the administrator.</p>
+    <p>Assignment is done on the user edit page (<strong>Users</strong> → <strong>Edit</strong>):</p>
+    <ul>
+        <li>The <strong>Homes</strong> block shows the list of assigned homes with a <strong>Remove</strong> button.</li>
+        <li>Below is a dropdown of unassigned homes and an <strong>Assign</strong> button to add one.</li>
+        <li>Admins do not need to be assigned — they always see all homes.</li>
+    </ul>
+</section>
+
+<section id="nav" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-bars me-2 text-primary"></i>4. Navigation</h2>
+    <p>The top navigation bar has the following sections:</p>
+    <ul>
+        <li><strong>Devices</strong> — devices in the current home (the main section).</li>
+        <li><strong>Connections</strong> — links between devices in the current home.</li>
+        <li><strong>Reference</strong> — reference data. Only for users with edit rights.</li>
+        <li><strong>Users</strong> — application user management. Admin only.</li>
+        <li><strong>Profile</strong> — your profile: language, theme, password change.</li>
+        <li><strong>Help</strong> — this guide.</li>
+    </ul>
+    <p>The <strong>Devices</strong>, <strong>Connections</strong>, and <strong>Reference</strong> sections appear in the header only when a home is selected. On the right — a badge with the current home, a <strong>Switch home</strong> button, the username, and <strong>Logout</strong>.</p>
+    <p>On mobile, the menu collapses into a hamburger.</p>
+</section>
+
+<section id="devices" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-desktop me-2 text-primary"></i>5. Devices</h2>
+
+    <h3 class="h6 mt-3">5.1. Device list</h3>
+    <p>Shows all devices of the <strong>current home</strong> as a table (desktop) or cards (mobile). Columns: Hostname, Name, Type, Vendor, Model, Location, Local IP, Gateway, MAC, Actions.</p>
+    <p>Devices are sorted <strong>by IP address</strong>. Devices without an IP appear at the end. Inactive devices are greyed out with an <code>inactive</code> badge.</p>
+
+    <h3 class="h6 mt-3">5.2. Creating a device</h3>
+    <p>Use the <strong>Add device</strong> button in the top-right corner. The form is split into colour-coded blocks.</p>
+
+    <p><strong>Basic (grey):</strong></p>
+    <ul>
+        <li><strong>Hostname</strong> — required. No spaces, unique <em>within a home</em>.</li>
+        <li><strong>Human readable name</strong> — a short, friendly name.</li>
+        <li><strong>Device type</strong> — a type from the reference data. Types can be <em>active</em> (must have an IP) or <em>passive</em> (hub, unmanaged switch).</li>
+        <li><strong>Vendor</strong> and <strong>Model</strong> — manufacturer and model. After choosing a vendor, the model list is refreshed automatically.</li>
+        <li><strong>Location</strong> — where the device physically is <em>in this home</em>.</li>
+        <li><strong>Network</strong> — which subnet of the home it belongs to.</li>
+        <li><strong>Active</strong> — tick if the device is operational.</li>
+    </ul>
+
+    <p><strong>Interfaces (blue):</strong></p>
+    <p>Network interfaces of the device. The <strong>+ Add interface</strong> button adds a row. Row fields:</p>
+    <ul>
+        <li><strong>Name</strong> — <code>eth0</code>, <code>wan0</code>, <code>wlan0</code>. Required.</li>
+        <li><strong>Type</strong> — <code>ethernet</code>, <code>wifi</code>, <code>wan</code>, <code>virtual</code>, <code>port</code>. Type <code>port</code> is a "dumb" port with no IP (for passive devices).</li>
+        <li><strong>MAC</strong> — MAC address. Can be empty for <code>static</code>, but is <strong>required</strong> for <code>dhcp</code> and <code>reserved</code>.</li>
+        <li><strong>IP address</strong> — the address. Leave empty for type <code>port</code>.</li>
+        <li><strong>Mask</strong> — subnet mask. Can be empty for <code>external</code>.</li>
+        <li><strong>Type</strong> (address type):
+            <ul>
+                <li><code>static</code> — manually configured on the device. MAC optional.</li>
+                <li><code>dhcp</code> — assigned automatically. MAC required.</li>
+                <li><code>reserved</code> — bound to a MAC address. MAC required.</li>
+                <li><code>external</code> — external IP from the ISP. MAC, mask, gateway optional.</li>
+            </ul>
+        </li>
+        <li><strong>Gateway</strong> — if filled in, must be in the same subnet as the IP (except for <code>external</code>).</li>
+        <li><strong>DNS</strong> — name server. Usually the same as the gateway.</li>
+        <li><strong>Connected Wi-Fi network</strong> — only for interfaces of type <code>wifi</code>. Choose the network this device is connected to.</li>
+    </ul>
+    <p>A device can have <strong>several</strong> interfaces — for example, LAN and WAN on a router.</p>
+
+    <p><strong>Ports (cyan):</strong></p>
+    <p><strong>Available only when editing an existing device.</strong> Physical ports (sockets) on the device chassis. Used to define connections.</p>
+    <ul>
+        <li><strong>Name</strong> — <code>WAN</code>, <code>LAN1</code>, <code>LAN2</code>. Required, unique within a device.</li>
+        <li><strong>Interface</strong> — which interface this port maps to. Required.</li>
+        <li><strong>Description</strong> — short note.</li>
+    </ul>
+    <p>The port field will not appear until the device has at least one interface. Save the device with interfaces first, then open Edit and add ports.</p>
+
+    <p><strong>Wi-Fi networks (purple):</strong></p>
+    <p>Networks this device <strong>broadcasts</strong> (router, access point).</p>
+    <ul>
+        <li><strong>SSID</strong> — network name. Required.</li>
+        <li><strong>Band</strong> — <code>2.4</code>, <code>5</code>, <code>6</code>.</li>
+        <li><strong>Encryption</strong> — encryption type.</li>
+        <li><strong>Password</strong> — stored in plain text.</li>
+        <li><strong>Guest</strong> — this is a guest network.</li>
+    </ul>
+    <p>An access point can broadcast <strong>multiple</strong> networks.</p>
+
+    <p><strong>DHCP pools (orange):</strong></p>
+    <p>Address pools this device <strong>serves</strong> (modem, router).</p>
+    <ul>
+        <li><strong>Name</strong> — pool name.</li>
+        <li><strong>Type</strong> — <code>dynamic</code> or <code>fixed</code>.</li>
+        <li><strong>Start IP</strong>, <strong>End IP</strong> — the range.</li>
+        <li><strong>Gateway</strong>, <strong>DNS</strong> — parameters handed to clients.</li>
+        <li><strong>Description</strong> — optional note.</li>
+    </ul>
+    <p>If a new <code>static</code> IP falls within a pool, a <strong>yellow banner</strong> appears after saving. This is a warning, not an error.</p>
+
+    <p><strong>Credentials (red):</strong></p>
+    <p>Logins and passwords for the device.</p>
+    <ul>
+        <li><strong>Type</strong> — <code>admin</code>, <code>ssh</code>, <code>wifi</code>, <code>camera</code>, <code>matter</code>, <code>other</code>.</li>
+        <li><strong>Username</strong>, <strong>Password</strong> — credentials.</li>
+        <li><strong>Description</strong> — what they are for.</li>
+    </ul>
+    <p>You can add several entries. Passwords are shown as <code>••••••••</code> with a <strong>show</strong> button — but only if you have the <em>can_view_passwords</em> permission.</p>
+
+    <p><strong>Services (green):</strong></p>
+    <p>Services running on the device (web UI, RTSP streams, HomeBridge, etc.).</p>
+    <ul>
+        <li><strong>Name</strong>, <strong>Protocol</strong> (<code>http</code>, <code>https</code>, <code>rtsp</code>, <code>ssh</code>, <code>other</code>), <strong>Port</strong>.</li>
+        <li><strong>URL</strong> — full address. If it starts with <code>http://</code>, <code>https://</code>, or <code>rtsp://</code> — it becomes clickable.</li>
+        <li><strong>Path</strong>, <strong>Description</strong>.</li>
+    </ul>
+
+    <p><strong>Remarks (yellow):</strong> free-form text for anything that did not fit elsewhere.</p>
+
+    <h3 class="h6 mt-3">5.3. Device page</h3>
+    <p>Click a hostname in the list to open the device page. All data is shown in colour-coded blocks. Buttons at the top: <strong>Back</strong>, <strong>Edit</strong>, <strong>Delete</strong> (admin only).</p>
+
+    <h3 class="h6 mt-3">5.4. Editing</h3>
+    <p>The same form as for creation, but pre-filled. If you delete an interface to which ports and connections are tied, they are removed automatically. Changes are applied only after you press <strong>Save</strong>.</p>
+
+    <h3 class="h6 mt-3">5.5. Deleting</h3>
+    <p>Deleting a device removes <strong>everything</strong> attached to it: interfaces, IPs, Wi-Fi, DHCP pools, credentials, services, ports, and connections. <strong>This cannot be undone.</strong></p>
+</section>
+
+<section id="connections" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-link me-2 text-primary"></i>6. Connections</h2>
+    <p>The section lists all physical and logical connections between device ports of the <strong>current home</strong>.</p>
+
+    <h3 class="h6 mt-3">6.1. Creating a connection</h3>
+    <p>Click <strong>Add connection</strong>. First choose a <strong>device</strong>, then a <strong>port</strong> of that device — for both Source and Target. Dropdowns show only devices and ports of the current home.</p>
+    <p>Additional fields: <strong>Type</strong> (<code>physical</code> or <code>logical</code>), <strong>Cable</strong> (colour or type), <strong>Description</strong>, <strong>Active</strong>.</p>
+
+    <h3 class="h6 mt-3">6.2. Rules</h3>
+    <ul>
+        <li>Source and Target cannot be the same port.</li>
+        <li>A→B and B→A are the <strong>same physical connection</strong>. Duplicates are not allowed.</li>
+        <li>Both ports must belong to devices of the <strong>same home</strong>. Cross-home links are not permitted.</li>
+        <li>Double-clicking Delete is safe — the second request is silently ignored.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">6.3. Connections on the device page</h3>
+    <p>The <strong>Connections</strong> block on the device page shows:</p>
+    <ul>
+        <li><span class="text-success"><i class="fa-solid fa-arrow-right"></i> outgoing</span> — connections where this device is the source.</li>
+        <li><span class="text-primary"><i class="fa-solid fa-arrow-left"></i> incoming</span> — connections where this device is the target.</li>
+    </ul>
+</section>
+
+<section id="reference" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-book me-2 text-primary"></i>7. Reference</h2>
+    <p>The <strong>Reference</strong> section lists all reference data. Accessible to users with edit rights. Some lists are per home, some are global.</p>
+
+    <p><strong>Per home</strong> (available to anyone with <em>Can edit</em>):</p>
+    <ul>
+        <li><strong>Locations</strong> — rooms (Living room, Bedroom, Kitchen, Rack). Each home has its own set. Identical names in different homes are allowed.</li>
+        <li><strong>Networks</strong> — subnets of the home with address, mask, gateway, VLAN. Each home has its own.</li>
+    </ul>
+
+    <p><strong>Global — admin only</strong> (shared across all homes):</p>
+    <ul>
+        <li><strong>Device Types</strong> — types of devices. <strong>Active = yes</strong> — a "smart" device (must have an IP). <strong>Active = no</strong> — passive (hub, unmanaged switch), must not have an IP.</li>
+        <li><strong>Vendors</strong> — manufacturers.</li>
+        <li><strong>Models</strong> — hardware models. Belong to a vendor.</li>
+        <li><strong>Credential Types</strong> — types of credentials.</li>
+    </ul>
+
+    <p><strong>Important:</strong></p>
+    <ul>
+        <li>Deletion is not possible if devices reference the entry. A red banner explains this.</li>
+        <li>Location and Network names are unique <em>within a home</em>; other lists are global.</li>
+    </ul>
+</section>
+
+<section id="users" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-users me-2 text-primary"></i>8. Users</h2>
+    <p>The <strong>Users</strong> section is available to the administrator only.</p>
+
+    <h3 class="h6 mt-3">8.1. Roles</h3>
+    <ul>
+        <li><strong>admin</strong> — full access, including user management, home management, and device deletion. Sees all homes.</li>
+        <li><strong>user</strong> — regular user with three permission flags. Sees only assigned homes.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.2. Three permission flags (for role=user)</h3>
+    <ul>
+        <li><strong>Can edit</strong> — create, edit, and delete devices and connections.</li>
+        <li><strong>Can view passwords</strong> — see device passwords.</li>
+        <li><strong>Can change passwords</strong> — change passwords of existing devices.</li>
+    </ul>
+    <p><strong>Forbidden combinations:</strong></p>
+    <ul>
+        <li><em>Can change passwords</em> cannot be granted without <em>Can edit</em>.</li>
+        <li><em>Can change passwords</em> cannot be granted without <em>Can view passwords</em>.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.3. Home assignment</h3>
+    <p>The user edit page has a <strong>Homes</strong> block:</p>
+    <ul>
+        <li>A table of assigned homes with a <strong>Remove</strong> button.</li>
+        <li>A dropdown of unassigned homes and an <strong>Assign</strong> button to add one.</li>
+        <li>If a user is not assigned to any home, they see no devices at all.</li>
+        <li>For <em>admin</em>, the block shows a note that admins see all homes.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.4. Actions</h3>
+    <ul>
+        <li><strong>Add user</strong> — create a user.</li>
+        <li><strong>Edit</strong> — change name, role, permissions, language, theme, home assignments.</li>
+        <li><strong>Reset password</strong> — reset the password and (optionally) require a change on next sign-in.</li>
+        <li><strong>Delete</strong> — remove the user. <strong>The default Admin cannot be deleted.</strong></li>
+    </ul>
+</section>
+
+<section id="profile" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-user-gear me-2 text-primary"></i>9. Profile</h2>
+    <p>The <strong>Profile</strong> section is your personal page.</p>
+    <ul>
+        <li><strong>Account</strong> — name, role, permissions.</li>
+        <li><strong>Preferences</strong> — <em>Language</em> (English/Russian) and <em>Theme</em> (Auto/Light/Dark). Applied immediately after Save.</li>
+        <li><strong>Change password</strong> — change your own password (current + new + confirmation).</li>
+    </ul>
+</section>
+
+<section id="permissions" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>10. Permissions and roles</h2>
+    <p><strong>Admin</strong> sees everything and can do everything.</p>
+    <p><strong>User</strong> can see:</p>
+    <ul>
+        <li>Only the homes assigned to them.</li>
+        <li>Device list and device pages of those homes — always.</li>
+        <li>Connections — always.</li>
+        <li>Reference — if they have <em>Can edit</em>.</li>
+        <li>Users — <strong>never</strong>.</li>
+    </ul>
+    <p>Add/Edit/Delete buttons are shown only with the <em>Can edit</em> permission. Passwords are visible only with <em>Can view passwords</em>. The password field in the edit form is available only with <em>Can change passwords</em>.</p>
+</section>
+
+<section id="tips" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-lightbulb me-2 text-primary"></i>11. Tips</h2>
+    <ul>
+        <li><strong>Homes first.</strong> Before creating devices, add a home (if you have more than one). Admins create homes on the home selection page.</li>
+        <li><strong>Then reference data.</strong> Inside a home, fill in locations and networks. Global reference lists (device types, vendors, models, credential types) are shared across all homes.</li>
+        <li><strong>Ports are added on edit.</strong> Create the device with interfaces, save, open Edit, then add ports.</li>
+        <li><strong>IP address type:</strong> <code>static</code> — manual, <code>dhcp</code> — automatic, <code>reserved</code> — bound to MAC, <code>external</code> — from the ISP.</li>
+        <li><strong>External IP of a modem</strong> is added as a separate interface of type <code>wan</code> with address type <code>external</code>. Mask, gateway, and MAC can be left blank.</li>
+        <li><strong>Wi-Fi: broadcasting vs connecting.</strong> Networks the device broadcasts go into the Wi-Fi networks block. Connections to an existing network go into a <code>wifi</code> interface via the Connected Wi-Fi network field.</li>
+        <li><strong>DHCP warning.</strong> If a <code>static</code> IP falls into a pool range, a yellow banner appears. This is a warning, not an error, but check for conflicts.</li>
+        <li><strong>Uniqueness within a home.</strong> Hostname, Local IP, location names, and network names are unique within a home. MAC is globally unique.</li>
+    </ul>
+</section>
+
+<section id="problems" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-triangle-exclamation me-2 text-primary"></i>12. Troubleshooting</h2>
+
+    <p><strong>"Safari cannot open the page".</strong> Rare. This is a Safari quirk with long pauses between opening a form and submitting. Press Back and save again — it should work.</p>
+
+    <p><strong>"Internal Server Error".</strong> A server-side error. Contact the administrator.</p>
+
+    <p><strong>I see no homes.</strong> Ask the administrator to assign you to at least one home.</p>
+
+    <p><strong>Cannot delete a home.</strong> Only empty homes can be deleted. Remove or move all devices, locations, and networks out of it first.</p>
+
+    <p><strong>Cannot delete a reference entry.</strong> Devices reference it. Remove the references first.</p>
+
+    <p><strong>Forgot password.</strong> The application password can be reset by an admin via the Users section. Device passwords are stored in plain text on the device page — they can be viewed there.</p>
+
+    <p><strong>IP address will not save.</strong> Check: the address is unique <em>within the home</em>, the gateway is in the same subnet (except for <code>external</code>), the MAC is filled in for <code>dhcp</code> and <code>reserved</code>, the interface is not of type <code>port</code>.</p>
+
+    <p><strong>Connection will not save.</strong> Check: Source and Target are different ports, the connection does not already exist, both ports belong to devices of the same home, both devices have ports.</p>
+</section>
+
+<section id="hotkeys" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-keyboard me-2 text-primary"></i>13. Hotkeys</h2>
+    <ul>
+        <li><strong>Cmd+Shift+R</strong> (Mac) / <strong>Ctrl+Shift+R</strong> (Windows) — hard reload. Useful after updates.</li>
+        <li><strong>Cmd+Shift+N</strong> (Safari) — private window. Helps when the browser caches stale content.</li>
+        <li>Show password — the <strong>show</strong> button next to <code>••••••••</code>.</li>
+    </ul>
+</section>
+
