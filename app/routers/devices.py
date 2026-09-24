@@ -38,6 +38,22 @@ def _can_change_passwords(user: User) -> bool:
 
 # ---------- Список устройств ----------
 
+def _parse_ipv4(ip_str: str) -> tuple[int, int, int, int] | None:
+    """Парсит IPv4 в кортеж из 4 целых. Возвращает None, если строка не IPv4."""
+    if not ip_str:
+        return None
+    parts = ip_str.split(".")
+    if len(parts) != 4:
+        return None
+    try:
+        octets = tuple(int(p) for p in parts)
+    except ValueError:
+        return None
+    if any(o < 0 or o > 255 for o in octets):
+        return None
+    return octets
+
+
 @router.get("")
 def list_devices(
     request: Request,
@@ -48,13 +64,21 @@ def list_devices(
     devices = crud_device.list_all(db, site.id)
 
     def sort_key(d: Device) -> tuple:
-        ips = []
+        """Сортировка по IP как по числу, а не как по строке.
+
+        IP превращается в кортеж из 4 целых, например 192.168.1.10 →
+        (192, 168, 1, 10). Тогда 192.168.1.10 идёт после 192.168.1.9
+        и до 192.168.1.11, а не после 192.168.1.100.
+        """
+        parsed = []
         for iface in d.interfaces:
             for ip in iface.ip_addresses:
-                ips.append(ip.address)
-        if not ips:
-            return (1, "")
-        return (0, min(ips))
+                octets = _parse_ipv4(ip.address)
+                if octets is not None:
+                    parsed.append(octets)
+        if not parsed:
+            return (1, (0, 0, 0, 0))
+        return (0, min(parsed))
 
     devices.sort(key=sort_key)
 

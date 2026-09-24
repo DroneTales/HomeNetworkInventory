@@ -27,20 +27,20 @@
 </div>
 {% else %}
 
-{# Десктопная таблица #}
+{# Десктопная таблица с сортировкой по клику на заголовок #}
 <div class="table-responsive d-none d-md-block">
-    <table class="table table-hover align-middle">
+    <table class="table table-hover align-middle" data-sortable="true">
         <thead>
         <tr>
-            <th>Hostname</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Vendor</th>
-            <th>Model</th>
-            <th>Location</th>
-            <th>Local IP</th>
-            <th>Gateway</th>
-            <th>MAC</th>
+            <th data-sort="hostname" data-type="text">Hostname <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="name" data-type="text">Name <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="type" data-type="text">Type <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="vendor" data-type="text">Vendor <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="model" data-type="text">Model <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="location" data-type="text">Location <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="ip" data-type="ip">Local IP <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="gateway" data-type="ip">Gateway <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="mac" data-type="text">MAC <span class="sort-arrow text-muted"></span></th>
             <th class="text-end">Actions</th>
         </tr>
         </thead>
@@ -85,7 +85,7 @@
     </table>
 </div>
 
-{# Мобильные карточки #}
+{# Мобильные карточки (без сортировки) #}
 <div class="d-md-none">
     {% for row in rows %}
     {% set d = row.device %}
@@ -131,5 +131,7 @@
     {% endfor %}
 </div>
 
+<script src="/static/js/devices-list.js"></script>
 {% endif %}
 {% endblock %}
+
