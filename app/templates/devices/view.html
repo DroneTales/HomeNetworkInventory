@@ -131,8 +131,12 @@
                             <td rowspan="{{ ips|length }}">{{ iface.type }}</td>
                             <td rowspan="{{ ips|length }}">{{ iface.mac or '—' }}</td>
                             {% endif %}
-                            <td>{{ ip.address }}</td>
-                            <td>{{ ip.mask }}</td>
+                            <td>
+                                {% if ip.address %}{{ ip.address }}
+                                {% elif ip.address_type == 'dhcp' %}<span class="text-muted fst-italic">DHCP (unknown)</span>
+                                {% else %}—{% endif %}
+                            </td>
+                            <td>{{ ip.mask or '—' }}</td>
                             <td>{{ ip.address_type }}</td>
                             <td>{{ ip.gateway or '—' }}</td>
                             <td>{{ ip.dns or '—' }}</td>

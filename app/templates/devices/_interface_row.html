@@ -31,24 +31,13 @@
         </div>
     </div>
 
-    {# Блок IP: показывается для всех типов, кроме 'port' #}
-    <div class="row g-2 mt-1 iface-ip-block {% if iface and iface.type == 'port' %}d-none{% endif %}">
-        <div class="col-12 col-md-3">
-            <label class="form-label small mb-0">IP address</label>
-            <input type="text" class="form-control form-control-sm iface-address"
-                   name="interface_address"
-                   value="{{ iface.address if iface and iface.address else '' }}"
-                   placeholder="192.168.1.10">
-        </div>
-        <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">Mask</label>
-            <input type="text" class="form-control form-control-sm iface-mask"
-                   name="interface_mask"
-                   value="{{ iface.mask if iface and iface.mask else '255.255.255.0' }}">
-        </div>
-        <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">Type</label>
-            {% set cur_at = iface.address_type if iface else 'static' %}
+    {% set cur_type = iface.type if iface else 'ethernet' %}
+    {% set cur_at = iface.address_type if iface else 'static' %}
+    {% set hide_ip_fields = (cur_type == 'port') or (cur_at == 'dhcp') %}
+
+    <div class="row g-2 mt-1 iface-ip-block {% if cur_type == 'port' %}d-none{% endif %}">
+        <div class="col-6 col-md-2 iface-field-address-type">
+            <label class="form-label small mb-0">Address type</label>
             <select class="form-select form-select-sm iface-address-type" name="interface_address_type">
                 <option value="static" {% if cur_at == 'static' %}selected{% endif %}>static</option>
                 <option value="dhcp" {% if cur_at == 'dhcp' %}selected{% endif %}>dhcp</option>
@@ -56,23 +45,42 @@
                 <option value="reserved" {% if cur_at == 'reserved' %}selected{% endif %}>reserved</option>
             </select>
         </div>
-        <div class="col-6 col-md-2">
+
+        <div class="col-12 col-md-3 iface-field-address {% if hide_ip_fields %}d-none{% endif %}">
+            <label class="form-label small mb-0">IP address</label>
+            <input type="text" class="form-control form-control-sm iface-address"
+                   name="interface_address"
+                   value="{{ iface.address if iface and iface.address else '' }}"
+                   placeholder="192.168.1.10">
+        </div>
+        <div class="col-6 col-md-2 iface-field-mask {% if hide_ip_fields %}d-none{% endif %}">
+            <label class="form-label small mb-0">Mask</label>
+            <input type="text" class="form-control form-control-sm iface-mask"
+                   name="interface_mask"
+                   value="{{ iface.mask if iface and iface.mask else '255.255.255.0' }}">
+        </div>
+        <div class="col-6 col-md-2 iface-field-gateway {% if hide_ip_fields %}d-none{% endif %}">
             <label class="form-label small mb-0">Gateway</label>
             <input type="text" class="form-control form-control-sm iface-gateway"
                    name="interface_gateway"
                    value="{{ iface.gateway if iface and iface.gateway else '' }}"
                    placeholder="192.168.1.1">
         </div>
-        <div class="col-6 col-md-2">
+        <div class="col-6 col-md-2 iface-field-dns {% if hide_ip_fields %}d-none{% endif %}">
             <label class="form-label small mb-0">DNS</label>
             <input type="text" class="form-control form-control-sm iface-dns"
                    name="interface_dns"
                    value="{{ iface.dns if iface and iface.dns else '' }}"
                    placeholder="192.168.1.1">
         </div>
+
+        <div class="col-12 iface-field-dhcp-note {% if not (cur_type != 'port' and cur_at == 'dhcp') %}d-none{% endif %}">
+            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
+                <i class="fa-solid fa-circle-info me-1"></i>DHCP — IP, mask, gateway and DNS are assigned automatically
+            </span>
+        </div>
     </div>
 
-    {# Блок Wi-Fi: показывается только для типа 'wifi' #}
     {% set cur_type = iface.type if iface else 'ethernet' %}
     <div class="row g-2 mt-1 iface-wifi-block {% if cur_type != 'wifi' %}d-none{% endif %}">
         <div class="col-12 col-md-6">

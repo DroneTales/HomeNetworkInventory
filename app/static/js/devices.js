@@ -40,7 +40,6 @@
         updateEmptyHint();
     }
 
-    // ---------- Interfaces ----------
     setupList({
         containerId: "interfaces-container",
         emptyHintId: "interfaces-empty",
@@ -53,23 +52,53 @@
 
     function bindInterfaceRow(row) {
         const typeSelect = row.querySelector(".iface-type");
+        const addressTypeSelect = row.querySelector(".iface-address-type");
         const ipBlock = row.querySelector(".iface-ip-block");
         const wifiBlock = row.querySelector(".iface-wifi-block");
 
-        function refreshVisibility() {
-            if (!typeSelect) return;
-            const value = typeSelect.value;
-            if (ipBlock) ipBlock.classList.toggle("d-none", value === "port");
-            if (wifiBlock) wifiBlock.classList.toggle("d-none", value !== "wifi");
+        function refresh() {
+            const tval = typeSelect ? typeSelect.value : "ethernet";
+            const atval = addressTypeSelect ? addressTypeSelect.value : "static";
+
+            const isPort = tval === "port";
+            const isDhcp = atval === "dhcp";
+
+            if (ipBlock) {
+                ipBlock.classList.toggle("d-none", isPort);
+            }
+            if (wifiBlock) {
+                wifiBlock.classList.toggle("d-none", tval !== "wifi");
+            }
+
+            const fieldsToHide = isPort || isDhcp;
+            [".iface-field-address", ".iface-field-mask", ".iface-field-gateway", ".iface-field-dns"]
+                .forEach(function (sel) {
+                    const el = row.querySelector(sel);
+                    if (el) el.classList.toggle("d-none", fieldsToHide);
+                });
+
+            const note = row.querySelector(".iface-field-dhcp-note");
+            if (note) {
+                note.classList.toggle("d-none", !(!isPort && isDhcp));
+            }
+
+            if (isDhcp && !isPort) {
+                const addr = row.querySelector(".iface-address");
+                const mask = row.querySelector(".iface-mask");
+                const gw = row.querySelector(".iface-gateway");
+                const dns = row.querySelector(".iface-dns");
+                if (addr) addr.value = "";
+                if (mask) mask.value = "";
+                if (gw) gw.value = "";
+                if (dns) dns.value = "";
+            }
         }
 
-        if (typeSelect) {
-            typeSelect.onchange = refreshVisibility;
-            refreshVisibility();
-        }
+        if (typeSelect) typeSelect.addEventListener("change", refresh);
+        if (addressTypeSelect) addressTypeSelect.addEventListener("change", refresh);
+        refresh();
     }
 
-    // ---------- Ports ----------
     setupList({
         containerId: "ports-container",
         emptyHintId: "ports-empty",
@@ -79,7 +108,6 @@
         removeBtnClass: "remove-port-btn",
     });
 
-    // ---------- Wi-Fi ----------
     setupList({
         containerId: "wifi-container",
         emptyHintId: "wifi-empty",
@@ -89,7 +117,6 @@
         removeBtnClass: "remove-wifi-btn",
     });
 
-    // ---------- DHCP ----------
     setupList({
         containerId: "dhcp-container",
         emptyHintId: "dhcp-empty",
@@ -99,7 +126,6 @@
         removeBtnClass: "remove-dhcp-btn",
     });
 
-    // ---------- Credentials ----------
     setupList({
         containerId: "credentials-container",
         emptyHintId: "credentials-empty",
@@ -109,7 +135,6 @@
         removeBtnClass: "remove-credential-btn",
     });
 
-    // ---------- Services ----------
     setupList({
         containerId: "services-container",
         emptyHintId: "services-empty",
@@ -119,7 +144,6 @@
         removeBtnClass: "remove-service-btn",
     });
 
-    // ---------- AJAX-подгрузка моделей по вендору ----------
     const vendorSelect = document.getElementById("vendor_id");
     const modelSelect = document.getElementById("model_id");
 
@@ -150,9 +174,7 @@
                     modelSelect.appendChild(opt);
                 });
             })
-            .catch(function () {
-                // Тихо игнорируем.
-            });
+            .catch(function () {});
     }
 
     if (vendorSelect && modelSelect) {

@@ -21,6 +21,7 @@ from app.crud import vendor as crud_vendor
 from app.crud import wifi_network as crud_wifi
 from app.database import get_db
 from app.models.device import Device
+from app.models.dhcp_pool import DhcpPool
 from app.models.interface import Interface
 from app.models.site import Site
 from app.models.user import User
@@ -320,7 +321,7 @@ def _process_device_form(
             **context,
         )
 
-    warning = _check_dhcp_conflicts(db, created_ips)
+    warning = _check_dhcp_conflicts(db, created_ips, site_id=site.id)
     if warning:
         request.session["warning"] = warning
 
@@ -407,15 +408,20 @@ def _sync_interfaces(
             )
 
         existing_ips = {ip.id: ip for ip in iface.ip_addresses}
-        if data.get("address"):
+        needs_ip_record = (
+            data["type"] != "port"
+            and (bool(data.get("address")) or data.get("address_type") == "dhcp")
+        )
+
+        if needs_ip_record:
             if existing_ips:
                 first_id = next(iter(existing_ips))
                 crud_ip.update(
                     db,
                     ip_id=first_id,
                     interface_id=iface.id,
-                    address=data["address"],
-                    mask=data["mask"],
+                    address=data.get("address"),
+                    mask=data.get("mask"),
                     address_type=data["address_type"],
                     gateway=data.get("gateway"),
                     dns=data.get("dns"),
@@ -427,14 +433,15 @@ def _sync_interfaces(
                 crud_ip.create(
                     db,
                     interface_id=iface.id,
-                    address=data["address"],
-                    mask=data["mask"],
+                    address=data.get("address"),
+                    mask=data.get("mask"),
                     address_type=data["address_type"],
                     gateway=data.get("gateway"),
                     dns=data.get("dns"),
                     network_id=network_id,
                 )
-            all_ips.append((data["address"], data["address_type"]))
+            if data.get("address"):
+                all_ips.append((data["address"], data["address_type"]))
         else:
             for ip in existing_ips.values():
                 db.delete(ip)
@@ -936,16 +943,25 @@ def _collect_services(form) -> list[dict]:
 
     return result
 
-def _check_dhcp_conflicts(db: Session, ips: list[tuple[str, str]]) -> str | None:
+def _check_dhcp_conflicts(
+    db: Session,
+    ips: list[tuple[str, str]],
+    site_id: int,
+) -> str | None:
     if not ips:
         return None
 
-    all_pools = crud_dhcp.list_all(db)
+    pools = (
+        db.query(DhcpPool)
+        .join(Device, DhcpPool.device_id == Device.id)
+        .filter(Device.site_id == site_id)
+        .all()
+    )
     conflicts = []
     for ip, address_type in ips:
         if address_type != "static":
             continue
-        for pool in all_pools:
+        for pool in pools:
             from app.core.validation import is_ip_in_range
             if is_ip_in_range(ip, pool.start_ip, pool.end_ip):
                 pool_name = pool.name or f"pool #{pool.id}"

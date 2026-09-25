@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
+
 class IPAddress(Base):
     __tablename__ = "ip_addresses"
 
@@ -12,8 +13,8 @@ class IPAddress(Base):
     )
     network_id: Mapped[int | None] = mapped_column(ForeignKey("networks.id"))
 
-    address: Mapped[str] = mapped_column(String(45), nullable=False, index=True)
-    mask: Mapped[str] = mapped_column(String(45), nullable=False)
+    address: Mapped[str | None] = mapped_column(String(45), index=True)
+    mask: Mapped[str | None] = mapped_column(String(45))
     gateway: Mapped[str | None] = mapped_column(String(45))
     dns: Mapped[str | None] = mapped_column(String(45))
     address_type: Mapped[str] = mapped_column(String(20), nullable=False)
