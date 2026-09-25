@@ -5,15 +5,7 @@ from app.core.deps import get_current_site
 from app.database import SessionLocal
 from app.models.user import User
 
-
 class CurrentSiteMiddleware(BaseHTTPMiddleware):
-    """Кладёт текущий дом (Site) в request.state.current_site.
-
-    Определяется по cookie `hni_site` и пользователю из сессии.
-    Если пользователь не залогинен, дом не выбран или недоступен —
-    request.state.current_site = None.
-    """
-
     async def dispatch(self, request: Request, call_next):
         request.state.current_site = None
 
@@ -21,7 +13,6 @@ class CurrentSiteMiddleware(BaseHTTPMiddleware):
         try:
             user_id = request.session.get("user_id")
         except (AttributeError, AssertionError):
-            # Сессия ещё не инициализирована (например, для статических файлов)
             user_id = None
 
         if user_id is not None:

@@ -4,10 +4,8 @@ from app.core.exceptions import ValidationError
 from app.models.device import Device
 from app.models.wifi_network import WiFiNetwork
 
-# Допустимые диапазоны
 VALID_BANDS = {"2.4", "5", "6"}
 
-# Допустимые шифрования
 VALID_ENCRYPTIONS = {
     "WPA2-PSK/AES",
     "WPA3-PSK/AES",
@@ -17,9 +15,7 @@ VALID_ENCRYPTIONS = {
     "Open",
 }
 
-
 def list_by_device(db: Session, device_id: int) -> list[WiFiNetwork]:
-    """Все Wi-Fi сети, которые раздаёт данное устройство."""
     return (
         db.query(WiFiNetwork)
         .filter(WiFiNetwork.device_id == device_id)
@@ -27,14 +23,11 @@ def list_by_device(db: Session, device_id: int) -> list[WiFiNetwork]:
         .all()
     )
 
-
 def list_all(db: Session) -> list[WiFiNetwork]:
     return db.query(WiFiNetwork).order_by(WiFiNetwork.ssid).all()
 
-
 def get_by_id(db: Session, wifi_id: int) -> WiFiNetwork | None:
     return db.get(WiFiNetwork, wifi_id)
-
 
 def get_by_device_and_ssid(
     db: Session,
@@ -46,7 +39,6 @@ def get_by_device_and_ssid(
         .filter(WiFiNetwork.device_id == device_id, WiFiNetwork.ssid == ssid)
         .first()
     )
-
 
 def _validate(
     ssid: str,
@@ -82,7 +74,6 @@ def _validate(
 
     return ssid, band, encryption
 
-
 def create(
     db: Session,
     device_id: int,
@@ -115,7 +106,6 @@ def create(
     db.flush()
     return wifi
 
-
 def update(
     db: Session,
     wifi_id: int,
@@ -146,11 +136,9 @@ def update(
     db.flush()
     return wifi
 
-
 def delete(db: Session, wifi_id: int) -> None:
     wifi = get_by_id(db, wifi_id)
     if wifi is None:
         raise ValidationError("Wi-Fi network not found", field="id")
     db.delete(wifi)
     db.flush()
-

@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Port(Base):
     __tablename__ = "ports"
     __table_args__ = (
@@ -33,4 +32,3 @@ class Port(Base):
         foreign_keys="Connection.target_port_id",
         cascade="all, delete-orphan",
     )
-

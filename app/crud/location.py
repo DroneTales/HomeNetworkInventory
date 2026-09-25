@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.location import Location
 
-
 def list_all(db: Session, site_id: int) -> list[Location]:
     return (
         db.query(Location)
@@ -11,7 +10,6 @@ def list_all(db: Session, site_id: int) -> list[Location]:
         .order_by(Location.name)
         .all()
     )
-
 
 def get_by_id(db: Session, location_id: int, site_id: int | None = None) -> Location | None:
     loc = db.get(Location, location_id)
@@ -21,14 +19,12 @@ def get_by_id(db: Session, location_id: int, site_id: int | None = None) -> Loca
         return None
     return loc
 
-
 def get_by_name(db: Session, name: str, site_id: int) -> Location | None:
     return (
         db.query(Location)
         .filter(Location.name == name, Location.site_id == site_id)
         .first()
     )
-
 
 def create(
     db: Session,
@@ -54,7 +50,6 @@ def create(
     db.add(location)
     db.flush()
     return location
-
 
 def update(
     db: Session,
@@ -82,11 +77,10 @@ def update(
     db.flush()
     return location
 
-
 def delete(db: Session, location_id: int) -> None:
     location = get_by_id(db, location_id)
     if location is None:
-        return  # idempotent
+        return
 
     from app.models.device import Device
 
@@ -103,4 +97,3 @@ def delete(db: Session, location_id: int) -> None:
 
     db.delete(location)
     db.flush()
-

@@ -14,13 +14,11 @@ from app.core.middleware import CurrentSiteMiddleware
 from app.database import Base, check_database_path, engine, get_db
 from app.models.user import User
 
-# Импортируем все модели, чтобы SQLAlchemy знал о них перед create_all().
 from app import models  # noqa: F401
 
 from app.routers import auth, connections, devices, help, profile, reference, reference_ui, sites, users
 
 BASE_DIR = Path(__file__).resolve().parent
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,14 +28,8 @@ async def lifespan(app: FastAPI):
     load_translations()
     yield
 
-
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
-# ВАЖНО: порядок добавления middleware в Starlette — обратный порядку выполнения.
-# Тот, что добавлен последним, выполняется первым.
-# Нам нужно, чтобы SessionMiddleware выполнилась ДО CurrentSiteMiddleware,
-# потому что вторая читает request.session. Значит, добавляем CurrentSite
-# первой, а Session — второй.
 app.add_middleware(CurrentSiteMiddleware)
 app.add_middleware(
     SessionMiddleware,
@@ -59,7 +51,6 @@ app.include_router(users.router)
 app.include_router(profile.router)
 app.include_router(help.router)
 
-
 @app.get("/")
 def root(
     request: Request,
@@ -74,4 +65,3 @@ def root(
         return RedirectResponse("/sites", status_code=303)
 
     return RedirectResponse("/devices", status_code=303)
-

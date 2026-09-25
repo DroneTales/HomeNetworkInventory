@@ -5,7 +5,6 @@ from app.models.device import Device
 from app.models.interface import Interface
 from app.models.port import Port
 
-
 def list_by_device(db: Session, device_id: int) -> list[Port]:
     return (
         db.query(Port)
@@ -14,10 +13,8 @@ def list_by_device(db: Session, device_id: int) -> list[Port]:
         .all()
     )
 
-
 def get_by_id(db: Session, port_id: int) -> Port | None:
     return db.get(Port, port_id)
-
 
 def get_by_device_and_name(db: Session, device_id: int, name: str) -> Port | None:
     return (
@@ -25,7 +22,6 @@ def get_by_device_and_name(db: Session, device_id: int, name: str) -> Port | Non
         .filter(Port.device_id == device_id, Port.name == name)
         .first()
     )
-
 
 def _validate(
     db: Session,
@@ -58,7 +54,6 @@ def _validate(
 
     return name
 
-
 def create(
     db: Session,
     device_id: int,
@@ -81,7 +76,6 @@ def create(
     db.flush()
     return port
 
-
 def update(
     db: Session,
     port_id: int,
@@ -101,11 +95,9 @@ def update(
     db.flush()
     return port
 
-
 def delete(db: Session, port_id: int) -> None:
     port = get_by_id(db, port_id)
     if port is None:
-        return  # idempotent
+        return
     db.delete(port)
     db.flush()
-

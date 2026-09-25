@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Location(Base):
     __tablename__ = "locations"
 
@@ -16,4 +15,3 @@ class Location(Base):
 
     site: Mapped["Site"] = relationship(back_populates="locations")
     devices: Mapped[list["Device"]] = relationship(back_populates="location")
-

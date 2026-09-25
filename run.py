@@ -9,4 +9,3 @@ if __name__ == "__main__":
         port=settings.app_port,
         reload=True,
     )
-

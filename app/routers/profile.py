@@ -11,7 +11,6 @@ from app.models.user import User
 
 router = APIRouter(prefix="/profile", tags=["profile"])
 
-
 @router.get("", response_class=HTMLResponse)
 def view_profile(
     request: Request,
@@ -20,7 +19,6 @@ def view_profile(
 ):
     warning = request.session.pop("warning", None)
     return render(request, "profile/view.html", user=user, warning=warning)
-
 
 @router.post("/preferences")
 async def update_preferences(
@@ -51,7 +49,6 @@ async def update_preferences(
 
     request.session["warning"] = "Preferences saved."
     return RedirectResponse("/profile", status_code=303)
-
 
 @router.post("/change-password")
 async def change_password(
@@ -98,4 +95,3 @@ async def change_password(
 
     request.session["warning"] = warning or "Password changed."
     return RedirectResponse("/profile", status_code=303)
-

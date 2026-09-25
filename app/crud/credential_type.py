@@ -3,18 +3,14 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.credential_type import CredentialType
 
-
 def list_all(db: Session) -> list[CredentialType]:
     return db.query(CredentialType).order_by(CredentialType.name).all()
-
 
 def get_by_id(db: Session, type_id: int) -> CredentialType | None:
     return db.get(CredentialType, type_id)
 
-
 def get_by_name(db: Session, name: str) -> CredentialType | None:
     return db.query(CredentialType).filter(CredentialType.name == name).first()
-
 
 def create(
     db: Session,
@@ -32,7 +28,6 @@ def create(
     db.add(ct)
     db.flush()
     return ct
-
 
 def update(
     db: Session,
@@ -57,13 +52,9 @@ def update(
     db.flush()
     return ct
 
-
 def delete(db: Session, type_id: int) -> None:
-    """Удаляет тип. У связанных credentials поле type_id станет NULL
-    благодаря ondelete='SET NULL' на FK."""
     ct = get_by_id(db, type_id)
     if ct is None:
-        return  # already gone, idempotent
+        return
     db.delete(ct)
     db.flush()
-

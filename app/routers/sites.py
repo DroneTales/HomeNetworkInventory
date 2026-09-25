@@ -20,11 +20,8 @@ from app.models.user import User
 
 router = APIRouter(prefix="/sites", tags=["sites"])
 
-MAX_PHOTO_BYTES = 2 * 1024 * 1024  # 2 MB
+MAX_PHOTO_BYTES = 2 * 1024 * 1024
 ALLOWED_PHOTO_MIME = {"image/jpeg", "image/png"}
-
-
-# ---------- Список и выбор ----------
 
 @router.get("")
 def list_sites(
@@ -34,8 +31,6 @@ def list_sites(
 ):
     sites = get_accessible_sites(db, user)
 
-    # Auto-select only for non-admin users.
-    # Admins always see the list so they can manage (create/edit/delete) homes.
     if len(sites) == 1 and user.role != "admin":
         response = RedirectResponse("/devices", status_code=303)
         set_current_site_cookie(response, sites[0].id)
@@ -50,19 +45,12 @@ def list_sites(
         error=error,
     )
 
-
 @router.get("/switch")
 @router.post("/switch")
 def switch_site(user: User = Depends(require_user)):
-    """Сбрасывает cookie текущего дома и возвращает на выбор.
-
-    GET-версия добавлена для случая, когда браузер перезагружает URL из истории
-    как GET после POST. Операция идемпотентна и не мутирует данные.
-    """
     response = RedirectResponse("/sites", status_code=303)
     clear_current_site_cookie(response)
     return response
-
 
 @router.get("/{site_id}/select")
 @router.post("/{site_id}/select")
@@ -71,11 +59,6 @@ def select_site(
     user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ):
-    """Выбирает дом и переходит в него.
-
-    GET-версия добавлена для случая, когда браузер перезагружает URL из истории
-    как GET после POST. Операция идемпотентна и не мутирует данные.
-    """
     site = crud_site.get_by_id(db, site_id)
     if site is None or not site.is_active:
         raise HTTPException(status_code=404, detail="Home not found")
@@ -85,11 +68,6 @@ def select_site(
     response = RedirectResponse("/devices", status_code=303)
     set_current_site_cookie(response, site_id)
     return response
-
-
-# ---------- Создание ----------
-# Важно: /sites/new объявлен до /sites/{site_id}/..., иначе FastAPI
-# попытается разобрать "new" как int.
 
 @router.get("/new", response_class=HTMLResponse)
 def new_site_form(
@@ -105,7 +83,6 @@ def new_site_form(
         form_data={},
         site=None,
     )
-
 
 @router.post("/new")
 async def new_site_submit(
@@ -144,9 +121,6 @@ async def new_site_submit(
 
     return RedirectResponse("/sites", status_code=303)
 
-
-# ---------- Редактирование ----------
-
 @router.get("/{site_id}/edit", response_class=HTMLResponse)
 def edit_site_form(
     site_id: int,
@@ -171,7 +145,6 @@ def edit_site_form(
             "is_active": site.is_active,
         },
     )
-
 
 @router.post("/{site_id}/edit")
 async def edit_site_submit(
@@ -219,9 +192,6 @@ async def edit_site_submit(
 
     return RedirectResponse("/sites", status_code=303)
 
-
-# ---------- Удаление ----------
-
 @router.post("/{site_id}/delete")
 def delete_site(
     site_id: int,
@@ -244,9 +214,6 @@ def delete_site(
 
     return RedirectResponse("/sites", status_code=303)
 
-
-# ---------- Фото ----------
-
 @router.get("/{site_id}/photo")
 def site_photo(
     site_id: int,
@@ -265,11 +232,7 @@ def site_photo(
         media_type=site.photo_mime or "image/jpeg",
     )
 
-
-# ---------- Вспомогательное ----------
-
 async def _extract_photo(form) -> tuple[bytes | None, str | None]:
-    """Извлекает фото из формы. Возвращает (bytes, mime) или (None, None)."""
     file = form.get("photo")
     if file is None or not hasattr(file, "read"):
         return None, None
@@ -292,4 +255,3 @@ async def _extract_photo(form) -> tuple[bytes | None, str | None]:
         )
 
     return content, mime
-

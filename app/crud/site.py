@@ -8,21 +8,17 @@ from app.models.site import Site
 from app.models.user import User
 from app.models.user_site import UserSite
 
-
 def list_all(db: Session, include_inactive: bool = False) -> list[Site]:
     query = db.query(Site)
     if not include_inactive:
         query = query.filter(Site.is_active == True)  # noqa: E712
     return query.order_by(Site.name).all()
 
-
 def get_by_id(db: Session, site_id: int) -> Site | None:
     return db.get(Site, site_id)
 
-
 def get_by_name(db: Session, name: str) -> Site | None:
     return db.query(Site).filter(Site.name == name).first()
-
 
 def create(
     db: Session,
@@ -52,7 +48,6 @@ def create(
     db.flush()
     return site
 
-
 def update(
     db: Session,
     site_id: int,
@@ -79,14 +74,11 @@ def update(
     site.name = name
     site.address = (address or "").strip() or None
     site.is_active = is_active
-    # Photo is only updated if explicitly provided.
-    # Passing None keeps the existing one.
     if photo is not None:
         site.photo = photo
         site.photo_mime = photo_mime
     db.flush()
     return site
-
 
 def clear_photo(db: Session, site_id: int) -> Site:
     site = get_by_id(db, site_id)
@@ -97,23 +89,17 @@ def clear_photo(db: Session, site_id: int) -> Site:
     db.flush()
     return site
 
-
 def is_empty(db: Session, site_id: int) -> bool:
-    """Проверяет, что в доме нет устройств, локаций и сетей.
-
-    Используется перед удалением: удалять можно только пустой дом.
-    """
     for model in (Device, Location, Network):
         count = db.query(model).filter(model.site_id == site_id).count()
         if count > 0:
             return False
     return True
 
-
 def delete(db: Session, site_id: int) -> None:
     site = get_by_id(db, site_id)
     if site is None:
-        return  # idempotent
+        return
 
     if not is_empty(db, site_id):
         raise ValidationError(
@@ -125,9 +111,6 @@ def delete(db: Session, site_id: int) -> None:
     db.delete(site)
     db.flush()
 
-
-# ---------- User assignments ----------
-
 def list_users(db: Session, site_id: int) -> list[User]:
     return (
         db.query(User)
@@ -137,7 +120,6 @@ def list_users(db: Session, site_id: int) -> list[User]:
         .all()
     )
 
-
 def is_user_assigned(db: Session, user_id: int, site_id: int) -> bool:
     return (
         db.query(UserSite)
@@ -146,7 +128,6 @@ def is_user_assigned(db: Session, user_id: int, site_id: int) -> bool:
         is not None
     )
 
-
 def assign_user(db: Session, user_id: int, site_id: int) -> None:
     if db.get(User, user_id) is None:
         raise ValidationError("User not found", field="user_id")
@@ -154,11 +135,10 @@ def assign_user(db: Session, user_id: int, site_id: int) -> None:
         raise ValidationError("Home not found", field="site_id")
 
     if is_user_assigned(db, user_id, site_id):
-        return  # already assigned, idempotent
+        return
 
     db.add(UserSite(user_id=user_id, site_id=site_id))
     db.flush()
-
 
 def unassign_user(db: Session, user_id: int, site_id: int) -> None:
     link = (
@@ -167,7 +147,6 @@ def unassign_user(db: Session, user_id: int, site_id: int) -> None:
         .first()
     )
     if link is None:
-        return  # already unassigned, idempotent
+        return
     db.delete(link)
     db.flush()
-

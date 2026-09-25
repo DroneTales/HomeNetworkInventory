@@ -3,19 +3,14 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.device_type import DeviceType
 
-
 def list_all(db: Session) -> list[DeviceType]:
-    """Возвращает все типы, отсортированные по имени."""
     return db.query(DeviceType).order_by(DeviceType.name).all()
-
 
 def get_by_id(db: Session, type_id: int) -> DeviceType | None:
     return db.get(DeviceType, type_id)
 
-
 def get_by_name(db: Session, name: str) -> DeviceType | None:
     return db.query(DeviceType).filter(DeviceType.name == name).first()
-
 
 def create(
     db: Session,
@@ -38,7 +33,6 @@ def create(
     db.add(device_type)
     db.flush()
     return device_type
-
 
 def update(
     db: Session,
@@ -65,13 +59,11 @@ def update(
     db.flush()
     return device_type
 
-
 def delete(db: Session, type_id: int) -> None:
     device_type = get_by_id(db, type_id)
     if device_type is None:
-        return  # already gone, idempotent
+        return
 
-    # Нельзя удалить тип, если на него ссылаются устройства
     from app.models.device import Device
 
     in_use = db.query(Device).filter(Device.device_type_id == type_id).count()
@@ -83,4 +75,3 @@ def delete(db: Session, type_id: int) -> None:
 
     db.delete(device_type)
     db.flush()
-

@@ -11,9 +11,7 @@ from app.models.model import Model
 from app.models.network import Network
 from app.models.vendor import Vendor
 
-
 def list_all(db: Session, site_id: int) -> list[Device]:
-    """Все устройства конкретного дома, отсортированные по hostname."""
     return (
         db.query(Device)
         .filter(Device.site_id == site_id)
@@ -21,16 +19,13 @@ def list_all(db: Session, site_id: int) -> list[Device]:
         .all()
     )
 
-
 def get_by_id(db: Session, device_id: int, site_id: int | None = None) -> Device | None:
-    """Устройство по id. Если site_id передан — проверяет принадлежность дому."""
     device = db.get(Device, device_id)
     if device is None:
         return None
     if site_id is not None and device.site_id != site_id:
         return None
     return device
-
 
 def get_by_hostname(db: Session, hostname: str, site_id: int) -> Device | None:
     return (
@@ -39,14 +34,12 @@ def get_by_hostname(db: Session, hostname: str, site_id: int) -> Device | None:
         .first()
     )
 
-
 def _check_hostname_unique(
     db: Session,
     hostname: str,
     site_id: int,
     exclude_id: int | None = None,
 ) -> None:
-    """Уникальность hostname в пределах дома."""
     query = (
         db.query(Device)
         .filter(Device.hostname == hostname, Device.site_id == site_id)
@@ -60,7 +53,6 @@ def _check_hostname_unique(
             field="hostname",
         )
 
-
 def _check_references(
     db: Session,
     site_id: int,
@@ -70,7 +62,6 @@ def _check_references(
     location_id: int | None,
     network_id: int | None,
 ) -> None:
-    """Проверяет существование справочников и принадлежность дому."""
     if device_type_id is not None and db.get(DeviceType, device_type_id) is None:
         raise ValidationError("Device type not found", field="device_type_id")
     if vendor_id is not None and db.get(Vendor, vendor_id) is None:
@@ -98,7 +89,6 @@ def _check_references(
                 field="network_id",
             )
 
-
 def _validate_consistency(db: Session, device: Device) -> None:
     if device.device_type is None:
         return
@@ -124,7 +114,6 @@ def _validate_consistency(db: Session, device: Device) -> None:
             "but device has interface with IP address",
             field="interfaces",
         )
-
 
 def create(
     db: Session,
@@ -161,7 +150,6 @@ def create(
     db.add(device)
     db.flush()
     return device
-
 
 def update(
     db: Session,
@@ -205,15 +193,12 @@ def update(
     db.flush()
     return device
 
-
 def delete(db: Session, device_id: int) -> None:
     device = get_by_id(db, device_id)
     if device is None:
-        return  # idempotent
+        return
     db.delete(device)
     db.flush()
 
-
 def validate_full(db: Session, device: Device) -> None:
     _validate_consistency(db, device)
-

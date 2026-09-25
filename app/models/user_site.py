@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class UserSite(Base):
     __tablename__ = "user_sites"
 
@@ -16,4 +15,3 @@ class UserSite(Base):
 
     user: Mapped["User"] = relationship(back_populates="user_sites")
     site: Mapped["Site"] = relationship(back_populates="user_sites")
-

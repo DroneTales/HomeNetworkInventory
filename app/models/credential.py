@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Credential(Base):
     __tablename__ = "credentials"
 
@@ -20,4 +19,3 @@ class Credential(Base):
 
     device: Mapped["Device"] = relationship(back_populates="credentials")
     type: Mapped["CredentialType | None"] = relationship(back_populates="credentials")
-

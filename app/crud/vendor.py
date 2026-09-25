@@ -3,19 +3,14 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.vendor import Vendor
 
-
 def list_all(db: Session) -> list[Vendor]:
-    """Возвращает всех вендоров, отсортированных по имени."""
     return db.query(Vendor).order_by(Vendor.name).all()
-
 
 def get_by_id(db: Session, vendor_id: int) -> Vendor | None:
     return db.get(Vendor, vendor_id)
 
-
 def get_by_name(db: Session, name: str) -> Vendor | None:
     return db.query(Vendor).filter(Vendor.name == name).first()
-
 
 def create(db: Session, name: str) -> Vendor:
     name = (name or "").strip()
@@ -29,7 +24,6 @@ def create(db: Session, name: str) -> Vendor:
     db.add(vendor)
     db.flush()
     return vendor
-
 
 def update(db: Session, vendor_id: int, name: str) -> Vendor:
     vendor = get_by_id(db, vendor_id)
@@ -48,13 +42,11 @@ def update(db: Session, vendor_id: int, name: str) -> Vendor:
     db.flush()
     return vendor
 
-
 def delete(db: Session, vendor_id: int) -> None:
     vendor = get_by_id(db, vendor_id)
     if vendor is None:
-        return  # already gone, idempotent
+        return
 
-    # Проверяем, не ссылаются ли на вендора модели или устройства
     from app.models.device import Device
     from app.models.model import Model
 
@@ -74,4 +66,3 @@ def delete(db: Session, vendor_id: int) -> None:
 
     db.delete(vendor)
     db.flush()
-

@@ -11,14 +11,12 @@ from app.models.user import User
 
 router = APIRouter()
 
-
 @router.get("/login", response_class=HTMLResponse)
 def login_form(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     if user is not None:
         return RedirectResponse("/", status_code=303)
     return render(request, "auth/login.html")
-
 
 @router.post("/login")
 def login_submit(
@@ -43,12 +41,10 @@ def login_submit(
     request.session["user_id"] = user.id
     return RedirectResponse("/", status_code=303)
 
-
 @router.post("/logout")
 def logout(request: Request):
     request.session.clear()
     return RedirectResponse("/login", status_code=303)
-
 
 @router.get("/change-password", response_class=HTMLResponse)
 def change_password_form(request: Request, db: Session = Depends(get_db)):
@@ -62,7 +58,6 @@ def change_password_form(request: Request, db: Session = Depends(get_db)):
         user=user,
         must_change=user.must_change_password,
     )
-
 
 @router.post("/change-password")
 def change_password_submit(

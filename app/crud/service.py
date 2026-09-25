@@ -4,9 +4,7 @@ from app.core.exceptions import ValidationError
 from app.models.device import Device
 from app.models.service import Service
 
-# Допустимые протоколы
 VALID_PROTOCOLS = {"http", "https", "rtsp", "ssh", "other"}
-
 
 def list_by_device(db: Session, device_id: int) -> list[Service]:
     return (
@@ -16,10 +14,8 @@ def list_by_device(db: Session, device_id: int) -> list[Service]:
         .all()
     )
 
-
 def get_by_id(db: Session, service_id: int) -> Service | None:
     return db.get(Service, service_id)
-
 
 def _validate(
     name: str,
@@ -50,7 +46,6 @@ def _validate(
 
     return name, protocol, port
 
-
 def create(
     db: Session,
     device_id: int,
@@ -79,7 +74,6 @@ def create(
     db.flush()
     return service
 
-
 def update(
     db: Session,
     service_id: int,
@@ -105,11 +99,9 @@ def update(
     db.flush()
     return service
 
-
 def delete(db: Session, service_id: int) -> None:
     service = get_by_id(db, service_id)
     if service is None:
         raise ValidationError("Service not found", field="id")
     db.delete(service)
     db.flush()
-

@@ -27,19 +27,13 @@ from app.models.user import User
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
-
 def _can_view_passwords(user: User) -> bool:
     return user.role == "admin" or user.can_view_passwords
-
 
 def _can_change_passwords(user: User) -> bool:
     return user.role == "admin" or user.can_change_passwords
 
-
-# ---------- Список устройств ----------
-
 def _parse_ipv4(ip_str: str) -> tuple[int, int, int, int] | None:
-    """Парсит IPv4 в кортеж из 4 целых. Возвращает None, если строка не IPv4."""
     if not ip_str:
         return None
     parts = ip_str.split(".")
@@ -53,7 +47,6 @@ def _parse_ipv4(ip_str: str) -> tuple[int, int, int, int] | None:
         return None
     return octets
 
-
 @router.get("")
 def list_devices(
     request: Request,
@@ -64,12 +57,6 @@ def list_devices(
     devices = crud_device.list_all(db, site.id)
 
     def sort_key(d: Device) -> tuple:
-        """Сортировка по IP как по числу, а не как по строке.
-
-        IP превращается в кортеж из 4 целых, например 192.168.1.10 →
-        (192, 168, 1, 10). Тогда 192.168.1.10 идёт после 192.168.1.9
-        и до 192.168.1.11, а не после 192.168.1.100.
-        """
         parsed = []
         for iface in d.interfaces:
             for ip in iface.ip_addresses:
@@ -105,9 +92,6 @@ def list_devices(
         warning=warning,
     )
 
-
-# ---------- Форма создания ----------
-
 @router.get("/new", response_class=HTMLResponse)
 def new_device_form(
     request: Request,
@@ -129,7 +113,6 @@ def new_device_form(
         **context,
     )
 
-
 @router.post("/new")
 async def new_device_submit(
     request: Request,
@@ -139,9 +122,6 @@ async def new_device_submit(
 ):
     form = await request.form()
     return _process_device_form(request, db, user, site, form, existing_device=None)
-
-
-# ---------- Карточка ----------
 
 @router.get("/{device_id}", response_class=HTMLResponse)
 def view_device(
@@ -178,9 +158,6 @@ def view_device(
         services=services,
     )
 
-
-# ---------- Редактирование ----------
-
 @router.get("/{device_id}/edit", response_class=HTMLResponse)
 def edit_device_form(
     device_id: int,
@@ -215,7 +192,6 @@ def edit_device_form(
         **context,
     )
 
-
 @router.post("/{device_id}/edit")
 async def edit_device_submit(
     device_id: int,
@@ -231,9 +207,6 @@ async def edit_device_submit(
     form = await request.form()
     return _process_device_form(request, db, user, site, form, existing_device=device)
 
-
-# ---------- Удаление ----------
-
 @router.post("/{device_id}/delete")
 def delete_device(
     device_id: int,
@@ -248,9 +221,6 @@ def delete_device(
     crud_device.delete(db, device_id)
     db.commit()
     return RedirectResponse("/devices", status_code=303)
-
-
-# ---------- Общая логика создания/обновления ----------
 
 def _process_device_form(
     request: Request,
@@ -356,9 +326,6 @@ def _process_device_form(
 
     return RedirectResponse("/devices", status_code=303)
 
-
-# ---------- Синхронизация детей ----------
-
 def _sync_wifi_networks(db: Session, device: Device, items: list[dict]) -> dict[int, int]:
     wifi_map: dict[int, int] = {}
     existing = {w.id: w for w in device.wifi_networks}
@@ -400,7 +367,6 @@ def _sync_wifi_networks(db: Session, device: Device, items: list[dict]) -> dict[
     db.flush()
 
     return wifi_map
-
 
 def _sync_interfaces(
     db: Session,
@@ -480,7 +446,6 @@ def _sync_interfaces(
 
     return all_ips
 
-
 def _sync_ports(db: Session, device: Device, items: list[dict]) -> None:
     valid_interface_ids = {
         row[0]
@@ -522,7 +487,6 @@ def _sync_ports(db: Session, device: Device, items: list[dict]) -> None:
             db.delete(port)
     db.flush()
 
-
 def _sync_dhcp_pools(db: Session, device: Device, items: list[dict]) -> None:
     existing = {p.id: p for p in device.dhcp_pools}
     seen_ids = set()
@@ -560,7 +524,6 @@ def _sync_dhcp_pools(db: Session, device: Device, items: list[dict]) -> None:
             db.delete(pool)
     db.flush()
 
-
 def _sync_credentials(db: Session, device: Device, items: list[dict]) -> None:
     existing = {c.id: c for c in device.credentials}
     seen_ids = set()
@@ -595,7 +558,6 @@ def _sync_credentials(db: Session, device: Device, items: list[dict]) -> None:
         if cred_id not in seen_ids:
             db.delete(cred)
     db.flush()
-
 
 def _sync_services(db: Session, device: Device, items: list[dict]) -> None:
     existing = {s.id: s for s in device.services}
@@ -632,9 +594,6 @@ def _sync_services(db: Session, device: Device, items: list[dict]) -> None:
             db.delete(svc)
     db.flush()
 
-
-# ---------- Вспомогательные ----------
-
 def _form_context(db: Session, site_id: int) -> dict:
     return {
         "device_types": crud_device_type.list_all(db),
@@ -644,7 +603,6 @@ def _form_context(db: Session, site_id: int) -> dict:
         "all_wifi_networks": crud_wifi.list_all(db),
         "credential_types": crud_cred_type.list_all(db),
     }
-
 
 def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
     interfaces = []
@@ -736,7 +694,6 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
         "services": services,
     }
 
-
 def _form_dict(form) -> dict:
     return {
         "hostname": form.get("hostname") or "",
@@ -756,7 +713,6 @@ def _form_dict(form) -> dict:
         "services": _collect_services(form),
     }
 
-
 def _to_int(value) -> int | None:
     if value is None:
         return None
@@ -767,7 +723,6 @@ def _to_int(value) -> int | None:
         return int(value)
     except ValueError:
         return None
-
 
 def _resolve_wifi_id(value, wifi_map: dict[int, int]) -> int | None:
     if value is None:
@@ -785,7 +740,6 @@ def _resolve_wifi_id(value, wifi_map: dict[int, int]) -> int | None:
         return int(value)
     except ValueError:
         return None
-
 
 def _collect_interfaces(form) -> list[dict]:
     ids = form.getlist("interface_id")
@@ -831,7 +785,6 @@ def _collect_interfaces(form) -> list[dict]:
 
     return result
 
-
 def _collect_ports(form) -> list[dict]:
     ids = form.getlist("port_id")
     names = form.getlist("port_name")
@@ -856,7 +809,6 @@ def _collect_ports(form) -> list[dict]:
         })
 
     return result
-
 
 def _collect_wifi_networks(form) -> list[dict]:
     ids = form.getlist("wifi_id")
@@ -889,7 +841,6 @@ def _collect_wifi_networks(form) -> list[dict]:
 
     return result
 
-
 def _collect_dhcp_pools(form) -> list[dict]:
     ids = form.getlist("dhcp_id")
     names = form.getlist("dhcp_name")
@@ -921,7 +872,6 @@ def _collect_dhcp_pools(form) -> list[dict]:
 
     return result
 
-
 def _collect_credentials(form) -> list[dict]:
     ids = form.getlist("credential_id")
     type_ids = form.getlist("credential_type_id")
@@ -951,7 +901,6 @@ def _collect_credentials(form) -> list[dict]:
         })
 
     return result
-
 
 def _collect_services(form) -> list[dict]:
     ids = form.getlist("service_id")
@@ -987,7 +936,6 @@ def _collect_services(form) -> list[dict]:
 
     return result
 
-
 def _check_dhcp_conflicts(db: Session, ips: list[tuple[str, str]]) -> str | None:
     if not ips:
         return None
@@ -1008,4 +956,3 @@ def _check_dhcp_conflicts(db: Session, ips: list[tuple[str, str]]) -> str | None
     if conflicts:
         return "Saved. " + "; ".join(conflicts)
     return None
-

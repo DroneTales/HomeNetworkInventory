@@ -4,9 +4,7 @@ from app.core.security import hash_password
 from app.database import SessionLocal
 from app.models.user import User
 
-
 def ensure_default_admin() -> None:
-    """Создаёт пользователя Admin/Admin, если таблица users пуста."""
     db: Session = SessionLocal()
     try:
         if db.query(User).count() > 0:
@@ -29,4 +27,3 @@ def ensure_default_admin() -> None:
         print("[bootstrap] Default admin user created: Admin / Admin")
     finally:
         db.close()
-

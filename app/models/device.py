@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Device(Base):
     __tablename__ = "devices"
 
@@ -56,4 +55,3 @@ class Device(Base):
     services: Mapped[list["Service"]] = relationship(
         back_populates="device", cascade="all, delete-orphan"
     )
-

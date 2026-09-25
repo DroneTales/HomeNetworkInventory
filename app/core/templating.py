@@ -11,12 +11,10 @@ from app.models.user import User
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
-
 def _resolve_theme(user: User | None) -> str:
     if user is not None and user.theme in ("light", "dark"):
         return user.theme
     return "auto"
-
 
 def render(
     request: Request,
@@ -25,11 +23,6 @@ def render(
     current_site: Site | None = None,
     **extra,
 ) -> HTMLResponse:
-    """Рендерит Jinja2-шаблон с общим контекстом.
-
-    Если current_site не передан явно — берётся из request.state.current_site,
-    куда его кладёт CurrentSiteMiddleware.
-    """
     if current_site is None:
         current_site = getattr(request.state, "current_site", None)
 
@@ -48,4 +41,3 @@ def render(
     }
     context.update(extra)
     return templates.TemplateResponse(template, context)
-

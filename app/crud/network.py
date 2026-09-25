@@ -6,7 +6,6 @@ from app.core.exceptions import ValidationError
 from app.core.validation import validate_ipv4, validate_mask, validate_same_subnet
 from app.models.network import Network
 
-
 def list_all(db: Session, site_id: int) -> list[Network]:
     return (
         db.query(Network)
@@ -14,7 +13,6 @@ def list_all(db: Session, site_id: int) -> list[Network]:
         .order_by(Network.name)
         .all()
     )
-
 
 def get_by_id(db: Session, network_id: int, site_id: int | None = None) -> Network | None:
     net = db.get(Network, network_id)
@@ -24,14 +22,12 @@ def get_by_id(db: Session, network_id: int, site_id: int | None = None) -> Netwo
         return None
     return net
 
-
 def get_by_name(db: Session, name: str, site_id: int) -> Network | None:
     return (
         db.query(Network)
         .filter(Network.name == name, Network.site_id == site_id)
         .first()
     )
-
 
 def create(
     db: Session,
@@ -74,7 +70,6 @@ def create(
     db.add(network)
     db.flush()
     return network
-
 
 def update(
     db: Session,
@@ -119,11 +114,10 @@ def update(
     db.flush()
     return network
 
-
 def delete(db: Session, network_id: int) -> None:
     network = get_by_id(db, network_id)
     if network is None:
-        return  # idempotent
+        return
 
     from app.models.device import Device
     from app.models.ip_address import IPAddress
@@ -153,7 +147,6 @@ def delete(db: Session, network_id: int) -> None:
     db.delete(network)
     db.flush()
 
-
 def contains_ip(network: Network, ip: str) -> bool:
     try:
         net = ipaddress.IPv4Network(
@@ -163,4 +156,3 @@ def contains_ip(network: Network, ip: str) -> bool:
     except ValueError:
         return False
     return addr in net
-

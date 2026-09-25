@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class DeviceType(Base):
     __tablename__ = "device_types"
 
@@ -13,4 +12,3 @@ class DeviceType(Base):
     description: Mapped[str | None] = mapped_column(String(255))
 
     devices: Mapped[list["Device"]] = relationship(back_populates="device_type")
-

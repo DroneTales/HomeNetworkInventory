@@ -9,13 +9,7 @@ from app.models.site import Site
 from app.models.user import User
 from app.models.user_site import UserSite
 
-
-# ============================================================
-# Current user
-# ============================================================
-
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> User | None:
-    """Возвращает текущего пользователя из сессии или None."""
     user_id = request.session.get("user_id")
     if user_id is None:
         return None
@@ -38,9 +32,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User | 
 
     return user
 
-
 def require_user(request: Request, db: Session = Depends(get_db)) -> User:
-    """Требует авторизованного пользователя. Иначе — редирект на /login."""
     user = get_current_user(request, db)
     if user is None:
         raise HTTPException(
@@ -49,29 +41,17 @@ def require_user(request: Request, db: Session = Depends(get_db)) -> User:
         )
     return user
 
-
 def require_admin(user: User = Depends(require_user)) -> User:
     if user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
     return user
-
 
 def require_edit(user: User = Depends(require_user)) -> User:
     if user.role == "admin" or user.can_edit:
         return user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
-
-# ============================================================
-# Sites
-# ============================================================
-
 def get_accessible_sites(db: Session, user: User) -> list[Site]:
-    """Список домов, доступных пользователю.
-
-    Admin — все активные дома.
-    Обычный пользователь — только назначенные (из user_sites), активные.
-    """
     if user.role == "admin":
         return (
             db.query(Site)
@@ -89,7 +69,6 @@ def get_accessible_sites(db: Session, user: User) -> list[Site]:
         .all()
     )
 
-
 def user_can_access_site(db: Session, user: User, site_id: int) -> bool:
     if user.role == "admin":
         return db.get(Site, site_id) is not None
@@ -101,13 +80,7 @@ def user_can_access_site(db: Session, user: User, site_id: int) -> bool:
         is not None
     )
 
-
 def get_current_site(request: Request, user: User, db: Session) -> Site | None:
-    """Возвращает текущий выбранный дом или None.
-
-    Читает cookie `hni_site`. Проверяет, что дом существует, активен
-    и доступен пользователю.
-    """
     site_id = request.cookies.get("hni_site")
     if site_id is None:
         return None
@@ -126,13 +99,11 @@ def get_current_site(request: Request, user: User, db: Session) -> Site | None:
 
     return site
 
-
 def require_site(
     request: Request,
     user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ) -> Site:
-    """Требует выбранного дома. Иначе — редирект на /sites."""
     site = get_current_site(request, user, db)
     if site is None:
         raise HTTPException(
@@ -141,9 +112,7 @@ def require_site(
         )
     return site
 
-
 def set_current_site_cookie(response, site_id: int) -> None:
-    """Устанавливает cookie с выбранным домом. Живёт 1 год."""
     response.set_cookie(
         key="hni_site",
         value=str(site_id),
@@ -154,7 +123,5 @@ def set_current_site_cookie(response, site_id: int) -> None:
         path="/",
     )
 
-
 def clear_current_site_cookie(response) -> None:
     response.delete_cookie("hni_site", path="/")
-

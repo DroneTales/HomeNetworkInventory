@@ -5,7 +5,6 @@ from app.models.credential import Credential
 from app.models.credential_type import CredentialType
 from app.models.device import Device
 
-
 def list_by_device(db: Session, device_id: int) -> list[Credential]:
     return (
         db.query(Credential)
@@ -14,10 +13,8 @@ def list_by_device(db: Session, device_id: int) -> list[Credential]:
         .all()
     )
 
-
 def get_by_id(db: Session, credential_id: int) -> Credential | None:
     return db.get(Credential, credential_id)
-
 
 def _validate(
     type_id: int | None,
@@ -34,7 +31,6 @@ def _validate(
         )
 
     return type_id, username, password
-
 
 def create(
     db: Session,
@@ -63,7 +59,6 @@ def create(
     db.flush()
     return cred
 
-
 def update(
     db: Session,
     credential_id: int,
@@ -88,11 +83,9 @@ def update(
     db.flush()
     return cred
 
-
 def delete(db: Session, credential_id: int) -> None:
     cred = get_by_id(db, credential_id)
     if cred is None:
         raise ValidationError("Credential not found", field="id")
     db.delete(cred)
     db.flush()
-

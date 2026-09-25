@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Connection(Base):
     __tablename__ = "connections"
 
@@ -27,4 +26,3 @@ class Connection(Base):
         back_populates="connections_to",
         foreign_keys=[target_port_id],
     )
-

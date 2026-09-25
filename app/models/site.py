@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Site(Base):
     __tablename__ = "sites"
 
@@ -28,4 +27,3 @@ class Site(Base):
     user_sites: Mapped[list["UserSite"]] = relationship(
         back_populates="site", cascade="all, delete-orphan"
     )
-

@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Network(Base):
     __tablename__ = "networks"
 
@@ -21,4 +20,3 @@ class Network(Base):
     site: Mapped["Site"] = relationship(back_populates="networks")
     devices: Mapped[list["Device"]] = relationship(back_populates="network")
     ip_addresses: Mapped[list["IPAddress"]] = relationship(back_populates="network")
-

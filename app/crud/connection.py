@@ -8,13 +8,7 @@ from app.models.port import Port
 
 VALID_TYPES = {"physical", "logical"}
 
-
 def list_all(db: Session, site_id: int) -> list[Connection]:
-    """Все связи внутри дома.
-
-    Связь принадлежит дому, если её source-порт и target-порт — из
-    устройств этого дома.
-    """
     return (
         db.query(Connection)
         .join(Port, Connection.source_port_id == Port.id)
@@ -23,7 +17,6 @@ def list_all(db: Session, site_id: int) -> list[Connection]:
         .order_by(Connection.id)
         .all()
     )
-
 
 def list_by_port(db: Session, port_id: int) -> list[Connection]:
     return (
@@ -37,7 +30,6 @@ def list_by_port(db: Session, port_id: int) -> list[Connection]:
         .order_by(Connection.id)
         .all()
     )
-
 
 def list_by_device(db: Session, device_id: int) -> list[Connection]:
     port_ids = [
@@ -58,13 +50,11 @@ def list_by_device(db: Session, device_id: int) -> list[Connection]:
         .all()
     )
 
-
 def get_by_id(
     db: Session,
     connection_id: int,
     site_id: int | None = None,
 ) -> Connection | None:
-    """Связь по id. Если site_id передан — проверяет, что оба порта из этого дома."""
     conn = db.get(Connection, connection_id)
     if conn is None:
         return None
@@ -84,9 +74,7 @@ def get_by_id(
         return None
     return conn
 
-
 def _check_port(db: Session, port_id: int, site_id: int, field: str) -> Port:
-    """Проверяет, что порт существует и принадлежит устройству этого дома."""
     port = db.get(Port, port_id)
     if port is None:
         raise ValidationError("Port not found", field=field)
@@ -99,7 +87,6 @@ def _check_port(db: Session, port_id: int, site_id: int, field: str) -> Port:
         )
     return port
 
-
 def _check_not_same(source_port_id: int, target_port_id: int) -> None:
     if source_port_id == target_port_id:
         raise ValidationError(
@@ -107,14 +94,12 @@ def _check_not_same(source_port_id: int, target_port_id: int) -> None:
             field="target_port_id",
         )
 
-
 def _check_duplicate(
     db: Session,
     source_port_id: int,
     target_port_id: int,
     exclude_id: int | None = None,
 ) -> None:
-    """A→B и B→A — одна и та же физическая связь, поэтому обе считаются дубликатом."""
     query = db.query(Connection).filter(
         or_(
             (Connection.source_port_id == source_port_id)
@@ -131,7 +116,6 @@ def _check_duplicate(
             "This connection already exists",
             field="source_port_id",
         )
-
 
 def _validate(
     db: Session,
@@ -155,7 +139,6 @@ def _validate(
     _check_duplicate(db, source_port_id, target_port_id, exclude_id=exclude_id)
 
     return connection_type
-
 
 def create(
     db: Session,
@@ -182,7 +165,6 @@ def create(
     db.add(conn)
     db.flush()
     return conn
-
 
 def update(
     db: Session,
@@ -213,11 +195,9 @@ def update(
     db.flush()
     return conn
 
-
 def delete(db: Session, connection_id: int) -> None:
     conn = db.get(Connection, connection_id)
     if conn is None:
-        return  # idempotent
+        return
     db.delete(conn)
     db.flush()
-

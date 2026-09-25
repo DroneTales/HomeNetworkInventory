@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class IPAddress(Base):
     __tablename__ = "ip_addresses"
 
@@ -22,4 +21,3 @@ class IPAddress(Base):
 
     interface: Mapped["Interface"] = relationship(back_populates="ip_addresses")
     network: Mapped["Network | None"] = relationship(back_populates="ip_addresses")
-

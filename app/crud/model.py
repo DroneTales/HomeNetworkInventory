@@ -4,9 +4,7 @@ from app.core.exceptions import ValidationError
 from app.models.model import Model
 from app.models.vendor import Vendor
 
-
 def list_all(db: Session) -> list[Model]:
-    """Возвращает все модели, отсортированные по имени вендора, потом по имени модели."""
     return (
         db.query(Model)
         .join(Vendor)
@@ -14,9 +12,7 @@ def list_all(db: Session) -> list[Model]:
         .all()
     )
 
-
 def list_by_vendor(db: Session, vendor_id: int) -> list[Model]:
-    """Возвращает модели конкретного вендора (для AJAX-подгрузки в форме)."""
     return (
         db.query(Model)
         .filter(Model.vendor_id == vendor_id)
@@ -24,10 +20,8 @@ def list_by_vendor(db: Session, vendor_id: int) -> list[Model]:
         .all()
     )
 
-
 def get_by_id(db: Session, model_id: int) -> Model | None:
     return db.get(Model, model_id)
-
 
 def get_by_vendor_and_name(db: Session, vendor_id: int, name: str) -> Model | None:
     return (
@@ -35,7 +29,6 @@ def get_by_vendor_and_name(db: Session, vendor_id: int, name: str) -> Model | No
         .filter(Model.vendor_id == vendor_id, Model.name == name)
         .first()
     )
-
 
 def create(db: Session, vendor_id: int, name: str) -> Model:
     if not vendor_id:
@@ -59,7 +52,6 @@ def create(db: Session, vendor_id: int, name: str) -> Model:
     db.add(model)
     db.flush()
     return model
-
 
 def update(db: Session, model_id: int, vendor_id: int, name: str) -> Model:
     model = get_by_id(db, model_id)
@@ -89,11 +81,10 @@ def update(db: Session, model_id: int, vendor_id: int, name: str) -> Model:
     db.flush()
     return model
 
-
 def delete(db: Session, model_id: int) -> None:
     model = get_by_id(db, model_id)
     if model is None:
-        return  # already gone, idempotent
+        return
 
     from app.models.device import Device
 
@@ -106,4 +97,3 @@ def delete(db: Session, model_id: int) -> None:
 
     db.delete(model)
     db.flush()
-

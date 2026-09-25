@@ -7,7 +7,6 @@ from app.models.dhcp_pool import DhcpPool
 
 VALID_TYPES = {"dynamic", "fixed"}
 
-
 def list_by_device(db: Session, device_id: int) -> list[DhcpPool]:
     return (
         db.query(DhcpPool)
@@ -16,14 +15,11 @@ def list_by_device(db: Session, device_id: int) -> list[DhcpPool]:
         .all()
     )
 
-
 def list_all(db: Session) -> list[DhcpPool]:
     return db.query(DhcpPool).order_by(DhcpPool.start_ip).all()
 
-
 def get_by_id(db: Session, pool_id: int) -> DhcpPool | None:
     return db.get(DhcpPool, pool_id)
-
 
 def create(
     db: Session,
@@ -49,7 +45,6 @@ def create(
     start_ip = validate_ipv4(start_ip, field="start_ip")
     end_ip = validate_ipv4(end_ip, field="end_ip")
 
-    # start_ip должен быть <= end_ip
     from ipaddress import IPv4Address
 
     if IPv4Address(start_ip) > IPv4Address(end_ip):
@@ -81,7 +76,6 @@ def create(
     db.add(pool)
     db.flush()
     return pool
-
 
 def update(
     db: Session,
@@ -136,11 +130,9 @@ def update(
     db.flush()
     return pool
 
-
 def delete(db: Session, pool_id: int) -> None:
     pool = get_by_id(db, pool_id)
     if pool is None:
         raise ValidationError("DHCP pool not found", field="id")
     db.delete(pool)
     db.flush()
-

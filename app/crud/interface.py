@@ -6,9 +6,7 @@ from app.models.device import Device
 from app.models.interface import Interface
 from app.models.wifi_network import WiFiNetwork
 
-# Допустимые типы интерфейсов
 VALID_TYPES = {"ethernet", "wifi", "wan", "virtual", "port"}
-
 
 def list_by_device(db: Session, device_id: int) -> list[Interface]:
     return (
@@ -18,17 +16,14 @@ def list_by_device(db: Session, device_id: int) -> list[Interface]:
         .all()
     )
 
-
 def get_by_id(db: Session, interface_id: int) -> Interface | None:
     return db.get(Interface, interface_id)
-
 
 def _check_mac_unique(
     db: Session,
     mac: str | None,
     exclude_id: int | None = None,
 ) -> None:
-    """Проверяет уникальность MAC. Пустой MAC не проверяется."""
     if not mac:
         return
 
@@ -38,7 +33,6 @@ def _check_mac_unique(
 
     if query.first() is not None:
         raise ValidationError(f"MAC address '{mac}' already exists", field="mac")
-
 
 def create(
     db: Session,
@@ -90,7 +84,6 @@ def create(
     db.flush()
     return iface
 
-
 def update(
     db: Session,
     interface_id: int,
@@ -138,16 +131,13 @@ def update(
     db.flush()
     return iface
 
-
 def delete(db: Session, interface_id: int) -> None:
     iface = get_by_id(db, interface_id)
     if iface is None:
-        return  # idempotent
+        return
 
-    # Удаляем порты, ссылающиеся на этот интерфейс (порты физически на этом интерфейсе)
     from app.models.port import Port
     db.query(Port).filter(Port.interface_id == interface_id).delete(synchronize_session=False)
 
     db.delete(iface)
     db.flush()
-

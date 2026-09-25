@@ -3,7 +3,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class Interface(Base):
     __tablename__ = "interfaces"
 
@@ -30,4 +29,3 @@ class Interface(Base):
     ports: Mapped[list["Port"]] = relationship(
         back_populates="interface", cascade="all, delete-orphan"
     )
-

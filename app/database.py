@@ -14,10 +14,8 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
 class Base(DeclarativeBase):
     pass
-
 
 def get_db():
     db = SessionLocal()
@@ -26,21 +24,11 @@ def get_db():
     finally:
         db.close()
 
-
 def check_database_path() -> None:
-    """Проверяет, что папка для SQLite-файла существует.
-
-    Если внешний диск не смонтирован, SQLite создаст файл в пустой папке
-    на SD-карте, и данные «затенятся» при подключении диска.
-    Лучше упасть с внятной ошибкой, чем тихо потерять базу.
-    """
     url = settings.database_url
     if not url.startswith("sqlite"):
         return
 
-    # sqlite:////abs/path/file.db -> /abs/path/file.db
-    # sqlite:///./rel/path/file.db -> ./rel/path/file.db
-    # sqlite:///:memory: -> пропускаем
     path_part = url.replace("sqlite:///", "", 1)
 
     if path_part.startswith(":memory:"):
@@ -59,4 +47,3 @@ def check_database_path() -> None:
         raise RuntimeError(
             f"Нет прав на запись в папку БД: {parent}"
         )
-

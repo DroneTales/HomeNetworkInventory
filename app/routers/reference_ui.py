@@ -17,9 +17,6 @@ from app.models.user import User
 
 router = APIRouter(prefix="/reference", tags=["reference-ui"])
 
-
-# ---------- Индекс ----------
-
 @router.get("", response_class=HTMLResponse)
 def reference_index(
     request: Request,
@@ -32,11 +29,6 @@ def reference_index(
         user=user,
         current_site=site,
     )
-
-
-# ============================================================
-# Locations (привязаны к дому, доступны с правом Can edit)
-# ============================================================
 
 @router.get("/locations", response_class=HTMLResponse)
 def locations_list(
@@ -60,7 +52,6 @@ def locations_list(
         rows=rows,
     )
 
-
 @router.get("/locations/new", response_class=HTMLResponse)
 def locations_new_form(
     request: Request,
@@ -76,7 +67,6 @@ def locations_new_form(
         is_edit=False,
         form_data={},
     )
-
 
 @router.post("/locations/new")
 async def locations_new_submit(
@@ -106,7 +96,6 @@ async def locations_new_submit(
         )
     return RedirectResponse("/reference/locations", status_code=303)
 
-
 @router.get("/locations/{item_id}/edit", response_class=HTMLResponse)
 def locations_edit_form(
     item_id: int,
@@ -127,7 +116,6 @@ def locations_edit_form(
         is_edit=True,
         form_data={"name": item.name, "description": item.description or ""},
     )
-
 
 @router.post("/locations/{item_id}/edit")
 async def locations_edit_submit(
@@ -162,7 +150,6 @@ async def locations_edit_submit(
         )
     return RedirectResponse("/reference/locations", status_code=303)
 
-
 @router.post("/locations/{item_id}/delete")
 def locations_delete(
     item_id: int,
@@ -185,11 +172,6 @@ def locations_delete(
             status_code=303,
         )
     return RedirectResponse("/reference/locations", status_code=303)
-
-
-# ============================================================
-# Device Types (глобальные, только admin)
-# ============================================================
 
 @router.get("/device-types", response_class=HTMLResponse)
 def device_types_list(
@@ -219,7 +201,6 @@ def device_types_list(
         rows=rows,
     )
 
-
 @router.get("/device-types/new", response_class=HTMLResponse)
 def device_types_new_form(
     request: Request,
@@ -235,7 +216,6 @@ def device_types_new_form(
         is_edit=False,
         form_data={"is_active": True},
     )
-
 
 @router.post("/device-types/new")
 async def device_types_new_submit(
@@ -266,7 +246,6 @@ async def device_types_new_submit(
         )
     return RedirectResponse("/reference/device-types", status_code=303)
 
-
 @router.get("/device-types/{item_id}/edit", response_class=HTMLResponse)
 def device_types_edit_form(
     item_id: int,
@@ -291,7 +270,6 @@ def device_types_edit_form(
             "description": item.description or "",
         },
     )
-
 
 @router.post("/device-types/{item_id}/edit")
 async def device_types_edit_submit(
@@ -325,7 +303,6 @@ async def device_types_edit_submit(
         )
     return RedirectResponse("/reference/device-types", status_code=303)
 
-
 @router.post("/device-types/{item_id}/delete")
 def device_types_delete(
     item_id: int,
@@ -344,11 +321,6 @@ def device_types_delete(
             status_code=303,
         )
     return RedirectResponse("/reference/device-types", status_code=303)
-
-
-# ============================================================
-# Vendors (глобальные, только admin)
-# ============================================================
 
 @router.get("/vendors", response_class=HTMLResponse)
 def vendors_list(
@@ -372,7 +344,6 @@ def vendors_list(
         rows=rows,
     )
 
-
 @router.get("/vendors/new", response_class=HTMLResponse)
 def vendors_new_form(
     request: Request,
@@ -388,7 +359,6 @@ def vendors_new_form(
         is_edit=False,
         form_data={},
     )
-
 
 @router.post("/vendors/new")
 async def vendors_new_submit(
@@ -417,7 +387,6 @@ async def vendors_new_submit(
         )
     return RedirectResponse("/reference/vendors", status_code=303)
 
-
 @router.get("/vendors/{item_id}/edit", response_class=HTMLResponse)
 def vendors_edit_form(
     item_id: int,
@@ -438,7 +407,6 @@ def vendors_edit_form(
         is_edit=True,
         form_data={"name": item.name},
     )
-
 
 @router.post("/vendors/{item_id}/edit")
 async def vendors_edit_submit(
@@ -468,7 +436,6 @@ async def vendors_edit_submit(
         )
     return RedirectResponse("/reference/vendors", status_code=303)
 
-
 @router.post("/vendors/{item_id}/delete")
 def vendors_delete(
     item_id: int,
@@ -487,11 +454,6 @@ def vendors_delete(
             status_code=303,
         )
     return RedirectResponse("/reference/vendors", status_code=303)
-
-
-# ============================================================
-# Models (глобальные, только admin)
-# ============================================================
 
 @router.get("/models", response_class=HTMLResponse)
 def models_list(
@@ -518,7 +480,6 @@ def models_list(
         rows=rows,
     )
 
-
 @router.get("/models/new", response_class=HTMLResponse)
 def models_new_form(
     request: Request,
@@ -537,7 +498,6 @@ def models_new_form(
         form_data={},
         vendors=vendors,
     )
-
 
 @router.post("/models/new")
 async def models_new_submit(
@@ -569,7 +529,6 @@ async def models_new_submit(
         )
     return RedirectResponse("/reference/models", status_code=303)
 
-
 @router.get("/models/{item_id}/edit", response_class=HTMLResponse)
 def models_edit_form(
     item_id: int,
@@ -592,7 +551,6 @@ def models_edit_form(
         form_data={"name": item.name, "vendor_id": item.vendor_id},
         vendors=vendors,
     )
-
 
 @router.post("/models/{item_id}/edit")
 async def models_edit_submit(
@@ -625,7 +583,6 @@ async def models_edit_submit(
         )
     return RedirectResponse("/reference/models", status_code=303)
 
-
 @router.post("/models/{item_id}/delete")
 def models_delete(
     item_id: int,
@@ -644,11 +601,6 @@ def models_delete(
             status_code=303,
         )
     return RedirectResponse("/reference/models", status_code=303)
-
-
-# ============================================================
-# Networks (привязаны к дому, доступны с правом Can edit)
-# ============================================================
 
 @router.get("/networks", response_class=HTMLResponse)
 def networks_list(
@@ -683,7 +635,6 @@ def networks_list(
         rows=rows,
     )
 
-
 @router.get("/networks/new", response_class=HTMLResponse)
 def networks_new_form(
     request: Request,
@@ -699,7 +650,6 @@ def networks_new_form(
         is_edit=False,
         form_data={},
     )
-
 
 @router.post("/networks/new")
 async def networks_new_submit(
@@ -728,7 +678,6 @@ async def networks_new_submit(
         )
     return RedirectResponse("/reference/networks", status_code=303)
 
-
 @router.get("/networks/{item_id}/edit", response_class=HTMLResponse)
 def networks_edit_form(
     item_id: int,
@@ -756,7 +705,6 @@ def networks_edit_form(
             "description": item.description or "",
         },
     )
-
 
 @router.post("/networks/{item_id}/edit")
 async def networks_edit_submit(
@@ -790,7 +738,6 @@ async def networks_edit_submit(
         )
     return RedirectResponse("/reference/networks", status_code=303)
 
-
 @router.post("/networks/{item_id}/delete")
 def networks_delete(
     item_id: int,
@@ -814,11 +761,6 @@ def networks_delete(
         )
     return RedirectResponse("/reference/networks", status_code=303)
 
-
-# ============================================================
-# Credential Types (глобальные, только admin)
-# ============================================================
-
 @router.get("/credential-types", response_class=HTMLResponse)
 def credential_types_list(
     request: Request,
@@ -841,7 +783,6 @@ def credential_types_list(
         rows=rows,
     )
 
-
 @router.get("/credential-types/new", response_class=HTMLResponse)
 def credential_types_new_form(
     request: Request,
@@ -857,7 +798,6 @@ def credential_types_new_form(
         is_edit=False,
         form_data={},
     )
-
 
 @router.post("/credential-types/new")
 async def credential_types_new_submit(
@@ -887,7 +827,6 @@ async def credential_types_new_submit(
         )
     return RedirectResponse("/reference/credential-types", status_code=303)
 
-
 @router.get("/credential-types/{item_id}/edit", response_class=HTMLResponse)
 def credential_types_edit_form(
     item_id: int,
@@ -908,7 +847,6 @@ def credential_types_edit_form(
         is_edit=True,
         form_data={"name": item.name, "description": item.description or ""},
     )
-
 
 @router.post("/credential-types/{item_id}/edit")
 async def credential_types_edit_submit(
@@ -939,7 +877,6 @@ async def credential_types_edit_submit(
         )
     return RedirectResponse("/reference/credential-types", status_code=303)
 
-
 @router.post("/credential-types/{item_id}/delete")
 def credential_types_delete(
     item_id: int,
@@ -959,9 +896,6 @@ def credential_types_delete(
         )
     return RedirectResponse("/reference/credential-types", status_code=303)
 
-
-# ---------- Вспомогательное ----------
-
 def _to_int(value) -> int | None:
     if value is None:
         return None
@@ -973,7 +907,6 @@ def _to_int(value) -> int | None:
     except ValueError:
         return None
 
-
 def _network_form_data(form) -> dict:
     return {
         "name": (form.get("name") or "").strip(),
@@ -983,4 +916,3 @@ def _network_form_data(form) -> dict:
         "vlan": _to_int(form.get("vlan")),
         "description": (form.get("description") or "").strip() or None,
     }
-

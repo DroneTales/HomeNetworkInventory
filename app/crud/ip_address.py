@@ -6,15 +6,11 @@ from app.models.dhcp_pool import DhcpPool
 from app.models.interface import Interface
 from app.models.ip_address import IPAddress
 
-# Типы адресации
 VALID_ADDRESS_TYPES = {"static", "dhcp", "external", "reserved"}
 
-# Для этих типов MAC интерфейса обязателен
 MAC_REQUIRED_TYPES = {"dhcp", "reserved"}
 
-# Для external, если маска не задана, используем этот «single host» дефолт
 EXTERNAL_DEFAULT_MASK = "255.255.255.255"
-
 
 def list_by_interface(db: Session, interface_id: int) -> list[IPAddress]:
     return (
@@ -24,10 +20,8 @@ def list_by_interface(db: Session, interface_id: int) -> list[IPAddress]:
         .all()
     )
 
-
 def get_by_id(db: Session, ip_id: int) -> IPAddress | None:
     return db.get(IPAddress, ip_id)
-
 
 def _check_ip_unique(
     db: Session,
@@ -40,7 +34,6 @@ def _check_ip_unique(
 
     if query.first() is not None:
         raise ValidationError(f"IP address '{address}' already exists", field="address")
-
 
 def _check_interface_type(
     db: Session,
@@ -65,7 +58,6 @@ def _check_interface_type(
 
     return iface
 
-
 def validate(
     db: Session,
     interface_id: int,
@@ -76,15 +68,6 @@ def validate(
     dns: str | None = None,
     exclude_id: int | None = None,
 ) -> tuple[str, str, str | None, str | None]:
-    """Проверяет все правила и возвращает нормализованные значения.
-
-    Возвращает кортеж (address, mask, gateway, dns).
-
-    Для address_type='external' маска опциональна: если не задана — подставляем
-    EXTERNAL_DEFAULT_MASK. Также для external не проверяется, что gateway
-    в одной подсети с IP (адрес внешний, шлюз провайдера может быть вне известной
-    нам маски).
-    """
     address_type = (address_type or "").strip().lower()
     if address_type not in VALID_ADDRESS_TYPES:
         raise ValidationError(
@@ -121,7 +104,6 @@ def validate(
 
     return address, mask, gateway, dns
 
-
 def create(
     db: Session,
     interface_id: int,
@@ -151,7 +133,6 @@ def create(
     db.add(ip)
     db.flush()
     return ip
-
 
 def update(
     db: Session,
@@ -185,14 +166,12 @@ def update(
     db.flush()
     return ip
 
-
 def delete(db: Session, ip_id: int) -> None:
     ip = get_by_id(db, ip_id)
     if ip is None:
-        return  # idempotent
+        return
     db.delete(ip)
     db.flush()
-
 
 def check_ip_in_dhcp_pools(db: Session, address: str) -> list[DhcpPool]:
     pools = db.query(DhcpPool).all()
@@ -201,4 +180,3 @@ def check_ip_in_dhcp_pools(db: Session, address: str) -> list[DhcpPool]:
         if is_ip_in_range(address, pool.start_ip, pool.end_ip):
             result.append(pool)
     return result
-

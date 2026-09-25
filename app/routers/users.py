@@ -12,9 +12,6 @@ from app.models.user import User
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-
-# ---------- Список пользователей ----------
-
 @router.get("")
 def list_users(
     request: Request,
@@ -30,9 +27,6 @@ def list_users(
         users=users,
         warning=warning,
     )
-
-
-# ---------- Создание ----------
 
 @router.get("/new", response_class=HTMLResponse)
 def new_user_form(
@@ -51,7 +45,6 @@ def new_user_form(
         all_sites=[],
         assigned_sites=[],
     )
-
 
 @router.post("/new")
 async def new_user_submit(
@@ -99,9 +92,6 @@ async def new_user_submit(
 
     return RedirectResponse("/users", status_code=303)
 
-
-# ---------- Редактирование ----------
-
 @router.get("/{user_id}/edit", response_class=HTMLResponse)
 def edit_user_form(
     user_id: int,
@@ -139,7 +129,6 @@ def edit_user_form(
         all_sites=all_sites,
         assigned_sites=assigned_sites,
     )
-
 
 @router.post("/{user_id}/edit")
 async def edit_user_submit(
@@ -189,9 +178,6 @@ async def edit_user_submit(
 
     return RedirectResponse("/users", status_code=303)
 
-
-# ---------- Назначение домов ----------
-
 @router.post("/{user_id}/sites/add")
 async def add_site_to_user(
     user_id: int,
@@ -218,7 +204,6 @@ async def add_site_to_user(
 
     return RedirectResponse(f"/users/{user_id}/edit", status_code=303)
 
-
 @router.post("/{user_id}/sites/{site_id}/remove")
 def remove_site_from_user(
     user_id: int,
@@ -233,9 +218,6 @@ def remove_site_from_user(
     crud_site.unassign_user(db, user_id=user_id, site_id=site_id)
     db.commit()
     return RedirectResponse(f"/users/{user_id}/edit", status_code=303)
-
-
-# ---------- Сброс пароля ----------
 
 @router.get("/{user_id}/reset-password", response_class=HTMLResponse)
 def reset_password_form(
@@ -256,7 +238,6 @@ def reset_password_form(
         form_action=f"/users/{user_id}/reset-password",
         form_data={},
     )
-
 
 @router.post("/{user_id}/reset-password")
 async def reset_password_submit(
@@ -301,9 +282,6 @@ async def reset_password_submit(
 
     return RedirectResponse("/users", status_code=303)
 
-
-# ---------- Удаление ----------
-
 @router.post("/{user_id}/delete")
 def delete_user(
     user_id: int,
@@ -327,9 +305,6 @@ def delete_user(
 
     return RedirectResponse("/users", status_code=303)
 
-
-# ---------- Вспомогательное ----------
-
 def _collect_form(form) -> dict:
     return {
         "username": (form.get("username") or "").strip(),
@@ -343,4 +318,3 @@ def _collect_form(form) -> dict:
         "language": (form.get("language") or "en").strip().lower(),
         "theme": (form.get("theme") or "auto").strip().lower(),
     }
-

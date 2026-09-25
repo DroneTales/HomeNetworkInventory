@@ -13,9 +13,6 @@ from app.models.user import User
 
 router = APIRouter(prefix="/connections", tags=["connections"])
 
-
-# ---------- Список связей ----------
-
 @router.get("")
 def list_connections(
     request: Request,
@@ -34,9 +31,6 @@ def list_connections(
         warning=warning,
     )
 
-
-# ---------- Форма создания ----------
-
 @router.get("/new", response_class=HTMLResponse)
 def new_connection_form(
     request: Request,
@@ -54,7 +48,6 @@ def new_connection_form(
         form_action="/connections/new",
         form_data={},
     )
-
 
 @router.post("/new")
 async def new_connection_submit(
@@ -108,9 +101,6 @@ async def new_connection_submit(
 
     return RedirectResponse("/connections", status_code=303)
 
-
-# ---------- Удаление ----------
-
 @router.post("/{connection_id}/delete")
 def delete_connection(
     connection_id: int,
@@ -126,11 +116,7 @@ def delete_connection(
     db.commit()
     return RedirectResponse("/connections", status_code=303)
 
-
-# ---------- Вспомогательное ----------
-
 def _devices_with_ports(db: Session, site_id: int) -> list[dict]:
-    """Список устройств текущего дома, у которых есть порты."""
     devices = crud_device.list_all(db, site_id)
     payload = []
     for d in devices:
@@ -149,7 +135,6 @@ def _devices_with_ports(db: Session, site_id: int) -> list[dict]:
             })
     return payload
 
-
 def _to_int(value) -> int | None:
     if value is None:
         return None
@@ -160,4 +145,3 @@ def _to_int(value) -> int | None:
         return int(value)
     except ValueError:
         return None
-

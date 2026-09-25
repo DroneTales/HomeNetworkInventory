@@ -4,23 +4,18 @@ from app.core.exceptions import ValidationError
 from app.core.security import hash_password
 from app.models.user import User
 
-# Допустимые роли
 ROLE_ADMIN = "admin"
 ROLE_USER = "user"
 VALID_ROLES = {ROLE_ADMIN, ROLE_USER}
 
-
 def list_all(db: Session) -> list[User]:
     return db.query(User).order_by(User.username).all()
-
 
 def get_by_id(db: Session, user_id: int) -> User | None:
     return db.get(User, user_id)
 
-
 def get_by_username(db: Session, username: str) -> User | None:
     return db.query(User).filter(User.username == username).first()
-
 
 def _validate_username(username: str) -> str:
     username = (username or "").strip()
@@ -32,14 +27,9 @@ def _validate_username(username: str) -> str:
         raise ValidationError("Username must be at most 100 characters", field="username")
     return username
 
-
 def _validate_password(password: str) -> None:
     if password is None or len(password) < 1:
         raise ValidationError("Password is required", field="password")
-    # Минимум 5 символов — предупреждение, а не запрет.
-    # Здесь мы не бросаем ошибку, только даём сигнал через возвращаемое значение.
-    # Реальная логика предупреждения — в роутере.
-
 
 def _validate_flags(
     role: str,
@@ -47,12 +37,6 @@ def _validate_flags(
     can_view_passwords: bool,
     can_change_passwords: bool,
 ) -> None:
-    """Проверяет комбинации флагов.
-
-    Запрещённые комбинации:
-    - can_change_passwords=True при can_edit=False (менять пароль без права менять данные)
-    - can_change_passwords=True при can_view_passwords=False (менять то, чего не видишь)
-    """
     if role == ROLE_ADMIN:
         return
 
@@ -67,7 +51,6 @@ def _validate_flags(
             "Cannot allow changing passwords without viewing passwords",
             field="can_change_passwords",
         )
-
 
 def create(
     db: Session,
@@ -109,7 +92,6 @@ def create(
     db.flush()
     return user
 
-
 def update(
     db: Session,
     user_id: int,
@@ -148,7 +130,6 @@ def update(
     db.flush()
     return user
 
-
 def reset_password(
     db: Session,
     user_id: int,
@@ -167,7 +148,6 @@ def reset_password(
     db.flush()
     return user
 
-
 def change_own_password(db: Session, user_id: int, old_password: str, new_password: str) -> User:
     from app.core.security import verify_password
 
@@ -185,7 +165,6 @@ def change_own_password(db: Session, user_id: int, old_password: str, new_passwo
     user.must_change_password = False
     db.flush()
     return user
-
 
 def update_preferences(
     db: Session,
@@ -208,7 +187,6 @@ def update_preferences(
     db.flush()
     return user
 
-
 def delete(db: Session, user_id: int) -> None:
     user = get_by_id(db, user_id)
     if user is None:
@@ -219,4 +197,3 @@ def delete(db: Session, user_id: int) -> None:
 
     db.delete(user)
     db.flush()
-
