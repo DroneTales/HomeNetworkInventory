@@ -16,6 +16,7 @@ def create(
     db: Session,
     name: str,
     is_active: bool = True,
+    supports_port_forwarding: bool = False,
     description: str | None = None,
 ) -> DeviceType:
     name = (name or "").strip()
@@ -28,6 +29,7 @@ def create(
     device_type = DeviceType(
         name=name,
         is_active=is_active,
+        supports_port_forwarding=supports_port_forwarding,
         description=description,
     )
     db.add(device_type)
@@ -39,6 +41,7 @@ def update(
     type_id: int,
     name: str,
     is_active: bool,
+    supports_port_forwarding: bool = False,
     description: str | None = None,
 ) -> DeviceType:
     device_type = get_by_id(db, type_id)
@@ -55,6 +58,7 @@ def update(
 
     device_type.name = name
     device_type.is_active = is_active
+    device_type.supports_port_forwarding = supports_port_forwarding
     device_type.description = description
     db.flush()
     return device_type

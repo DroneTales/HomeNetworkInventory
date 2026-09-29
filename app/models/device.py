@@ -55,3 +55,14 @@ class Device(Base):
     services: Mapped[list["Service"]] = relationship(
         back_populates="device", cascade="all, delete-orphan"
     )
+
+    port_forwards: Mapped[list["PortForward"]] = relationship(
+        back_populates="device",
+        foreign_keys="PortForward.device_id",
+        cascade="all, delete-orphan",
+    )
+    port_forwards_targeted: Mapped[list["PortForward"]] = relationship(
+        back_populates="internal_device",
+        foreign_keys="PortForward.internal_device_id",
+        passive_deletes=True,
+    )

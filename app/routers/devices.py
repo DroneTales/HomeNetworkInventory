@@ -16,6 +16,7 @@ from app.crud import ip_address as crud_ip
 from app.crud import location as crud_location
 from app.crud import network as crud_network
 from app.crud import port as crud_port
+from app.crud import port_forward as crud_pf
 from app.crud import service as crud_service
 from app.crud import vendor as crud_vendor
 from app.crud import wifi_network as crud_wifi
@@ -143,6 +144,7 @@ def view_device(
     connections = crud_connection.list_by_device(db, device_id)
     credentials = crud_credential.list_by_device(db, device_id)
     services = crud_service.list_by_device(db, device_id)
+    port_forwards = crud_pf.list_by_device(db, device_id)
 
     return render(
         request,
@@ -157,6 +159,7 @@ def view_device(
         connections=connections,
         credentials=credentials,
         services=services,
+        port_forwards=port_forwards,
     )
 
 @router.get("/{device_id}/edit", response_class=HTMLResponse)
@@ -247,6 +250,7 @@ def _process_device_form(
     dhcp_pools = _collect_dhcp_pools(form)
     credentials = _collect_credentials(form)
     services = _collect_services(form)
+    port_forwards = _collect_port_forwards(form)
 
     is_edit = existing_device is not None
     form_action = (
@@ -293,6 +297,7 @@ def _process_device_form(
         _sync_dhcp_pools(db, device, dhcp_pools)
         _sync_credentials(db, device, credentials)
         _sync_services(db, device, services)
+        _sync_port_forwards(db, device, port_forwards)
 
         crud_device.validate_full(db, device)
         db.commit()
@@ -609,6 +614,7 @@ def _form_context(db: Session, site_id: int) -> dict:
         "networks": crud_network.list_all(db, site_id),
         "all_wifi_networks": crud_wifi.list_all(db),
         "credential_types": crud_cred_type.list_all(db),
+        "all_devices": crud_device.list_all(db, site_id),
     }
 
 def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
@@ -683,6 +689,21 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
             "description": s.description or "",
         })
 
+    port_forwards = []
+    for pf in device.port_forwards:
+        port_forwards.append({
+            "id": pf.id,
+            "external_port_start": pf.external_port_start,
+            "external_port_end": pf.external_port_end,
+            "protocol": pf.protocol,
+            "internal_device_id": pf.internal_device_id or "",
+            "internal_ip_manual": pf.internal_ip_manual or "",
+            "internal_port_start": pf.internal_port_start,
+            "internal_port_end": pf.internal_port_end,
+            "description": pf.description or "",
+            "is_active": pf.is_active,
+        })
+
     return {
         "hostname": device.hostname,
         "human_readable_name": device.human_readable_name or "",
@@ -699,6 +720,7 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
         "dhcp_pools": dhcp_pools,
         "credentials": credentials,
         "services": services,
+        "port_forwards": port_forwards,
     }
 
 def _form_dict(form) -> dict:
@@ -718,6 +740,7 @@ def _form_dict(form) -> dict:
         "dhcp_pools": _collect_dhcp_pools(form),
         "credentials": _collect_credentials(form),
         "services": _collect_services(form),
+        "port_forwards": _collect_port_forwards(form),
     }
 
 def _to_int(value) -> int | None:
@@ -972,3 +995,105 @@ def _check_dhcp_conflicts(
     if conflicts:
         return "Saved. " + "; ".join(conflicts)
     return None
+
+
+def _collect_port_forwards(form) -> list[dict]:
+    ids = form.getlist("pf_id")
+    ext_starts = form.getlist("pf_external_start")
+    ext_ends = form.getlist("pf_external_end")
+    protocols = form.getlist("pf_protocol")
+    target_types = form.getlist("pf_target_type")
+    internal_device_ids = form.getlist("pf_internal_device_id")
+    internal_ip_manual_list = form.getlist("pf_internal_ip_manual")
+    internal_starts = form.getlist("pf_internal_start")
+    internal_ends = form.getlist("pf_internal_end")
+    descriptions = form.getlist("pf_description")
+
+    active_flags = set()
+    for idx, v in enumerate(form.getlist("pf_is_active")):
+        if v == "on":
+            active_flags.add(idx)
+    active_by_id = {}
+    for idx, item_id in enumerate(ids):
+        if item_id and item_id.strip() and idx in active_flags:
+            active_by_id[item_id.strip()] = True
+
+    max_len = max(len(ext_starts), len(ids))
+    result = []
+    for i in range(max_len):
+        ext_start = (ext_starts[i] if i < len(ext_starts) else "").strip()
+        ext_end = (ext_ends[i] if i < len(ext_ends) else "").strip()
+        if not ext_start and not ext_end:
+            continue
+
+        item_id = _to_int(ids[i] if i < len(ids) else None)
+        target_type = (target_types[i] if i < len(target_types) else "device").strip().lower()
+        internal_device_id = _to_int(internal_device_ids[i] if i < len(internal_device_ids) else None)
+        internal_ip_manual = (internal_ip_manual_list[i] if i < len(internal_ip_manual_list) else "").strip() or None
+
+        if target_type == "ip":
+            internal_device_id = None
+        else:
+            internal_ip_manual = None
+
+        is_active = True
+        if item_id:
+            is_active = active_by_id.get(str(item_id), False)
+        else:
+            is_active = i in active_flags
+
+        result.append({
+            "id": item_id,
+            "external_port_start": ext_start,
+            "external_port_end": ext_end,
+            "protocol": (protocols[i] if i < len(protocols) else "tcp").strip().lower(),
+            "internal_device_id": internal_device_id,
+            "internal_ip_manual": internal_ip_manual,
+            "internal_port_start": (internal_starts[i] if i < len(internal_starts) else "").strip(),
+            "internal_port_end": (internal_ends[i] if i < len(internal_ends) else "").strip(),
+            "description": (descriptions[i] if i < len(descriptions) else "").strip() or None,
+            "is_active": is_active,
+        })
+    return result
+
+
+def _sync_port_forwards(db: Session, device: Device, items: list[dict]) -> None:
+    existing = {pf.id: pf for pf in device.port_forwards}
+    seen_ids = set()
+
+    for data in items:
+        item_id = data.get("id")
+        if item_id and item_id in existing:
+            crud_pf.update(
+                db,
+                pf_id=item_id,
+                external_port_start=data["external_port_start"],
+                external_port_end=data["external_port_end"],
+                protocol=data["protocol"],
+                internal_device_id=data["internal_device_id"],
+                internal_ip_manual=data["internal_ip_manual"],
+                internal_port_start=data["internal_port_start"],
+                internal_port_end=data["internal_port_end"],
+                description=data["description"],
+                is_active=data["is_active"],
+            )
+            seen_ids.add(item_id)
+        else:
+            crud_pf.create(
+                db,
+                device_id=device.id,
+                external_port_start=data["external_port_start"],
+                external_port_end=data["external_port_end"],
+                protocol=data["protocol"],
+                internal_device_id=data["internal_device_id"],
+                internal_ip_manual=data["internal_ip_manual"],
+                internal_port_start=data["internal_port_start"],
+                internal_port_end=data["internal_port_end"],
+                description=data["description"],
+                is_active=data["is_active"],
+            )
+
+    for pf_id, pf in existing.items():
+        if pf_id not in seen_ids:
+            db.delete(pf)
+    db.flush()

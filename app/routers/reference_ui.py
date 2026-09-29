@@ -214,7 +214,7 @@ def device_types_new_form(
         current_site=site,
         form_action="/reference/device-types/new",
         is_edit=False,
-        form_data={"is_active": True},
+        form_data={"is_active": True, "supports_port_forwarding": False},
     )
 
 @router.post("/device-types/new")
@@ -227,10 +227,11 @@ async def device_types_new_submit(
     form = await request.form()
     name = (form.get("name") or "").strip()
     is_active = form.get("is_active") == "on"
+    supports_pf = form.get("supports_port_forwarding") == "on"
     description = (form.get("description") or "").strip() or None
 
     try:
-        crud_device_type.create(db, name=name, is_active=is_active, description=description)
+        crud_device_type.create(db, name=name, is_active=is_active, supports_port_forwarding=supports_pf, description=description)
         db.commit()
     except ValidationError as e:
         db.rollback()
@@ -242,7 +243,7 @@ async def device_types_new_submit(
             form_action="/reference/device-types/new",
             is_edit=False,
             error=e.message,
-            form_data={"name": name, "is_active": is_active, "description": description or ""},
+            form_data={"name": name, "is_active": is_active, "supports_port_forwarding": supports_pf, "description": description or ""},
         )
     return RedirectResponse("/reference/device-types", status_code=303)
 
@@ -267,6 +268,7 @@ def device_types_edit_form(
         form_data={
             "name": item.name,
             "is_active": item.is_active,
+            "supports_port_forwarding": item.supports_port_forwarding,
             "description": item.description or "",
         },
     )
@@ -282,11 +284,12 @@ async def device_types_edit_submit(
     form = await request.form()
     name = (form.get("name") or "").strip()
     is_active = form.get("is_active") == "on"
+    supports_pf = form.get("supports_port_forwarding") == "on"
     description = (form.get("description") or "").strip() or None
 
     try:
         crud_device_type.update(
-            db, type_id=item_id, name=name, is_active=is_active, description=description
+            db, type_id=item_id, name=name, is_active=is_active, supports_port_forwarding=supports_pf, description=description
         )
         db.commit()
     except ValidationError as e:
@@ -299,7 +302,7 @@ async def device_types_edit_submit(
             form_action=f"/reference/device-types/{item_id}/edit",
             is_edit=True,
             error=e.message,
-            form_data={"name": name, "is_active": is_active, "description": description or ""},
+            form_data={"name": name, "is_active": is_active, "supports_port_forwarding": supports_pf, "description": description or ""},
         )
     return RedirectResponse("/reference/device-types", status_code=303)
 

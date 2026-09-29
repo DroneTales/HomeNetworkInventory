@@ -53,6 +53,7 @@
                         {% for t_item in device_types %}
                         <option value="{{ t_item.id }}"
                                 data-is-active="{{ '1' if t_item.is_active else '0' }}"
+                                data-supports-pf="{{ '1' if t_item.supports_port_forwarding else '0' }}"
                                 {% if fd.device_type_id and fd.device_type_id|string == t_item.id|string %}selected{% endif %}>
                             {{ t_item.name }}{% if not t_item.is_active %} (passive){% endif %}
                         </option>
@@ -257,6 +258,27 @@
         </div>
     </div>
 
+    {# ---------- Port forwarding ---------- #}
+    <div class="card info-card section-port-forwarding mb-3" id="port-forwarding-section" style="display:none">
+        <div class="card-header">
+            <i class="fa-solid fa-right-left"></i>
+            <span>Port forwarding</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-pf-btn">
+                <i class="fa-solid fa-plus me-1"></i>Add rule
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="pf-container">
+                {% for pf in fd.port_forwards or [] %}
+                    {% include "devices/_port_forward_row.html" with context %}
+                {% endfor %}
+            </div>
+            <div id="pf-empty" class="text-muted small {% if fd.port_forwards %}d-none{% endif %}">
+                No port forwarding rules yet.
+            </div>
+        </div>
+    </div>
+
     {# ---------- Remarks ---------- #}
     <div class="card info-card section-remarks mb-3">
         <div class="card-header">
@@ -303,6 +325,12 @@
 <template id="dhcp-row-template">
     {% with pool = None %}
         {% include "devices/_dhcp_row.html" with context %}
+    {% endwith %}
+</template>
+
+<template id="pf-row-template">
+    {% with pf = None %}
+        {% include "devices/_port_forward_row.html" with context %}
     {% endwith %}
 </template>
 

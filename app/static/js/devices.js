@@ -135,6 +135,31 @@
         removeBtnClass: "remove-credential-btn",
     });
 
+    function bindPortForwardRow(row) {
+        const targetType = row.querySelector(".pf-target-type");
+        const deviceBlock = row.querySelector(".pf-target-device-block");
+        const ipBlock = row.querySelector(".pf-target-ip-block");
+
+        function refreshTarget() {
+            const val = targetType ? targetType.value : "device";
+            if (deviceBlock) deviceBlock.classList.toggle("d-none", val !== "device");
+            if (ipBlock) ipBlock.classList.toggle("d-none", val !== "ip");
+        }
+
+        if (targetType) targetType.addEventListener("change", refreshTarget);
+        refreshTarget();
+    }
+
+    setupList({
+        containerId: "pf-container",
+        emptyHintId: "pf-empty",
+        addBtnId: "add-pf-btn",
+        templateId: "pf-row-template",
+        rowClass: "pf-row",
+        removeBtnClass: "remove-pf-btn",
+        afterBind: bindPortForwardRow,
+    });
+
     setupList({
         containerId: "services-container",
         emptyHintId: "services-empty",
@@ -188,5 +213,20 @@
             loadModels(vendorSelect.value, preselectedModel);
         }
     }
+
+    (function () {
+        const select = document.getElementById("device_type_id");
+        const section = document.getElementById("port-forwarding-section");
+        if (!select || !section) return;
+
+        function refresh() {
+            const opt = select.options[select.selectedIndex];
+            const supports = opt && opt.getAttribute("data-supports-pf") === "1";
+            section.style.display = supports ? "" : "none";
+        }
+
+        select.addEventListener("change", refresh);
+        refresh();
+    })();
 })();
 

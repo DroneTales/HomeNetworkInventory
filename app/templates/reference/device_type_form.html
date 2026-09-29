@@ -31,6 +31,14 @@
                     Active device (must have at least one IP; passive devices have no IP)
                 </label>
             </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="supports_port_forwarding"
+                       name="supports_port_forwarding"
+                       {% if fd.supports_port_forwarding %}checked{% endif %}>
+                <label class="form-check-label" for="supports_port_forwarding">
+                    Supports port forwarding (adds a Port forwarding block to this device type)
+                </label>
+            </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
                 <input type="text" class="form-control" id="description" name="description"

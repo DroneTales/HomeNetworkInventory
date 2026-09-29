@@ -10,6 +10,7 @@ from app.models.location import Location
 from app.models.model import Model
 from app.models.network import Network
 from app.models.port import Port
+from app.models.port_forward import PortForward
 from app.models.service import Service
 from app.models.site import Site
 from app.models.user import User
@@ -30,6 +31,7 @@ __all__ = [
     "Model",
     "Network",
     "Port",
+    "PortForward",
     "Service",
     "Site",
     "User",
