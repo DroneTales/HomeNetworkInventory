@@ -48,7 +48,7 @@
                 {% if current_user.role == 'admin' or current_user.can_edit %}
                 <li class="nav-item">
                     <a class="nav-link" href="/reference">
-                        <i class="fa-solid fa-book me-1"></i>Reference
+                        <i class="fa-solid fa-book me-1"></i>{{ t('nav.reference') }}
                     </a>
                 </li>
                 {% endif %}
@@ -79,7 +79,7 @@
                 <form method="post" action="/sites/switch" class="d-inline">
                     <button type="submit" class="btn btn-sm btn-outline-secondary">
                         <i class="fa-solid fa-right-left me-1"></i>
-                        {% if lang == 'ru' %}Сменить дом{% else %}Switch home{% endif %}
+                        {{ t('nav.switch_home') }}
                     </button>
                 </form>
                 {% endif %}

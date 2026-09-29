@@ -7,7 +7,7 @@
     <div>
         <h1 class="mb-1">
             {{ device.hostname }}
-            {% if not device.is_active %}<span class="badge bg-secondary">inactive</span>{% endif %}
+            {% if not device.is_active %}<span class="badge bg-secondary">{{ t('common.inactive') }}</span>{% endif %}
         </h1>
         {% if device.human_readable_name %}
         <div class="text-muted">{{ device.human_readable_name }}</div>
@@ -15,18 +15,18 @@
     </div>
     <div>
         <a href="/devices" class="btn btn-outline-secondary">
-            <i class="fa-solid fa-arrow-left me-1"></i>Back
+            <i class="fa-solid fa-arrow-left me-1"></i>{{ t('devices.view.btn.back') }}
         </a>
         {% if current_user.role == 'admin' or current_user.can_edit %}
         <a href="/devices/{{ device.id }}/edit" class="btn btn-outline-primary">
-            <i class="fa-solid fa-pen me-1"></i>Edit
+            <i class="fa-solid fa-pen me-1"></i>{{ t('common.edit') }}
         </a>
         {% endif %}
         {% if current_user.role == 'admin' %}
         <form method="post" action="/devices/{{ device.id }}/delete" class="d-inline"
-              onsubmit="return confirm('Delete device {{ device.hostname }}? This cannot be undone.');">
+              onsubmit="return confirm('{{ t('devices.view.confirm_delete') }}');">
             <button type="submit" class="btn btn-outline-danger">
-                <i class="fa-solid fa-trash me-1"></i>Delete
+                <i class="fa-solid fa-trash me-1"></i>{{ t('common.delete') }}
             </button>
         </form>
         {% endif %}
@@ -37,40 +37,40 @@
 <div class="card info-card section-basic mb-3">
     <div class="card-header">
         <i class="fa-solid fa-circle-info"></i>
-        <span>Basic</span>
+        <span>{{ t('devices.view.section.basic') }}</span>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-6">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">Hostname</dt>
+                    <dt class="col-sm-4">{{ t('devices.list.hostname') }}</dt>
                     <dd class="col-sm-8">{{ device.hostname }}</dd>
 
-                    <dt class="col-sm-4">Human name</dt>
+                    <dt class="col-sm-4">{{ t('devices.view.field.human_name') }}</dt>
                     <dd class="col-sm-8">{{ device.human_readable_name or '—' }}</dd>
 
-                    <dt class="col-sm-4">Device type</dt>
+                    <dt class="col-sm-4">{{ t('devices.form.field.device_type') }}</dt>
                     <dd class="col-sm-8">
                         {{ device.device_type.name if device.device_type else '—' }}
                         {% if device.device_type %}
                             {% if device.device_type.is_active %}
-                            <span class="badge bg-success">active</span>
+                            <span class="badge bg-success">{{ t('devices.view.badge.active') }}</span>
                             {% else %}
-                            <span class="badge bg-secondary">passive</span>
+                            <span class="badge bg-secondary">{{ t('devices.form.passive') }}</span>
                             {% endif %}
                         {% endif %}
                     </dd>
 
-                    <dt class="col-sm-4">Vendor</dt>
+                    <dt class="col-sm-4">{{ t('devices.list.vendor') }}</dt>
                     <dd class="col-sm-8">{{ device.vendor.name if device.vendor else '—' }}</dd>
 
-                    <dt class="col-sm-4">Model</dt>
+                    <dt class="col-sm-4">{{ t('devices.list.model') }}</dt>
                     <dd class="col-sm-8">{{ device.model.name if device.model else '—' }}</dd>
 
-                    <dt class="col-sm-4">Location</dt>
+                    <dt class="col-sm-4">{{ t('devices.list.location') }}</dt>
                     <dd class="col-sm-8">{{ device.location.name if device.location else '—' }}</dd>
 
-                    <dt class="col-sm-4">Network</dt>
+                    <dt class="col-sm-4">{{ t('devices.form.field.network') }}</dt>
                     <dd class="col-sm-8">
                         {% if device.network %}
                             {{ device.network.name }}
@@ -83,10 +83,10 @@
             </div>
             <div class="col-md-6">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">Created</dt>
+                    <dt class="col-sm-4">{{ t('devices.view.field.created') }}</dt>
                     <dd class="col-sm-8">{{ device.created_at.strftime('%Y-%m-%d %H:%M') }}</dd>
 
-                    <dt class="col-sm-4">Updated</dt>
+                    <dt class="col-sm-4">{{ t('devices.view.field.updated') }}</dt>
                     <dd class="col-sm-8">{{ device.updated_at.strftime('%Y-%m-%d %H:%M') }}</dd>
                 </dl>
             </div>
@@ -98,26 +98,26 @@
 <div class="card info-card section-interfaces mb-3">
     <div class="card-header">
         <i class="fa-solid fa-ethernet"></i>
-        <span>Interfaces</span>
+        <span>{{ t('devices.view.section.interfaces') }}</span>
         <span class="section-count">({{ interfaces|length }})</span>
     </div>
     <div class="card-body">
         {% if not interfaces %}
-        <div class="text-muted small">No interfaces.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.interfaces') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>MAC</th>
-                    <th>IP</th>
-                    <th>Mask</th>
-                    <th>Address type</th>
-                    <th>Gateway</th>
-                    <th>DNS</th>
-                    <th>Connected Wi-Fi</th>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.list.type') }}</th>
+                    <th>{{ t('devices.list.mac') }}</th>
+                    <th>{{ t('devices.list.local_ip') }}</th>
+                    <th>{{ t('devices.form.field.mask') }}</th>
+                    <th>{{ t('devices.form.field.address_type') }}</th>
+                    <th>{{ t('devices.list.gateway') }}</th>
+                    <th>{{ t('devices.form.field.dns') }}</th>
+                    <th>{{ t('devices.view.field.connected_wifi') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -133,7 +133,7 @@
                             {% endif %}
                             <td>
                                 {% if ip.address %}{{ ip.address }}
-                                {% elif ip.address_type == 'dhcp' %}<span class="text-muted fst-italic">DHCP (unknown)</span>
+                                {% elif ip.address_type == 'dhcp' %}<span class="text-muted fst-italic">{{ t('devices.view.dhcp_unknown') }}</span>
                                 {% else %}—{% endif %}
                             </td>
                             <td>{{ ip.mask or '—' }}</td>
@@ -178,20 +178,20 @@
 <div class="card info-card section-ports mb-3">
     <div class="card-header">
         <i class="fa-solid fa-plug"></i>
-        <span>Ports</span>
+        <span>{{ t('devices.view.section.ports') }}</span>
         <span class="section-count">({{ ports|length }})</span>
     </div>
     <div class="card-body">
         {% if not ports %}
-        <div class="text-muted small">No ports.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.ports') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Interface</th>
-                    <th>Description</th>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.form.field.interface') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -213,22 +213,22 @@
 <div class="card info-card section-wifi mb-3">
     <div class="card-header">
         <i class="fa-solid fa-wifi"></i>
-        <span>Wi-Fi networks (this device broadcasts)</span>
+        <span>{{ t('devices.view.section.wifi') }}</span>
         <span class="section-count">({{ wifi_networks|length }})</span>
     </div>
     <div class="card-body">
         {% if not wifi_networks %}
-        <div class="text-muted small">No Wi-Fi networks.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.wifi') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>SSID</th>
-                    <th>Band</th>
-                    <th>Encryption</th>
-                    <th>Password</th>
-                    <th>Guest</th>
+                    <th>{{ t('devices.form.field.ssid') }}</th>
+                    <th>{{ t('devices.form.field.band') }}</th>
+                    <th>{{ t('devices.form.field.encryption') }}</th>
+                    <th>{{ t('devices.form.field.password') }}</th>
+                    <th>{{ t('devices.form.field.guest') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -242,7 +242,7 @@
                             {% if current_user.role == 'admin' or current_user.can_view_passwords %}
                             <span class="password-cell" data-password="{{ w.password }}">
                                 <span class="password-mask">••••••••</span>
-                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">show</button>
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">{{ t('devices.view.btn.show_password') }}</button>
                             </span>
                             {% else %}
                             <span class="text-muted">••••••••</span>
@@ -251,7 +251,7 @@
                         —
                         {% endif %}
                     </td>
-                    <td>{% if w.is_guest %}yes{% else %}—{% endif %}</td>
+                    <td>{% if w.is_guest %}{{ t('common.yes') }}{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -265,23 +265,23 @@
 <div class="card info-card section-dhcp mb-3">
     <div class="card-header">
         <i class="fa-solid fa-server"></i>
-        <span>DHCP pools (this device serves)</span>
+        <span>{{ t('devices.view.section.dhcp') }}</span>
         <span class="section-count">({{ dhcp_pools|length }})</span>
     </div>
     <div class="card-body">
         {% if not dhcp_pools %}
-        <div class="text-muted small">No DHCP pools.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.dhcp') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Range</th>
-                    <th>Gateway</th>
-                    <th>DNS</th>
-                    <th>Description</th>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.list.type') }}</th>
+                    <th>{{ t('devices.view.field.range') }}</th>
+                    <th>{{ t('devices.list.gateway') }}</th>
+                    <th>{{ t('devices.form.field.dns') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -306,21 +306,21 @@
 <div class="card info-card section-credentials mb-3">
     <div class="card-header">
         <i class="fa-solid fa-key"></i>
-        <span>Credentials</span>
+        <span>{{ t('devices.view.section.credentials') }}</span>
         <span class="section-count">({{ credentials|length }})</span>
     </div>
     <div class="card-body">
         {% if not credentials %}
-        <div class="text-muted small">No credentials.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.credentials') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>Type</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Description</th>
+                    <th>{{ t('devices.list.type') }}</th>
+                    <th>{{ t('devices.form.field.username') }}</th>
+                    <th>{{ t('devices.form.field.password') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -333,7 +333,7 @@
                             {% if current_user.role == 'admin' or current_user.can_view_passwords %}
                             <span class="password-cell" data-password="{{ c.password }}">
                                 <span class="password-mask">••••••••</span>
-                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">show</button>
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">{{ t('devices.view.btn.show_password') }}</button>
                             </span>
                             {% else %}
                             <span class="text-muted">••••••••</span>
@@ -356,23 +356,23 @@
 <div class="card info-card section-services mb-3">
     <div class="card-header">
         <i class="fa-solid fa-cogs"></i>
-        <span>Services</span>
+        <span>{{ t('devices.view.section.services') }}</span>
         <span class="section-count">({{ services|length }})</span>
     </div>
     <div class="card-body">
         {% if not services %}
-        <div class="text-muted small">No services.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.services') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Protocol</th>
-                    <th>Port</th>
-                    <th>URL</th>
-                    <th>Path</th>
-                    <th>Description</th>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.form.field.protocol') }}</th>
+                    <th>{{ t('devices.form.field.port') }}</th>
+                    <th>{{ t('devices.form.field.url') }}</th>
+                    <th>{{ t('devices.form.field.path') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -407,23 +407,23 @@
 <div class="card info-card section-port-forwarding mb-3">
     <div class="card-header">
         <i class="fa-solid fa-right-left"></i>
-        <span>Port forwarding</span>
+        <span>{{ t('devices.view.section.pf') }}</span>
         <span class="section-count">({{ port_forwards|length }})</span>
     </div>
     <div class="card-body">
         {% if not port_forwards %}
-        <div class="text-muted small">No port forwarding rules.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.pf') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>External</th>
-                    <th>Proto</th>
-                    <th>Target</th>
-                    <th>Internal</th>
-                    <th>Description</th>
-                    <th>Active</th>
+                    <th>{{ t('devices.view.field.external') }}</th>
+                    <th>{{ t('devices.form.field.protocol') }}</th>
+                    <th>{{ t('devices.form.field.target') }}</th>
+                    <th>{{ t('devices.view.field.internal') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
+                    <th>{{ t('devices.form.field.active') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -454,7 +454,7 @@
                         {% endif %}
                     </td>
                     <td>{{ pf.description or '—' }}</td>
-                    <td>{% if pf.is_active %}yes{% else %}no{% endif %}</td>
+                    <td>{% if pf.is_active %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -468,35 +468,35 @@
 <div class="card info-card section-connections mb-3">
     <div class="card-header">
         <i class="fa-solid fa-link"></i>
-        <span>Connections</span>
+        <span>{{ t('devices.view.section.connections') }}</span>
         <span class="section-count">({{ connections|length }})</span>
         {% if current_user.role == 'admin' or current_user.can_edit %}
         <a href="/connections/new" class="btn btn-sm btn-outline-primary ms-auto">
-            <i class="fa-solid fa-plus me-1"></i>Add connection
+            <i class="fa-solid fa-plus me-1"></i>{{ t('devices.view.btn.add_connection') }}
         </a>
         {% endif %}
     </div>
     <div class="card-body">
         {% if not connections %}
-        <div class="text-muted small">No connections.</div>
+        <div class="text-muted small">{{ t('devices.view.empty.connections') }}</div>
         {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>Direction</th>
-                    <th>This port</th>
-                    <th>Other port</th>
-                    <th>Type</th>
-                    <th>Cable</th>
-                    <th>Description</th>
+                    <th>{{ t('devices.view.field.direction') }}</th>
+                    <th>{{ t('devices.view.field.this_port') }}</th>
+                    <th>{{ t('devices.view.field.other_port') }}</th>
+                    <th>{{ t('devices.list.type') }}</th>
+                    <th>{{ t('devices.view.field.cable') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for c in connections %}
                 <tr class="{% if not c.is_active %}text-muted{% endif %}">
                     {% if c.source_port.device_id == device.id %}
-                    <td><i class="fa-solid fa-arrow-right text-success"></i> outgoing</td>
+                    <td><i class="fa-solid fa-arrow-right text-success"></i> {{ t('devices.view.outgoing') }}</td>
                     <td>
                         <code>{{ c.source_port.name }}</code>
                         <span class="text-muted small">({{ c.source_port.interface.name }})</span>
@@ -507,7 +507,7 @@
                         <span class="text-muted small">({{ c.target_port.interface.name }})</span>
                     </td>
                     {% else %}
-                    <td><i class="fa-solid fa-arrow-left text-primary"></i> incoming</td>
+                    <td><i class="fa-solid fa-arrow-left text-primary"></i> {{ t('devices.view.incoming') }}</td>
                     <td>
                         <code>{{ c.target_port.name }}</code>
                         <span class="text-muted small">({{ c.target_port.interface.name }})</span>
@@ -535,7 +535,7 @@
 <div class="card info-card section-remarks mb-3">
     <div class="card-header">
         <i class="fa-solid fa-note-sticky"></i>
-        <span>Remarks</span>
+        <span>{{ t('devices.view.section.remarks') }}</span>
     </div>
     <div class="card-body">
         <pre class="mb-0" style="white-space: pre-wrap;">{{ device.remarks }}</pre>

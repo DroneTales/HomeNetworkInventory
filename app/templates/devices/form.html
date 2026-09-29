@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}{% if is_edit %}Edit {{ form_data.hostname or '' }}{% else %}{{ t('devices.add') }}{% endif %}{% endblock %}
+{% block title %}{% if is_edit %}{{ t('devices.form.edit_title') }} {{ form_data.hostname or '' }}{% else %}{{ t('devices.add') }}{% endif %}{% endblock %}
 
 {% block content %}
 {% set fd = form_data or {} %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">
         {% if is_edit %}
-        <i class="fa-solid fa-pen me-2"></i>Edit device
+        <i class="fa-solid fa-pen me-2"></i>{{ t('devices.form.edit_title') }}
         {% else %}
         <i class="fa-solid fa-plus me-2"></i>{{ t('devices.add') }}
         {% endif %}
@@ -31,23 +31,23 @@
     <div class="card info-card section-basic mb-3">
         <div class="card-header">
             <i class="fa-solid fa-circle-info"></i>
-            <span>Basic</span>
+            <span>{{ t('devices.form.section.basic') }}</span>
         </div>
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-12 col-md-6">
-                    <label for="hostname" class="form-label">Hostname *</label>
+                    <label for="hostname" class="form-label">{{ t('devices.list.hostname') }} *</label>
                     <input type="text" class="form-control" id="hostname" name="hostname"
                            value="{{ fd.hostname or '' }}" required maxlength="100">
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="human_readable_name" class="form-label">Human readable name</label>
+                    <label for="human_readable_name" class="form-label">{{ t('devices.form.field.human_readable_name') }}</label>
                     <input type="text" class="form-control" id="human_readable_name"
                            name="human_readable_name"
                            value="{{ fd.human_readable_name or '' }}" maxlength="60">
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="device_type_id" class="form-label">Device type</label>
+                    <label for="device_type_id" class="form-label">{{ t('devices.form.field.device_type') }}</label>
                     <select class="form-select" id="device_type_id" name="device_type_id">
                         <option value="">—</option>
                         {% for t_item in device_types %}
@@ -55,13 +55,13 @@
                                 data-is-active="{{ '1' if t_item.is_active else '0' }}"
                                 data-supports-pf="{{ '1' if t_item.supports_port_forwarding else '0' }}"
                                 {% if fd.device_type_id and fd.device_type_id|string == t_item.id|string %}selected{% endif %}>
-                            {{ t_item.name }}{% if not t_item.is_active %} (passive){% endif %}
+                            {{ t_item.name }}{% if not t_item.is_active %} ({{ t('devices.form.passive') }}){% endif %}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="vendor_id" class="form-label">Vendor</label>
+                    <label for="vendor_id" class="form-label">{{ t('devices.list.vendor') }}</label>
                     <select class="form-select" id="vendor_id" name="vendor_id">
                         <option value="">—</option>
                         {% for v in vendors %}
@@ -73,14 +73,14 @@
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="model_id" class="form-label">Model</label>
+                    <label for="model_id" class="form-label">{{ t('devices.list.model') }}</label>
                     <select class="form-select" id="model_id" name="model_id"
                             data-selected="{{ fd.model_id or '' }}">
                         <option value="">—</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="location_id" class="form-label">Location</label>
+                    <label for="location_id" class="form-label">{{ t('devices.list.location') }}</label>
                     <select class="form-select" id="location_id" name="location_id">
                         <option value="">—</option>
                         {% for l in locations %}
@@ -92,7 +92,7 @@
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="network_id" class="form-label">Network</label>
+                    <label for="network_id" class="form-label">{{ t('devices.form.field.network') }}</label>
                     <select class="form-select" id="network_id" name="network_id">
                         <option value="">—</option>
                         {% for n in networks %}
@@ -107,7 +107,7 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
                                {% if fd.is_active is not defined or fd.is_active %}checked{% endif %}>
-                        <label class="form-check-label" for="is_active">Active</label>
+                        <label class="form-check-label" for="is_active">{{ t('devices.form.field.active') }}</label>
                     </div>
                 </div>
             </div>
@@ -118,9 +118,9 @@
     <div class="card info-card section-interfaces mb-3">
         <div class="card-header">
             <i class="fa-solid fa-ethernet"></i>
-            <span>Interfaces</span>
+            <span>{{ t('devices.form.section.interfaces') }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-interface-btn">
-                <i class="fa-solid fa-plus me-1"></i>Add interface
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_interface') }}
             </button>
         </div>
         <div class="card-body">
@@ -130,7 +130,7 @@
                 {% endfor %}
             </div>
             <div id="interfaces-empty" class="text-muted small {% if fd.interfaces %}d-none{% endif %}">
-                No interfaces added yet.
+                {{ t('devices.form.empty.interfaces') }}
             </div>
         </div>
     </div>
@@ -140,10 +140,10 @@
     <div class="card info-card section-ports mb-3">
         <div class="card-header">
             <i class="fa-solid fa-plug"></i>
-            <span>Ports</span>
+            <span>{{ t('devices.form.section.ports') }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-port-btn"
-                    {% if not interfaces %}disabled title="Add an interface first"{% endif %}>
-                <i class="fa-solid fa-plus me-1"></i>Add port
+                    {% if not interfaces %}disabled title="{{ t('devices.form.hint.add_interface_first') }}"{% endif %}>
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_port') }}
             </button>
         </div>
         <div class="card-body">
@@ -155,11 +155,11 @@
                 {% endfor %}
             </div>
             <div id="ports-empty" class="text-muted small {% if fd.ports %}d-none{% endif %}">
-                No ports added yet.
+                {{ t('devices.form.empty.ports') }}
             </div>
             {% if not interfaces %}
             <div class="text-muted small mt-2">
-                Ports can be added after at least one interface is saved.
+                {{ t('devices.form.hint.ports_need_interface') }}
             </div>
             {% endif %}
         </div>
@@ -170,9 +170,9 @@
     <div class="card info-card section-wifi mb-3">
         <div class="card-header">
             <i class="fa-solid fa-wifi"></i>
-            <span>Wi-Fi networks (this device broadcasts)</span>
+            <span>{{ t('devices.form.section.wifi') }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-wifi-btn">
-                <i class="fa-solid fa-plus me-1"></i>Add Wi-Fi network
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_wifi') }}
             </button>
         </div>
         <div class="card-body">
@@ -184,7 +184,7 @@
                 {% endfor %}
             </div>
             <div id="wifi-empty" class="text-muted small {% if fd.wifi_networks %}d-none{% endif %}">
-                No Wi-Fi networks added yet.
+                {{ t('devices.form.empty.wifi') }}
             </div>
         </div>
     </div>
@@ -193,9 +193,9 @@
     <div class="card info-card section-dhcp mb-3">
         <div class="card-header">
             <i class="fa-solid fa-server"></i>
-            <span>DHCP pools (this device serves)</span>
+            <span>{{ t('devices.form.section.dhcp') }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-dhcp-btn">
-                <i class="fa-solid fa-plus me-1"></i>Add DHCP pool
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_dhcp') }}
             </button>
         </div>
         <div class="card-body">
@@ -207,7 +207,7 @@
                 {% endfor %}
             </div>
             <div id="dhcp-empty" class="text-muted small {% if fd.dhcp_pools %}d-none{% endif %}">
-                No DHCP pools added yet.
+                {{ t('devices.form.empty.dhcp') }}
             </div>
         </div>
     </div>
@@ -216,9 +216,9 @@
     <div class="card info-card section-credentials mb-3">
         <div class="card-header">
             <i class="fa-solid fa-key"></i>
-            <span>Credentials</span>
+            <span>{{ t('devices.form.section.credentials') }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-credential-btn">
-                <i class="fa-solid fa-plus me-1"></i>Add credential
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_credential') }}
             </button>
         </div>
         <div class="card-body">
@@ -230,7 +230,7 @@
                 {% endfor %}
             </div>
             <div id="credentials-empty" class="text-muted small {% if fd.credentials %}d-none{% endif %}">
-                No credentials added yet.
+                {{ t('devices.form.empty.credentials') }}
             </div>
         </div>
     </div>
@@ -239,9 +239,9 @@
     <div class="card info-card section-services mb-3">
         <div class="card-header">
             <i class="fa-solid fa-cogs"></i>
-            <span>Services</span>
+            <span>{{ t('devices.form.section.services') }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-service-btn">
-                <i class="fa-solid fa-plus me-1"></i>Add service
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_service') }}
             </button>
         </div>
         <div class="card-body">
@@ -253,7 +253,7 @@
                 {% endfor %}
             </div>
             <div id="services-empty" class="text-muted small {% if fd.services %}d-none{% endif %}">
-                No services added yet.
+                {{ t('devices.form.empty.services') }}
             </div>
         </div>
     </div>
@@ -262,9 +262,9 @@
     <div class="card info-card section-port-forwarding mb-3" id="port-forwarding-section" style="display:none">
         <div class="card-header">
             <i class="fa-solid fa-right-left"></i>
-            <span>Port forwarding</span>
+            <span>{{ t('devices.form.section.pf') }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-pf-btn">
-                <i class="fa-solid fa-plus me-1"></i>Add rule
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_pf') }}
             </button>
         </div>
         <div class="card-body">
@@ -274,7 +274,7 @@
                 {% endfor %}
             </div>
             <div id="pf-empty" class="text-muted small {% if fd.port_forwards %}d-none{% endif %}">
-                No port forwarding rules yet.
+                {{ t('devices.form.empty.pf') }}
             </div>
         </div>
     </div>
@@ -283,7 +283,7 @@
     <div class="card info-card section-remarks mb-3">
         <div class="card-header">
             <i class="fa-solid fa-note-sticky"></i>
-            <span>Remarks</span>
+            <span>{{ t('devices.form.section.remarks') }}</span>
         </div>
         <div class="card-body">
             <textarea class="form-control" id="remarks" name="remarks" rows="3">{{ fd.remarks or '' }}</textarea>

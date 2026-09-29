@@ -44,11 +44,11 @@ def locations_list(
         "reference/list.html",
         user=user,
         current_site=site,
-        title="Locations",
+        title_key="reference.title.locations",
         add_url="/reference/locations/new",
         edit_url_prefix="/reference/locations/",
         delete_url_prefix="/reference/locations/",
-        columns=["Name", "Description"],
+        column_keys=["devices.list.name", "devices.form.field.description"],
         rows=rows,
     )
 
@@ -193,11 +193,11 @@ def device_types_list(
         "reference/list.html",
         user=user,
         current_site=site,
-        title="Device Types",
+        title_key="reference.title.device_types",
         add_url="/reference/device-types/new",
         edit_url_prefix="/reference/device-types/",
         delete_url_prefix="/reference/device-types/",
-        columns=["Name", "Active", "Description"],
+        column_keys=["devices.list.name", "devices.form.field.active", "devices.form.field.description"],
         rows=rows,
     )
 
@@ -339,11 +339,11 @@ def vendors_list(
         "reference/list.html",
         user=user,
         current_site=site,
-        title="Vendors",
+        title_key="reference.title.vendors",
         add_url="/reference/vendors/new",
         edit_url_prefix="/reference/vendors/",
         delete_url_prefix="/reference/vendors/",
-        columns=["Name"],
+        column_keys=["devices.list.name"],
         rows=rows,
     )
 
@@ -475,11 +475,11 @@ def models_list(
         "reference/list.html",
         user=user,
         current_site=site,
-        title="Models",
+        title_key="reference.title.models",
         add_url="/reference/models/new",
         edit_url_prefix="/reference/models/",
         delete_url_prefix="/reference/models/",
-        columns=["Vendor", "Name"],
+        column_keys=["devices.list.vendor", "devices.list.name"],
         rows=rows,
     )
 
@@ -630,11 +630,11 @@ def networks_list(
         "reference/list.html",
         user=user,
         current_site=site,
-        title="Networks",
+        title_key="reference.title.networks",
         add_url="/reference/networks/new",
         edit_url_prefix="/reference/networks/",
         delete_url_prefix="/reference/networks/",
-        columns=["Name", "Address", "Gateway", "VLAN"],
+        column_keys=["devices.list.name", "reference.col.address", "devices.list.gateway", "reference.field.vlan"],
         rows=rows,
     )
 
@@ -778,11 +778,11 @@ def credential_types_list(
         "reference/list.html",
         user=user,
         current_site=site,
-        title="Credential Types",
+        title_key="reference.title.credential_types",
         add_url="/reference/credential-types/new",
         edit_url_prefix="/reference/credential-types/",
         delete_url_prefix="/reference/credential-types/",
-        columns=["Name", "Description"],
+        column_keys=["devices.list.name", "devices.form.field.description"],
         rows=rows,
     )
 

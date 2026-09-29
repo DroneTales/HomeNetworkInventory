@@ -20,30 +20,30 @@
 
 {# ---------- Информация ---------- #}
 <div class="card mb-3">
-    <div class="card-header">Account</div>
+    <div class="card-header">{{ t('profile.section.account') }}</div>
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-sm-3">Username</dt>
+            <dt class="col-sm-3">{{ t('users.form.field.username') }}</dt>
             <dd class="col-sm-9">{{ current_user.username }}</dd>
 
-            <dt class="col-sm-3">Role</dt>
+            <dt class="col-sm-3">{{ t('users.form.field.role') }}</dt>
             <dd class="col-sm-9">
                 {% if current_user.role == 'admin' %}
-                <span class="badge bg-primary">admin</span>
+                <span class="badge bg-primary">{{ t('users.list.role_admin') }}</span>
                 {% else %}
-                user
+                {{ t('users.list.role_user') }}
                 {% endif %}
             </dd>
 
             {% if current_user.role != 'admin' %}
-            <dt class="col-sm-3">Can edit</dt>
-            <dd class="col-sm-9">{% if current_user.can_edit %}yes{% else %}no{% endif %}</dd>
+            <dt class="col-sm-3">{{ t('users.list.can_edit') }}</dt>
+            <dd class="col-sm-9">{% if current_user.can_edit %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</dd>
 
-            <dt class="col-sm-3">View passwords</dt>
-            <dd class="col-sm-9">{% if current_user.can_view_passwords %}yes{% else %}no{% endif %}</dd>
+            <dt class="col-sm-3">{{ t('users.list.view_passwords') }}</dt>
+            <dd class="col-sm-9">{% if current_user.can_view_passwords %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</dd>
 
-            <dt class="col-sm-3">Change passwords</dt>
-            <dd class="col-sm-9">{% if current_user.can_change_passwords %}yes{% else %}no{% endif %}</dd>
+            <dt class="col-sm-3">{{ t('users.list.change_passwords') }}</dt>
+            <dd class="col-sm-9">{% if current_user.can_change_passwords %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</dd>
             {% endif %}
         </dl>
     </div>
@@ -51,23 +51,23 @@
 
 {# ---------- Preferences ---------- #}
 <div class="card mb-3">
-    <div class="card-header">Preferences</div>
+    <div class="card-header">{{ t('profile.section.preferences') }}</div>
     <div class="card-body">
         <form method="post" action="/profile/preferences">
             <div class="row g-3">
                 <div class="col-12 col-md-6">
-                    <label for="language" class="form-label">Language</label>
+                    <label for="language" class="form-label">{{ t('users.form.field.language') }}</label>
                     <select class="form-select" id="language" name="language">
                         <option value="en" {% if current_user.language == 'en' %}selected{% endif %}>English</option>
                         <option value="ru" {% if current_user.language == 'ru' %}selected{% endif %}>Русский</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="theme" class="form-label">Theme</label>
+                    <label for="theme" class="form-label">{{ t('users.form.field.theme') }}</label>
                     <select class="form-select" id="theme" name="theme">
-                        <option value="auto" {% if current_user.theme == 'auto' %}selected{% endif %}>Auto</option>
-                        <option value="light" {% if current_user.theme == 'light' %}selected{% endif %}>Light</option>
-                        <option value="dark" {% if current_user.theme == 'dark' %}selected{% endif %}>Dark</option>
+                        <option value="auto" {% if current_user.theme == 'auto' %}selected{% endif %}>{{ t('profile.theme.auto') }}</option>
+                        <option value="light" {% if current_user.theme == 'light' %}selected{% endif %}>{{ t('profile.theme.light') }}</option>
+                        <option value="dark" {% if current_user.theme == 'dark' %}selected{% endif %}>{{ t('profile.theme.dark') }}</option>
                     </select>
                 </div>
             </div>

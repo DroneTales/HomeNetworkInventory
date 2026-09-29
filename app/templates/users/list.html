@@ -19,25 +19,25 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">{{ t('nav.users') }}</h1>
-    <a href="/users/new" class="btn btn-primary">Add user</a>
+    <a href="/users/new" class="btn btn-primary">{{ t('users.list.add') }}</a>
 </div>
 
 {% if not users %}
-<div class="alert alert-info">No users.</div>
+<div class="alert alert-info">{{ t('users.list.empty') }}</div>
 {% else %}
 
 <div class="table-responsive d-none d-md-block">
     <table class="table table-hover align-middle">
         <thead>
         <tr>
-            <th>Username</th>
-            <th>Role</th>
-            <th>Can edit</th>
-            <th>View passwords</th>
-            <th>Change passwords</th>
-            <th>Active</th>
-            <th>Created</th>
-            <th class="text-end">Actions</th>
+            <th>{{ t('users.form.field.username') }}</th>
+            <th>{{ t('users.form.field.role') }}</th>
+            <th>{{ t('users.list.can_edit') }}</th>
+            <th>{{ t('users.list.view_passwords') }}</th>
+            <th>{{ t('users.list.change_passwords') }}</th>
+            <th>{{ t('devices.form.field.active') }}</th>
+            <th>{{ t('devices.view.field.created') }}</th>
+            <th class="text-end">{{ t('common.actions') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -46,12 +46,12 @@
             <td>
                 {{ u.username }}
                 {% if u.must_change_password %}
-                <span class="badge bg-warning text-dark">must change</span>
+                <span class="badge bg-warning text-dark">{{ t('users.list.must_change') }}</span>
                 {% endif %}
             </td>
             <td>
                 {% if u.role == 'admin' %}
-                <span class="badge bg-primary">admin</span>
+                <span class="badge bg-primary">{{ t('users.list.role_admin') }}</span>
                 {% else %}
                 user
                 {% endif %}
@@ -62,12 +62,12 @@
             <td>{% if u.is_active %}✓{% else %}—{% endif %}</td>
             <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
             <td class="text-end">
-                <a href="/users/{{ u.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-                <a href="/users/{{ u.id }}/reset-password" class="btn btn-sm btn-outline-secondary">Reset&nbsp;password</a>
+                <a href="/users/{{ u.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
+                <a href="/users/{{ u.id }}/reset-password" class="btn btn-sm btn-outline-secondary">{{ t('users.list.btn.reset_password') }}</a>
                 {% if u.username != 'Admin' %}
                 <form method="post" action="/users/{{ u.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('Delete user {{ u.username }}?');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                      onsubmit="return confirm('{{ t('users.list.confirm_delete') }}');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
                 </form>
                 {% endif %}
             </td>
@@ -84,34 +84,34 @@
             <h5 class="card-title mb-1">
                 {{ u.username }}
                 {% if u.must_change_password %}
-                <span class="badge bg-warning text-dark">must change</span>
+                <span class="badge bg-warning text-dark">{{ t('users.list.must_change') }}</span>
                 {% endif %}
             </h5>
 
             <div class="row small">
-                <div class="col-6 text-muted">Role</div>
-                <div class="col-6">{% if u.role == 'admin' %}admin{% else %}user{% endif %}</div>
+                <div class="col-6 text-muted">{{ t('users.form.field.role') }}</div>
+                <div class="col-6">{% if u.role == 'admin' %}{{ t('users.list.role_admin') }}{% else %}{{ t('users.list.role_user') }}{% endif %}</div>
 
-                <div class="col-6 text-muted">Can edit</div>
+                <div class="col-6 text-muted">{{ t('users.list.can_edit') }}</div>
                 <div class="col-6">{% if u.role == 'admin' or u.can_edit %}✓{% else %}—{% endif %}</div>
 
-                <div class="col-6 text-muted">View passwords</div>
+                <div class="col-6 text-muted">{{ t('users.list.view_passwords') }}</div>
                 <div class="col-6">{% if u.role == 'admin' or u.can_view_passwords %}✓{% else %}—{% endif %}</div>
 
-                <div class="col-6 text-muted">Change passwords</div>
+                <div class="col-6 text-muted">{{ t('users.list.change_passwords') }}</div>
                 <div class="col-6">{% if u.role == 'admin' or u.can_change_passwords %}✓{% else %}—{% endif %}</div>
 
-                <div class="col-6 text-muted">Active</div>
+                <div class="col-6 text-muted">{{ t('devices.form.field.active') }}</div>
                 <div class="col-6">{% if u.is_active %}✓{% else %}—{% endif %}</div>
             </div>
 
             <div class="mt-2">
-                <a href="/users/{{ u.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-                <a href="/users/{{ u.id }}/reset-password" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <a href="/users/{{ u.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
+                <a href="/users/{{ u.id }}/reset-password" class="btn btn-sm btn-outline-secondary">{{ t('users.list.btn.reset') }}</a>
                 {% if u.username != 'Admin' %}
                 <form method="post" action="/users/{{ u.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('Delete user {{ u.username }}?');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                      onsubmit="return confirm('{{ t('users.list.confirm_delete') }}');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
                 </form>
                 {% endif %}
             </div>

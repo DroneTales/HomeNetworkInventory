@@ -4,13 +4,13 @@
 
     <div class="row g-2 align-items-end">
         <div class="col-12 col-md-3">
-            <label class="form-label small mb-0">SSID</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.ssid') }}</label>
             <input type="text" class="form-control form-control-sm wifi-ssid"
                    name="wifi_ssid" value="{{ wifi.ssid if wifi else '' }}"
                    placeholder="homekit2" required>
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">Band</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.band') }}</label>
             <select class="form-select form-select-sm wifi-band" name="wifi_band">
                 <option value="">—</option>
                 {% set cur_band = wifi.band if wifi else '' %}
@@ -20,7 +20,7 @@
             </select>
         </div>
         <div class="col-6 col-md-3">
-            <label class="form-label small mb-0">Encryption</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.encryption') }}</label>
             <select class="form-select form-select-sm wifi-encryption" name="wifi_encryption">
                 <option value="">—</option>
                 {% set cur_enc = wifi.encryption if wifi else '' %}
@@ -34,9 +34,9 @@
         </div>
         <div class="col-12 col-md-3">
             <label class="form-label small mb-0">
-                Password
+                {{ t('devices.form.field.password') }}
                 {% if not can_change_passwords %}
-                <i class="fa-solid fa-lock text-muted ms-1" title="You cannot change this password"></i>
+                <i class="fa-solid fa-lock text-muted ms-1" title="{{ t('devices.form.hint.password_locked') }}"></i>
                 {% endif %}
             </label>
             {% if can_view_passwords %}
@@ -56,11 +56,11 @@
             <div class="form-check">
                 <input class="form-check-input wifi-is-guest" type="checkbox" name="wifi_is_guest"
                        {% if wifi and wifi.is_guest %}checked{% endif %}>
-                <label class="form-check-label small">Guest</label>
+                <label class="form-check-label small">{{ t('devices.form.field.guest') }}</label>
             </div>
         </div>
         <div class="col-6 col-md-12 text-end mt-1">
-            <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-btn">Remove</button>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-btn">{{ t('devices.form.btn.remove') }}</button>
         </div>
     </div>
 </div>

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Reference{% endblock %}
+{% block title %}{{ t('reference.title.index') }}{% endblock %}
 
 {% block content %}
-<h1 class="mb-3">Reference</h1>
+<h1 class="mb-3">{{ t('reference.title.index') }}</h1>
 
 <div class="row g-3">
     {# ---------- Локальные (в контексте дома) ---------- #}
@@ -11,9 +11,9 @@
         <a href="/reference/locations" class="card text-decoration-none h-100 info-card section-basic">
             <div class="card-body">
                 <h5 class="card-title mb-1">
-                    <i class="fa-solid fa-location-dot me-1 text-primary"></i>Locations
+                    <i class="fa-solid fa-location-dot me-1 text-primary"></i>{{ t('reference.title.locations') }}
                 </h5>
-                <p class="card-text text-muted small mb-0">Rooms of the current home</p>
+                <p class="card-text text-muted small mb-0">{{ t('reference.index.locations_desc') }}</p>
             </div>
         </a>
     </div>
@@ -21,9 +21,9 @@
         <a href="/reference/networks" class="card text-decoration-none h-100 info-card section-basic">
             <div class="card-body">
                 <h5 class="card-title mb-1">
-                    <i class="fa-solid fa-network-wired me-1 text-primary"></i>Networks
+                    <i class="fa-solid fa-network-wired me-1 text-primary"></i>{{ t('reference.title.networks') }}
                 </h5>
-                <p class="card-text text-muted small mb-0">Subnets of the current home</p>
+                <p class="card-text text-muted small mb-0">{{ t('reference.index.networks_desc') }}</p>
             </div>
         </a>
     </div>
@@ -33,7 +33,7 @@
     <div class="col-12">
         <hr class="my-2">
         <div class="text-muted small mb-2">
-            <i class="fa-solid fa-globe me-1"></i>Global lists — shared across all homes (admin only)
+            <i class="fa-solid fa-globe me-1"></i>{{ t('reference.index.global_hint') }}
         </div>
     </div>
 
@@ -41,9 +41,9 @@
         <a href="/reference/device-types" class="card text-decoration-none h-100 info-card section-basic">
             <div class="card-body">
                 <h5 class="card-title mb-1">
-                    <i class="fa-solid fa-list me-1 text-primary"></i>Device Types
+                    <i class="fa-solid fa-list me-1 text-primary"></i>{{ t('reference.title.device_types') }}
                 </h5>
-                <p class="card-text text-muted small mb-0">Types of devices (active/passive)</p>
+                <p class="card-text text-muted small mb-0">{{ t('reference.index.device_types_desc') }}</p>
             </div>
         </a>
     </div>
@@ -51,9 +51,9 @@
         <a href="/reference/vendors" class="card text-decoration-none h-100 info-card section-basic">
             <div class="card-body">
                 <h5 class="card-title mb-1">
-                    <i class="fa-solid fa-industry me-1 text-primary"></i>Vendors
+                    <i class="fa-solid fa-industry me-1 text-primary"></i>{{ t('reference.title.vendors') }}
                 </h5>
-                <p class="card-text text-muted small mb-0">Manufacturers</p>
+                <p class="card-text text-muted small mb-0">{{ t('reference.index.vendors_desc') }}</p>
             </div>
         </a>
     </div>
@@ -61,9 +61,9 @@
         <a href="/reference/models" class="card text-decoration-none h-100 info-card section-basic">
             <div class="card-body">
                 <h5 class="card-title mb-1">
-                    <i class="fa-solid fa-microchip me-1 text-primary"></i>Models
+                    <i class="fa-solid fa-microchip me-1 text-primary"></i>{{ t('reference.title.models') }}
                 </h5>
-                <p class="card-text text-muted small mb-0">Hardware models per vendor</p>
+                <p class="card-text text-muted small mb-0">{{ t('reference.index.models_desc') }}</p>
             </div>
         </a>
     </div>
@@ -71,9 +71,9 @@
         <a href="/reference/credential-types" class="card text-decoration-none h-100 info-card section-basic">
             <div class="card-body">
                 <h5 class="card-title mb-1">
-                    <i class="fa-solid fa-key me-1 text-primary"></i>Credential Types
+                    <i class="fa-solid fa-key me-1 text-primary"></i>{{ t('reference.title.credential_types') }}
                 </h5>
-                <p class="card-text text-muted small mb-0">Types of credentials (admin, ssh, ...)</p>
+                <p class="card-text text-muted small mb-0">{{ t('reference.index.credential_types_desc') }}</p>
             </div>
         </a>
     </div>

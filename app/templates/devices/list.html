@@ -32,16 +32,16 @@
     <table class="table table-hover align-middle" data-sortable="true">
         <thead>
         <tr>
-            <th data-sort="hostname" data-type="text">Hostname <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="name" data-type="text">Name <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="type" data-type="text">Type <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="vendor" data-type="text">Vendor <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="model" data-type="text">Model <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="location" data-type="text">Location <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="ip" data-type="ip">Local IP <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="gateway" data-type="ip">Gateway <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="mac" data-type="text">MAC <span class="sort-arrow text-muted"></span></th>
-            <th class="text-end">Actions</th>
+            <th data-sort="hostname" data-type="text">{{ t('devices.list.hostname') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="name" data-type="text">{{ t('devices.list.name') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="type" data-type="text">{{ t('devices.list.type') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="vendor" data-type="text">{{ t('devices.list.vendor') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="model" data-type="text">{{ t('devices.list.model') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="location" data-type="text">{{ t('devices.list.location') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="ip" data-type="ip">{{ t('devices.list.local_ip') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="gateway" data-type="ip">{{ t('devices.list.gateway') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="mac" data-type="text">{{ t('devices.list.mac') }} <span class="sort-arrow text-muted"></span></th>
+            <th class="text-end">{{ t('common.actions') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -52,7 +52,7 @@
             <td>
                 <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
                 {% if not d.is_active %}
-                <span class="badge bg-secondary ms-1">inactive</span>
+                <span class="badge bg-secondary ms-1">{{ t('common.inactive') }}</span>
                 {% endif %}
             </td>
             <td>{{ d.human_readable_name or '—' }}</td>
@@ -95,7 +95,7 @@
             <h5 class="card-title mb-1">
                 <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
                 {% if not d.is_active %}
-                <span class="badge bg-secondary ms-1">inactive</span>
+                <span class="badge bg-secondary ms-1">{{ t('common.inactive') }}</span>
                 {% endif %}
             </h5>
             {% if d.human_readable_name %}
@@ -118,11 +118,11 @@
 
             <div class="mt-2">
                 <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa-solid fa-eye"></i> View
+                    <i class="fa-solid fa-eye"></i> {{ t('common.view') }}
                 </a>
                 {% if current_user.role == 'admin' or current_user.can_edit %}
                 <a href="/devices/{{ d.id }}/edit" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa-solid fa-pen"></i> Edit
+                    <i class="fa-solid fa-pen"></i> {{ t('common.edit') }}
                 </a>
                 {% endif %}
             </div>

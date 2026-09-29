@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ t(title_key) }}{% endblock %}
 
 {% block content %}
 {% if request.query_params.get('error') %}
@@ -12,24 +12,24 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <a href="/reference" class="text-decoration-none small text-muted">← Reference</a>
-        <h1 class="mb-0">{{ title }}</h1>
+        <a href="/reference" class="text-decoration-none small text-muted">← {{ t('reference.title.index') }}</a>
+        <h1 class="mb-0">{{ t(title_key) }}</h1>
     </div>
-    <a href="{{ add_url }}" class="btn btn-primary">Add</a>
+    <a href="{{ add_url }}" class="btn btn-primary">{{ t('reference.action.add') }}</a>
 </div>
 
 {% if not rows %}
-<div class="alert alert-info">Nothing here yet.</div>
+<div class="alert alert-info">{{ t('reference.list.empty') }}</div>
 {% else %}
 
 <div class="table-responsive d-none d-md-block">
     <table class="table table-hover align-middle">
         <thead>
         <tr>
-            {% for col in columns %}
-            <th>{{ col }}</th>
+            {% for col in column_keys %}
+            <th>{{ t(col) }}</th>
             {% endfor %}
-            <th class="text-end">Actions</th>
+            <th class="text-end">{{ t('common.actions') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -39,10 +39,10 @@
             <td>{{ value }}</td>
             {% endfor %}
             <td class="text-end">
-                <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
                 <form method="post" action="{{ delete_url_prefix }}{{ row.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('Delete this item?');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                      onsubmit="return confirm('{{ t('reference.list.confirm_delete') }}');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
                 </form>
             </td>
         </tr>
@@ -55,17 +55,17 @@
     {% for row in rows %}
     <div class="card mb-2">
         <div class="card-body">
-            {% for col in columns %}
+            {% for col in column_keys %}
             <div class="row small">
-                <div class="col-5 text-muted">{{ col }}</div>
+                <div class="col-5 text-muted">{{ t(col) }}</div>
                 <div class="col-7">{{ row.cells[loop.index0] }}</div>
             </div>
             {% endfor %}
             <div class="mt-2">
-                <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
                 <form method="post" action="{{ delete_url_prefix }}{{ row.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('Delete this item?');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                      onsubmit="return confirm('{{ t('reference.list.confirm_delete') }}');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
                 </form>
             </div>
         </div>

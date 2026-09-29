@@ -4,21 +4,21 @@
 
     <div class="row g-2 align-items-end">
         <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">External start</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.external_start') }}</label>
             <input type="number" min="1" max="65535"
                    class="form-control form-control-sm pf-external-start"
                    name="pf_external_start"
                    value="{{ pf.external_port_start if pf and pf.external_port_start else '' }}">
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">External end</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.external_end') }}</label>
             <input type="number" min="1" max="65535"
                    class="form-control form-control-sm pf-external-end"
                    name="pf_external_end"
                    value="{{ pf.external_port_end if pf and pf.external_port_end else '' }}">
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">Protocol</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.protocol') }}</label>
             {% set cur_proto = pf.protocol if pf and pf.protocol else 'tcp' %}
             <select class="form-select form-select-sm pf-protocol" name="pf_protocol">
                 <option value="tcp" {% if cur_proto == 'tcp' %}selected{% endif %}>tcp</option>
@@ -27,7 +27,7 @@
             </select>
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">Target</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.target') }}</label>
             {% set cur_target = 'device' if pf and pf.internal_device_id else ('ip' if pf and pf.internal_ip_manual else 'device') %}
             <select class="form-select form-select-sm pf-target-type" name="pf_target_type">
                 <option value="device" {% if cur_target == 'device' %}selected{% endif %}>Device</option>
@@ -35,7 +35,7 @@
             </select>
         </div>
         <div class="col-6 col-md-2 pf-target-device-block">
-            <label class="form-label small mb-0">Internal device</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.internal_device') }}</label>
             <select class="form-select form-select-sm pf-internal-device-id" name="pf_internal_device_id">
                 <option value="">—</option>
                 {% for d in all_devices %}
@@ -47,28 +47,28 @@
             </select>
         </div>
         <div class="col-6 col-md-2 pf-target-ip-block d-none">
-            <label class="form-label small mb-0">Internal IP</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.internal_ip') }}</label>
             <input type="text" class="form-control form-control-sm pf-internal-ip-manual"
                    name="pf_internal_ip_manual"
                    value="{{ pf.internal_ip_manual if pf and pf.internal_ip_manual else '' }}"
                    placeholder="192.168.1.10">
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">Internal start</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.internal_start') }}</label>
             <input type="number" min="1" max="65535"
                    class="form-control form-control-sm pf-internal-start"
                    name="pf_internal_start"
                    value="{{ pf.internal_port_start if pf and pf.internal_port_start else '' }}">
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">Internal end</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.internal_end') }}</label>
             <input type="number" min="1" max="65535"
                    class="form-control form-control-sm pf-internal-end"
                    name="pf_internal_end"
                    value="{{ pf.internal_port_end if pf and pf.internal_port_end else '' }}">
         </div>
         <div class="col-12 col-md-3">
-            <label class="form-label small mb-0">Description</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.description') }}</label>
             <input type="text" class="form-control form-control-sm pf-description"
                    name="pf_description"
                    value="{{ pf.description if pf and pf.description else '' }}">
@@ -78,11 +78,11 @@
                 <input class="form-check-input pf-is-active" type="checkbox"
                        name="pf_is_active"
                        {% if not pf or pf.is_active %}checked{% endif %}>
-                <label class="form-check-label small">Active</label>
+                <label class="form-check-label small">{{ t('devices.form.field.active') }}</label>
             </div>
         </div>
         <div class="col-6 col-md-1 text-end">
-            <button type="button" class="btn btn-sm btn-outline-danger remove-pf-btn">Remove</button>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-pf-btn">{{ t('devices.form.btn.remove') }}</button>
         </div>
     </div>
 </div>

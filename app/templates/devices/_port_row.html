@@ -4,14 +4,14 @@
 
     <div class="row g-2 align-items-end">
         <div class="col-6 col-md-3">
-            <label class="form-label small mb-0">Name</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.name') }}</label>
             <input type="text" class="form-control form-control-sm port-name"
                    name="port_name"
                    value="{{ port.name if port and port.name else '' }}"
                    placeholder="LAN1" maxlength="50" required>
         </div>
         <div class="col-6 col-md-4">
-            <label class="form-label small mb-0">Interface</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.interface') }}</label>
             <select class="form-select form-select-sm port-interface" name="port_interface_id" required>
                 <option value="">—</option>
                 {% set cur_iface = port.interface_id if port and port.interface_id else '' %}
@@ -24,14 +24,14 @@
             </select>
         </div>
         <div class="col-12 col-md-3">
-            <label class="form-label small mb-0">Description</label>
+            <label class="form-label small mb-0">{{ t('devices.form.field.description') }}</label>
             <input type="text" class="form-control form-control-sm port-description"
                    name="port_description"
                    value="{{ port.description if port and port.description else '' }}"
                    maxlength="255">
         </div>
         <div class="col-12 col-md-2 text-end">
-            <button type="button" class="btn btn-sm btn-outline-danger remove-port-btn">Remove</button>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-port-btn">{{ t('devices.form.btn.remove') }}</button>
         </div>
     </div>
 </div>

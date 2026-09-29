@@ -13,12 +13,12 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">{{ t('nav.connections') }}</h1>
     {% if current_user.role == 'admin' or current_user.can_edit %}
-    <a href="/connections/new" class="btn btn-primary">Add connection</a>
+    <a href="/connections/new" class="btn btn-primary">{{ t('connections.list.add') }}</a>
     {% endif %}
 </div>
 
 {% if not connections %}
-<div class="alert alert-info">No connections yet.</div>
+<div class="alert alert-info">{{ t('connections.list.empty') }}</div>
 {% else %}
 
 {# Десктопная таблица #}
@@ -26,14 +26,14 @@
     <table class="table table-hover align-middle">
         <thead>
         <tr>
-            <th>Source device</th>
-            <th>Source port</th>
-            <th>Target device</th>
-            <th>Target port</th>
-            <th>Type</th>
-            <th>Cable</th>
-            <th>Description</th>
-            <th class="text-end">Actions</th>
+            <th>{{ t('connections.list.source_device') }}</th>
+            <th>{{ t('connections.list.source_port') }}</th>
+            <th>{{ t('connections.list.target_device') }}</th>
+            <th>{{ t('connections.list.target_port') }}</th>
+            <th>{{ t('devices.list.type') }}</th>
+            <th>{{ t('devices.view.field.cable') }}</th>
+            <th>{{ t('devices.form.field.description') }}</th>
+            <th class="text-end">{{ t('common.actions') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -63,8 +63,8 @@
             <td class="text-end">
                 {% if current_user.role == 'admin' %}
                 <form method="post" action="/connections/{{ c.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('Delete this connection?');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                      onsubmit="return confirm('{{ t('connections.list.confirm_delete') }}');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
                 </form>
                 {% endif %}
             </td>
@@ -94,22 +94,22 @@
             </div>
 
             <div class="row small">
-                <div class="col-5 text-muted">Source interface</div>
+                <div class="col-5 text-muted">{{ t('connections.list.source_interface') }}</div>
                 <div class="col-7">{{ c.source_port.interface.name }}</div>
 
-                <div class="col-5 text-muted">Target interface</div>
+                <div class="col-5 text-muted">{{ t('connections.list.target_interface') }}</div>
                 <div class="col-7">{{ c.target_port.interface.name }}</div>
 
-                <div class="col-5 text-muted">Type</div>
+                <div class="col-5 text-muted">{{ t('devices.list.type') }}</div>
                 <div class="col-7">{{ c.connection_type }}</div>
 
                 {% if c.cable_type %}
-                <div class="col-5 text-muted">Cable</div>
+                <div class="col-5 text-muted">{{ t('devices.view.field.cable') }}</div>
                 <div class="col-7">{{ c.cable_type }}</div>
                 {% endif %}
 
                 {% if c.description %}
-                <div class="col-5 text-muted">Description</div>
+                <div class="col-5 text-muted">{{ t('devices.form.field.description') }}</div>
                 <div class="col-7">{{ c.description }}</div>
                 {% endif %}
             </div>
@@ -117,8 +117,8 @@
             {% if current_user.role == 'admin' %}
             <div class="mt-2">
                 <form method="post" action="/connections/{{ c.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('Delete this connection?');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                      onsubmit="return confirm('{{ t('connections.list.confirm_delete') }}');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
                 </form>
             </div>
             {% endif %}
