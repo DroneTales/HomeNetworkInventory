@@ -233,5 +233,8 @@
   "connections.form.section.target": "Цель",
   "connections.form.section.details": "Детали",
   "connections.form.field.device": "Устройство",
-  "connections.form.field.port": "Порт"
+  "connections.form.field.port": "Порт",
+  "reference.col.pf": "Проброс портов",
+  "auth.demo_hint": "Демо-доступ — имя пользователя: test, пароль: test",
+  "auth.personal_hint": "Для личного аккаунта свяжитесь:"
 }

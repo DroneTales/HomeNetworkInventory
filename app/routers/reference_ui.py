@@ -184,7 +184,7 @@ def device_types_list(
     rows = [
         {
             "id": x.id,
-            "cells": [x.name, "yes" if x.is_active else "no", x.description or "—"],
+            "cells": [x.name, "✓" if x.is_active else "—", "✓" if x.supports_port_forwarding else "—", x.description or "—"],
         }
         for x in items
     ]
@@ -197,7 +197,7 @@ def device_types_list(
         add_url="/reference/device-types/new",
         edit_url_prefix="/reference/device-types/",
         delete_url_prefix="/reference/device-types/",
-        column_keys=["devices.list.name", "devices.form.field.active", "devices.form.field.description"],
+        column_keys=["devices.list.name", "devices.form.field.active", "reference.col.pf", "devices.form.field.description"],
         rows=rows,
     )
 

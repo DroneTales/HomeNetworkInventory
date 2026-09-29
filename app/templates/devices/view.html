@@ -251,7 +251,7 @@
                         —
                         {% endif %}
                     </td>
-                    <td>{% if w.is_guest %}{{ t('common.yes') }}{% else %}—{% endif %}</td>
+                    <td>{% if w.is_guest %}✓{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -454,7 +454,7 @@
                         {% endif %}
                     </td>
                     <td>{{ pf.description or '—' }}</td>
-                    <td>{% if pf.is_active %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</td>
+                    <td>{% if pf.is_active %}✓{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

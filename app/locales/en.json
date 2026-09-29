@@ -233,5 +233,8 @@
   "connections.form.section.target": "Target",
   "connections.form.section.details": "Details",
   "connections.form.field.device": "Device",
-  "connections.form.field.port": "Port"
+  "connections.form.field.port": "Port",
+  "reference.col.pf": "Port forwarding",
+  "auth.demo_hint": "Demo access — username: test, password: test",
+  "auth.personal_hint": "For a personal account, contact:"
 }
