@@ -6,7 +6,7 @@
 <h1 class="mb-3">{{ t('reference.title.index') }}</h1>
 
 <div class="row g-3">
-    {# ---------- Локальные (в контексте дома) ---------- #}
+    {# ---------- Local (site-scoped) ---------- #}
     <div class="col-12 col-md-6 col-lg-4">
         <a href="/reference/locations" class="card text-decoration-none h-100 info-card section-basic">
             <div class="card-body">
@@ -28,7 +28,7 @@
         </a>
     </div>
 
-    {# ---------- Глобальные (только admin) ---------- #}
+    {# ---------- Global (admin only) ---------- #}
     {% if current_user.role == 'admin' %}
     <div class="col-12">
         <hr class="my-2">

@@ -53,7 +53,7 @@ def _validate_ports(
         start = int(start)
         end = int(end)
     except (TypeError, ValueError):
-        raise ValidationError("Port must be an integer", field=field_start)
+        raise ValidationError("Port must be an integer", field=field_start) from None
 
     if start < 1 or start > 65535:
         raise ValidationError("Port must be between 1 and 65535", field=field_start)

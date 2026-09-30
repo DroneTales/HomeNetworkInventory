@@ -5,6 +5,7 @@ from app.models.credential import Credential
 from app.models.credential_type import CredentialType
 from app.models.device import Device
 
+
 def list_by_device(db: Session, device_id: int) -> list[Credential]:
     return (
         db.query(Credential)

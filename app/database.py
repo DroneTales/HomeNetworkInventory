@@ -45,5 +45,5 @@ def check_database_path() -> None:
 
     if not os.access(parent, os.W_OK):
         raise RuntimeError(
-            f"Нет прав на запись в папку БД: {parent}"
+            f"Cannot write to database directory: {parent}"
         )

@@ -13,7 +13,7 @@
 <div class="alert alert-danger" role="alert">{{ error }}</div>
 {% endif %}
 
-{# ---------- Основная форма пользователя ---------- #}
+{# ---------- Main user form ---------- #}
 <form method="post" action="{{ form_action }}" id="user-form">
     <div class="card info-card section-basic mb-3">
         <div class="card-header">
@@ -135,7 +135,7 @@
     </div>
 </form>
 
-{# ---------- Homes (вне основной формы, чтобы не было вложенных форм) ---------- #}
+{# ---------- Homes (outside main form to avoid nesting) ---------- #}
 {% if is_edit and target_user and target_user.role != 'admin' %}
 <div class="card info-card section-ports mb-3">
     <div class="card-header">

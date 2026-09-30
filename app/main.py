@@ -6,6 +6,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
+from app import models  # noqa: F401
 from app.config import settings
 from app.core.bootstrap import ensure_default_admin
 from app.core.deps import get_current_site, require_user
@@ -13,10 +14,18 @@ from app.core.i18n import load_translations
 from app.core.middleware import CurrentSiteMiddleware
 from app.database import Base, check_database_path, engine, get_db
 from app.models.user import User
-
-from app import models  # noqa: F401
-
-from app.routers import auth, connections, devices, help, profile, reference, reference_ui, sites, topology, users
+from app.routers import (
+    auth,
+    connections,
+    devices,
+    help,
+    profile,
+    reference,
+    reference_ui,
+    sites,
+    topology,
+    users,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 

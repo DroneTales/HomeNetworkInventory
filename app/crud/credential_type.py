@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.credential_type import CredentialType
 
+
 def list_all(db: Session) -> list[CredentialType]:
     return db.query(CredentialType).order_by(CredentialType.name).all()
 

@@ -9,6 +9,7 @@ from app.models.site import Site
 from app.models.user import User
 from app.models.user_site import UserSite
 
+
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> User | None:
     user_id = request.session.get("user_id")
     if user_id is None:

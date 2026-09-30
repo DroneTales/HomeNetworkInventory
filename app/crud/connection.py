@@ -18,18 +18,6 @@ def list_all(db: Session, site_id: int) -> list[Connection]:
         .all()
     )
 
-def list_by_port(db: Session, port_id: int) -> list[Connection]:
-    return (
-        db.query(Connection)
-        .filter(
-            or_(
-                Connection.source_port_id == port_id,
-                Connection.target_port_id == port_id,
-            )
-        )
-        .order_by(Connection.id)
-        .all()
-    )
 
 def list_by_device(db: Session, device_id: int) -> list[Connection]:
     port_ids = [

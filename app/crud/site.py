@@ -8,6 +8,7 @@ from app.models.site import Site
 from app.models.user import User
 from app.models.user_site import UserSite
 
+
 def list_all(db: Session, include_inactive: bool = False) -> list[Site]:
     query = db.query(Site)
     if not include_inactive:
@@ -111,14 +112,6 @@ def delete(db: Session, site_id: int) -> None:
     db.delete(site)
     db.flush()
 
-def list_users(db: Session, site_id: int) -> list[User]:
-    return (
-        db.query(User)
-        .join(UserSite, UserSite.user_id == User.id)
-        .filter(UserSite.site_id == site_id)
-        .order_by(User.username)
-        .all()
-    )
 
 def is_user_assigned(db: Session, user_id: int, site_id: int) -> bool:
     return (

@@ -5,6 +5,7 @@ from app.models.device import Device
 from app.models.interface import Interface
 from app.models.port import Port
 
+
 def list_by_device(db: Session, device_id: int) -> list[Port]:
     return (
         db.query(Port)

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
+
 class UserSite(Base):
     __tablename__ = "user_sites"
 

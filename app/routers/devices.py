@@ -1035,7 +1035,7 @@ def _check_dhcp_conflicts(
                 pool_name = pool.name or f"pool #{pool.id}"
                 conflicts.append(
                     f"IP {ip} falls into DHCP pool '{pool_name}' "
-                    f"({pool.start_ip}–{pool.end_ip})"
+                    f"({pool.start_ip}-{pool.end_ip})"
                 )
     if conflicts:
         return "Saved. " + "; ".join(conflicts)
@@ -1081,11 +1081,9 @@ def _collect_port_forwards(form) -> list[dict]:
         else:
             internal_ip_manual = None
 
-        is_active = True
-        if item_id:
-            is_active = active_by_id.get(str(item_id), False)
-        else:
-            is_active = i in active_flags
+        is_active = (
+            active_by_id.get(str(item_id), False) if item_id else i in active_flags
+        )
 
         result.append({
             "id": item_id,

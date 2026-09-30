@@ -26,7 +26,7 @@
 <div class="alert alert-info">{{ t('connections.list.empty') }}</div>
 {% else %}
 
-{# Десктопная таблица #}
+{# Desktop table #}
 <div class="table-responsive d-none d-md-block">
     <table class="table table-hover align-middle">
         <thead>
@@ -79,7 +79,7 @@
     </table>
 </div>
 
-{# Мобильные карточки #}
+{# Mobile cards #}
 <div class="d-md-none">
     {% for c in connections %}
     <div class="card mb-2 {% if not c.is_active %}text-muted{% endif %}">

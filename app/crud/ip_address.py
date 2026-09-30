@@ -2,13 +2,11 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
 from app.core.validation import (
-    is_ip_in_range,
     validate_ipv4,
     validate_mask,
     validate_same_subnet,
 )
 from app.models.device import Device
-from app.models.dhcp_pool import DhcpPool
 from app.models.interface import Interface
 from app.models.ip_address import IPAddress
 
@@ -114,10 +112,7 @@ def validate(
     else:
         gateway = None
 
-    if dns is not None and dns.strip():
-        dns = validate_ipv4(dns, field="dns")
-    else:
-        dns = None
+    dns = validate_ipv4(dns, field="dns") if dns is not None and dns.strip() else None
 
     iface = _check_interface_type(db, interface_id, address_type)
     device = db.get(Device, iface.device_id)
@@ -202,24 +197,3 @@ def delete(db: Session, ip_id: int) -> None:
     db.flush()
 
 
-def check_ip_in_dhcp_pools(
-    db: Session,
-    address: str | None,
-    site_id: int | None = None,
-) -> list[DhcpPool]:
-    if not address:
-        return []
-
-    query = db.query(DhcpPool)
-    if site_id is not None:
-        query = (
-            query.join(Device, DhcpPool.device_id == Device.id)
-            .filter(Device.site_id == site_id)
-        )
-    pools = query.all()
-
-    result = []
-    for pool in pools:
-        if is_ip_in_range(address, pool.start_ip, pool.end_ip):
-            result.append(pool)
-    return result

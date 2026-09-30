@@ -72,7 +72,7 @@
 </div>
 {% else %}
 
-{# Десктопная таблица с сортировкой по клику на заголовок #}
+{# Desktop table with client-side sorting #}
 <div class="table-responsive d-none d-md-block">
     <table class="table table-hover align-middle" data-sortable="true">
         <thead>
@@ -131,7 +131,7 @@
     </table>
 </div>
 
-{# Мобильные карточки (без сортировки) #}
+{# Mobile cards (no sorting) #}
 <div class="d-md-none">
     {% for row in rows %}
     {% set d = row.device %}

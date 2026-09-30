@@ -55,8 +55,7 @@
     const source = setupSide("source");
     const target = setupSide("target");
 
-    // Восстановление после ошибки валидации: предзаполним селекты
-    // по сохранённым id портов из form_data.
+    // Restore after validation error: preselect from saved port ids in form_data.
     const initialSourcePortId = "{{ form_data.source_port_id if form_data else '' }}";
     const initialTargetPortId = "{{ form_data.target_port_id if form_data else '' }}";
 

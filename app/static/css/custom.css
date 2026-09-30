@@ -109,10 +109,6 @@
 
 /* ---- Mobile cards: same accent as info-card ---- */
 
-.mobile-card {
-    border-left: 4px solid var(--section-color, #dee2e6);
-}
-
 .pf-row .form-label.small {
     font-size: 0.7rem;
     line-height: 1.1;
@@ -145,24 +141,6 @@
     font-size: 0.75rem;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
-}
-
-@media (max-width: 767.98px) {
-    .credential-row .cred-fields-row {
-        flex-wrap: wrap !important;
-    }
-    .credential-row .cred-col-type,
-    .credential-row .cred-col-username,
-    .credential-row .cred-col-password,
-    .credential-row .cred-col-description,
-    .credential-row .cred-col-remove {
-        flex: 0 0 calc(50% - 0.5rem) !important;
-        width: auto !important;
-    }
-    .credential-row .cred-col-description,
-    .credential-row .cred-col-remove {
-        flex: 0 0 100% !important;
-    }
 }
 
 .interface-row .form-label.small {
@@ -234,17 +212,6 @@
     padding-left: 0.25rem;
     padding-right: 0.25rem;
 }
-
-.topo-node-label {
-    font-size: 9px;
-    line-height: 1;
-    text-align: center;
-    max-width: 56px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 
 .cytoscape-node-html-label {
     pointer-events: none !important;

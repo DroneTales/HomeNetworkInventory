@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.location import Location
 
+
 def list_all(db: Session, site_id: int) -> list[Location]:
     return (
         db.query(Location)

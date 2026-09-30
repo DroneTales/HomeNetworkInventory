@@ -1,5 +1,6 @@
 from passlib.hash import bcrypt
 
+
 def hash_password(plain: str) -> str:
     return bcrypt.hash(plain)
 

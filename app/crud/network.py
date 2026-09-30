@@ -1,10 +1,10 @@
-import ipaddress
 
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
 from app.core.validation import validate_ipv4, validate_mask, validate_same_subnet
 from app.models.network import Network
+
 
 def list_all(db: Session, site_id: int) -> list[Network]:
     return (
@@ -147,12 +147,3 @@ def delete(db: Session, network_id: int) -> None:
     db.delete(network)
     db.flush()
 
-def contains_ip(network: Network, ip: str) -> bool:
-    try:
-        net = ipaddress.IPv4Network(
-            f"{network.network_address}/{network.mask}", strict=False
-        )
-        addr = ipaddress.IPv4Address(ip)
-    except ValueError:
-        return False
-    return addr in net

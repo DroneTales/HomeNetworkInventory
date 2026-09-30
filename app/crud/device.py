@@ -11,6 +11,7 @@ from app.models.model import Model
 from app.models.network import Network
 from app.models.vendor import Vendor
 
+
 def list_all(db: Session, site_id: int) -> list[Device]:
     return (
         db.query(Device)
@@ -27,12 +28,6 @@ def get_by_id(db: Session, device_id: int, site_id: int | None = None) -> Device
         return None
     return device
 
-def get_by_hostname(db: Session, hostname: str, site_id: int) -> Device | None:
-    return (
-        db.query(Device)
-        .filter(Device.hostname == hostname, Device.site_id == site_id)
-        .first()
-    )
 
 def _check_hostname_unique(
     db: Session,

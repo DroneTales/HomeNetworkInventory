@@ -135,7 +135,7 @@
         </div>
     </div>
 
-    {# ---------- Ports (только при редактировании) ---------- #}
+    {# ---------- Ports (edit mode only) ---------- #}
     {% if is_edit %}
     <div class="card info-card section-ports mb-3">
         <div class="card-header">
@@ -301,7 +301,7 @@
     </div>
 </form>
 
-{# Шаблоны строк для клонирования через JS #}
+{# Row templates cloned by JS #}
 <template id="interface-row-template">
     {% with iface = None %}
         {% include "devices/_interface_row.html" with context %}

@@ -5,6 +5,7 @@ from app.core.deps import get_current_site
 from app.database import SessionLocal
 from app.models.user import User
 
+
 class CurrentSiteMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         request.state.current_site = None

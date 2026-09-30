@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.vendor import Vendor
 
+
 def list_all(db: Session) -> list[Vendor]:
     return db.query(Vendor).order_by(Vendor.name).all()
 

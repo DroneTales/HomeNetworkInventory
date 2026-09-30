@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ValidationError
 from app.models.device_type import DeviceType
 
+
 def list_all(db: Session) -> list[DeviceType]:
     return db.query(DeviceType).order_by(DeviceType.name).all()
 

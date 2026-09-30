@@ -4,6 +4,7 @@ from app.core.security import hash_password
 from app.database import SessionLocal
 from app.models.user import User
 
+
 def ensure_default_admin() -> None:
     db: Session = SessionLocal()
     try:

@@ -4,10 +4,10 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import require_site, require_user
 from app.core.templating import render
+from app.crud import device as crud_device
 from app.database import get_db
 from app.models.site import Site
 from app.models.user import User
-from app.crud import device as crud_device
 
 router = APIRouter(prefix="/topology", tags=["topology"])
 

@@ -37,12 +37,11 @@ def _validate(
     else:
         protocol = None
 
-    if port is not None:
-        if not isinstance(port, int) or port < 1 or port > 65535:
-            raise ValidationError(
-                f"Port must be between 1 and 65535",
-                field="port",
-            )
+    if port is not None and (not isinstance(port, int) or port < 1 or port > 65535):
+        raise ValidationError(
+            "Port must be between 1 and 65535",
+            field="port",
+        )
 
     return name, protocol, port
 

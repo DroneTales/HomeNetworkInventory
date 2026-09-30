@@ -10,12 +10,12 @@
     const headers = table.querySelectorAll("th[data-sort]");
     if (!headers.length) return;
 
-    // Запоминаем исходный порядок (пришёл с сервера, отсортирован по IP).
+    // Preserve initial order (server-sorted by IP).
     const originalOrder = Array.from(tbody.querySelectorAll("tr"));
     originalOrder.forEach((tr, i) => { tr.dataset.origIndex = i; });
 
-    let currentColumn = null;   // индекс колонки, по которой сортируем сейчас
-    let currentState = 0;       // 0 = выкл, 1 = asc, 2 = desc
+    let currentColumn = null;
+    let currentState = 0; // 0 = off, 1 = asc, 2 = desc
 
     function parseIPv4(str) {
         if (!str || str === "—") return null;
@@ -53,7 +53,7 @@
     function applySort(colIndex, type, direction) {
         const rows = Array.from(tbody.querySelectorAll("tr"));
 
-        // Пустые всегда в конец, независимо от направления.
+        // Empty values always go last, regardless of direction.
         const nonEmpty = [];
         const empty = [];
 
@@ -70,7 +70,7 @@
             return direction === 1 ? cmp : -cmp;
         });
 
-        // Пустые — в конец, среди пустых сохраняем исходный порядок.
+        // Empty values go last, preserving their original order.
         empty.sort((a, b) =>
             parseInt(a.dataset.origIndex, 10) - parseInt(b.dataset.origIndex, 10)
         );
@@ -101,10 +101,10 @@
             const type = th.dataset.type || "text";
 
             if (currentColumn === colIndex) {
-                // Тот же столбец — переключаем состояние по кругу: 1 → 2 → 0
+                // Same column: cycle 1 -> 2 -> 0
                 currentState = (currentState + 1) % 3;
             } else {
-                // Другой столбец — начинаем с asc
+                // Different column: start with asc
                 currentColumn = colIndex;
                 currentState = 1;
             }
