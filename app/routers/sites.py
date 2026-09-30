@@ -1,4 +1,3 @@
-from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
@@ -15,6 +14,7 @@ from app.core.deps import (
 )
 from app.core.exceptions import ValidationError
 from app.core.templating import render
+from app.core.utils import redirect_with_error
 from app.crud import site as crud_site
 from app.database import get_db
 from app.models.user import User
@@ -208,10 +208,7 @@ def delete_site(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return RedirectResponse(
-            f"/sites?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/sites", e.message)
 
     return RedirectResponse("/sites", status_code=303)
 

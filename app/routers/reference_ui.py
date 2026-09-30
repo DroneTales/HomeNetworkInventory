@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import require_admin, require_edit, require_site
 from app.core.exceptions import ValidationError
 from app.core.templating import render
-from app.core.utils import to_int
+from app.core.utils import redirect_with_error, to_int
 from app.crud import credential_type as crud_cred_type
 from app.crud import device_type as crud_device_type
 from app.crud import location as crud_location
@@ -17,6 +17,30 @@ from app.models.site import Site
 from app.models.user import User
 
 router = APIRouter(prefix="/reference", tags=["reference-ui"])
+
+def _ref_form(
+    request,
+    user,
+    site,
+    template,
+    form_action,
+    is_edit,
+    form_data,
+    error=None,
+    **extra,
+):
+    return render(
+        request,
+        template,
+        user=user,
+        current_site=site,
+        form_action=form_action,
+        is_edit=is_edit,
+        error=error,
+        form_data=form_data,
+        **extra,
+    )
+
 
 @router.get("", response_class=HTMLResponse)
 def reference_index(
@@ -59,14 +83,14 @@ def locations_new_form(
     user: User = Depends(require_edit),
     site: Site = Depends(require_site),
 ):
-    return render(
-        request,
-        "reference/location_form.html",
-        user=user,
-        current_site=site,
-        form_action="/reference/locations/new",
-        is_edit=False,
-        form_data={},
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/location_form.html",
+            "/reference/locations/new",
+            False,
+            {},
     )
 
 @router.post("/locations/new")
@@ -85,15 +109,15 @@ async def locations_new_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/location_form.html",
-            user=user,
-            current_site=site,
-            form_action="/reference/locations/new",
-            is_edit=False,
+            "/reference/locations/new",
+            False,
+            {"name": name, "description": description or ""},
             error=e.message,
-            form_data={"name": name, "description": description or ""},
         )
     return RedirectResponse("/reference/locations", status_code=303)
 
@@ -108,15 +132,15 @@ def locations_edit_form(
     item = crud_location.get_by_id(db, item_id, site_id=site.id)
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return render(
-        request,
-        "reference/location_form.html",
-        user=user,
-        current_site=site,
-        form_action=f"/reference/locations/{item_id}/edit",
-        is_edit=True,
-        form_data={"name": item.name, "description": item.description or ""},
-    )
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/location_form.html",
+            f"/reference/locations/{item_id}/edit",
+            True,
+            {"name": item.name, "description": item.description or ""},
+        )
 
 @router.post("/locations/{item_id}/edit")
 async def locations_edit_submit(
@@ -139,15 +163,15 @@ async def locations_edit_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/location_form.html",
-            user=user,
-            current_site=site,
-            form_action=f"/reference/locations/{item_id}/edit",
-            is_edit=True,
+            f"/reference/locations/{item_id}/edit",
+            True,
+            {"name": name, "description": description or ""},
             error=e.message,
-            form_data={"name": name, "description": description or ""},
         )
     return RedirectResponse("/reference/locations", status_code=303)
 
@@ -162,16 +186,12 @@ def locations_delete(
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
 
-    from urllib.parse import quote
     try:
         crud_location.delete(db, item_id)
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return RedirectResponse(
-            f"/reference/locations?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/reference/locations", e.message)
     return RedirectResponse("/reference/locations", status_code=303)
 
 @router.get("/device-types", response_class=HTMLResponse)
@@ -208,15 +228,15 @@ def device_types_new_form(
     user: User = Depends(require_admin),
     site: Site = Depends(require_site),
 ):
-    return render(
-        request,
-        "reference/device_type_form.html",
-        user=user,
-        current_site=site,
-        form_action="/reference/device-types/new",
-        is_edit=False,
-        form_data={"is_active": True, "supports_port_forwarding": False},
-    )
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/device_type_form.html",
+            "/reference/device-types/new",
+            False,
+            {"is_active": True, "supports_port_forwarding": False},
+        )
 
 @router.post("/device-types/new")
 async def device_types_new_submit(
@@ -236,15 +256,15 @@ async def device_types_new_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/device_type_form.html",
-            user=user,
-            current_site=site,
-            form_action="/reference/device-types/new",
-            is_edit=False,
+            "/reference/device-types/new",
+            False,
+            {"name": name, "is_active": is_active, "supports_port_forwarding": supports_pf, "description": description or ""},
             error=e.message,
-            form_data={"name": name, "is_active": is_active, "supports_port_forwarding": supports_pf, "description": description or ""},
         )
     return RedirectResponse("/reference/device-types", status_code=303)
 
@@ -259,20 +279,20 @@ def device_types_edit_form(
     item = crud_device_type.get_by_id(db, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return render(
-        request,
-        "reference/device_type_form.html",
-        user=user,
-        current_site=site,
-        form_action=f"/reference/device-types/{item_id}/edit",
-        is_edit=True,
-        form_data={
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/device_type_form.html",
+            f"/reference/device-types/{item_id}/edit",
+            True,
+            {
             "name": item.name,
             "is_active": item.is_active,
             "supports_port_forwarding": item.supports_port_forwarding,
             "description": item.description or "",
         },
-    )
+        )
 
 @router.post("/device-types/{item_id}/edit")
 async def device_types_edit_submit(
@@ -295,15 +315,15 @@ async def device_types_edit_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/device_type_form.html",
-            user=user,
-            current_site=site,
-            form_action=f"/reference/device-types/{item_id}/edit",
-            is_edit=True,
+            f"/reference/device-types/{item_id}/edit",
+            True,
+            {"name": name, "is_active": is_active, "supports_port_forwarding": supports_pf, "description": description or ""},
             error=e.message,
-            form_data={"name": name, "is_active": is_active, "supports_port_forwarding": supports_pf, "description": description or ""},
         )
     return RedirectResponse("/reference/device-types", status_code=303)
 
@@ -314,16 +334,12 @@ def device_types_delete(
     user: User = Depends(require_admin),
     site: Site = Depends(require_site),
 ):
-    from urllib.parse import quote
     try:
         crud_device_type.delete(db, item_id)
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return RedirectResponse(
-            f"/reference/device-types?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/reference/device-types", e.message)
     return RedirectResponse("/reference/device-types", status_code=303)
 
 @router.get("/vendors", response_class=HTMLResponse)
@@ -354,14 +370,14 @@ def vendors_new_form(
     user: User = Depends(require_admin),
     site: Site = Depends(require_site),
 ):
-    return render(
-        request,
-        "reference/vendor_form.html",
-        user=user,
-        current_site=site,
-        form_action="/reference/vendors/new",
-        is_edit=False,
-        form_data={},
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/vendor_form.html",
+            "/reference/vendors/new",
+            False,
+            {},
     )
 
 @router.post("/vendors/new")
@@ -379,15 +395,15 @@ async def vendors_new_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/vendor_form.html",
-            user=user,
-            current_site=site,
-            form_action="/reference/vendors/new",
-            is_edit=False,
+            "/reference/vendors/new",
+            False,
+            {"name": name},
             error=e.message,
-            form_data={"name": name},
         )
     return RedirectResponse("/reference/vendors", status_code=303)
 
@@ -402,15 +418,15 @@ def vendors_edit_form(
     item = crud_vendor.get_by_id(db, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return render(
-        request,
-        "reference/vendor_form.html",
-        user=user,
-        current_site=site,
-        form_action=f"/reference/vendors/{item_id}/edit",
-        is_edit=True,
-        form_data={"name": item.name},
-    )
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/vendor_form.html",
+            f"/reference/vendors/{item_id}/edit",
+            True,
+            {"name": item.name},
+        )
 
 @router.post("/vendors/{item_id}/edit")
 async def vendors_edit_submit(
@@ -428,15 +444,15 @@ async def vendors_edit_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/vendor_form.html",
-            user=user,
-            current_site=site,
-            form_action=f"/reference/vendors/{item_id}/edit",
-            is_edit=True,
+            f"/reference/vendors/{item_id}/edit",
+            True,
+            {"name": name},
             error=e.message,
-            form_data={"name": name},
         )
     return RedirectResponse("/reference/vendors", status_code=303)
 
@@ -447,16 +463,12 @@ def vendors_delete(
     user: User = Depends(require_admin),
     site: Site = Depends(require_site),
 ):
-    from urllib.parse import quote
     try:
         crud_vendor.delete(db, item_id)
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return RedirectResponse(
-            f"/reference/vendors?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/reference/vendors", e.message)
     return RedirectResponse("/reference/vendors", status_code=303)
 
 @router.get("/models", response_class=HTMLResponse)
@@ -492,14 +504,14 @@ def models_new_form(
     site: Site = Depends(require_site),
 ):
     vendors = crud_vendor.list_all(db)
-    return render(
-        request,
-        "reference/model_form.html",
-        user=user,
-        current_site=site,
-        form_action="/reference/models/new",
-        is_edit=False,
-        form_data={},
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/model_form.html",
+            "/reference/models/new",
+            False,
+            {},
         vendors=vendors,
     )
 
@@ -520,15 +532,15 @@ async def models_new_submit(
     except ValidationError as e:
         db.rollback()
         vendors = crud_vendor.list_all(db)
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/model_form.html",
-            user=user,
-            current_site=site,
-            form_action="/reference/models/new",
-            is_edit=False,
+            "/reference/models/new",
+            False,
+            {"name": name, "vendor_id": vendor_id or ""},
             error=e.message,
-            form_data={"name": name, "vendor_id": vendor_id or ""},
             vendors=vendors,
         )
     return RedirectResponse("/reference/models", status_code=303)
@@ -545,16 +557,16 @@ def models_edit_form(
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
     vendors = crud_vendor.list_all(db)
-    return render(
-        request,
-        "reference/model_form.html",
-        user=user,
-        current_site=site,
-        form_action=f"/reference/models/{item_id}/edit",
-        is_edit=True,
-        form_data={"name": item.name, "vendor_id": item.vendor_id},
-        vendors=vendors,
-    )
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/model_form.html",
+            f"/reference/models/{item_id}/edit",
+            True,
+            {"name": item.name, "vendor_id": item.vendor_id},
+            vendors=vendors,
+        )
 
 @router.post("/models/{item_id}/edit")
 async def models_edit_submit(
@@ -574,15 +586,15 @@ async def models_edit_submit(
     except ValidationError as e:
         db.rollback()
         vendors = crud_vendor.list_all(db)
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/model_form.html",
-            user=user,
-            current_site=site,
-            form_action=f"/reference/models/{item_id}/edit",
-            is_edit=True,
+            f"/reference/models/{item_id}/edit",
+            True,
+            {"name": name, "vendor_id": vendor_id or ""},
             error=e.message,
-            form_data={"name": name, "vendor_id": vendor_id or ""},
             vendors=vendors,
         )
     return RedirectResponse("/reference/models", status_code=303)
@@ -594,16 +606,12 @@ def models_delete(
     user: User = Depends(require_admin),
     site: Site = Depends(require_site),
 ):
-    from urllib.parse import quote
     try:
         crud_model.delete(db, item_id)
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return RedirectResponse(
-            f"/reference/models?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/reference/models", e.message)
     return RedirectResponse("/reference/models", status_code=303)
 
 @router.get("/networks", response_class=HTMLResponse)
@@ -645,14 +653,14 @@ def networks_new_form(
     user: User = Depends(require_edit),
     site: Site = Depends(require_site),
 ):
-    return render(
-        request,
-        "reference/network_form.html",
-        user=user,
-        current_site=site,
-        form_action="/reference/networks/new",
-        is_edit=False,
-        form_data={},
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/network_form.html",
+            "/reference/networks/new",
+            False,
+            {},
     )
 
 @router.post("/networks/new")
@@ -670,12 +678,12 @@ async def networks_new_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/network_form.html",
-            user=user,
-            current_site=site,
-            form_action="/reference/networks/new",
+            "/reference/networks/new",
             is_edit=False,
             error=e.message,
             form_data=data,
@@ -693,14 +701,14 @@ def networks_edit_form(
     item = crud_network.get_by_id(db, item_id, site_id=site.id)
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return render(
+    return _ref_form(
         request,
+        user,
+        site,
         "reference/network_form.html",
-        user=user,
-        current_site=site,
-        form_action=f"/reference/networks/{item_id}/edit",
-        is_edit=True,
-        form_data={
+        f"/reference/networks/{item_id}/edit",
+        True,
+        {
             "name": item.name,
             "network_address": item.network_address,
             "mask": item.mask,
@@ -730,12 +738,12 @@ async def networks_edit_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/network_form.html",
-            user=user,
-            current_site=site,
-            form_action=f"/reference/networks/{item_id}/edit",
+            f"/reference/networks/{item_id}/edit",
             is_edit=True,
             error=e.message,
             form_data=data,
@@ -753,16 +761,12 @@ def networks_delete(
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
 
-    from urllib.parse import quote
     try:
         crud_network.delete(db, item_id)
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return RedirectResponse(
-            f"/reference/networks?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/reference/networks", e.message)
     return RedirectResponse("/reference/networks", status_code=303)
 
 @router.get("/credential-types", response_class=HTMLResponse)
@@ -793,14 +797,14 @@ def credential_types_new_form(
     user: User = Depends(require_admin),
     site: Site = Depends(require_site),
 ):
-    return render(
-        request,
-        "reference/credential_type_form.html",
-        user=user,
-        current_site=site,
-        form_action="/reference/credential-types/new",
-        is_edit=False,
-        form_data={},
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/credential_type_form.html",
+            "/reference/credential-types/new",
+            False,
+            {},
     )
 
 @router.post("/credential-types/new")
@@ -819,15 +823,16 @@ async def credential_types_new_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
+            site,
             "reference/credential_type_form.html",
-            user=user,
-            current_site=site,
-            form_action="/reference/credential-types/new",
-            is_edit=False,
+            "/reference/credential-types/new",
+            False,
+            {"name": name, "description": description or ""},
             error=e.message,
-            form_data={"name": name, "description": description or ""},
         )
     return RedirectResponse("/reference/credential-types", status_code=303)
 
@@ -842,15 +847,15 @@ def credential_types_edit_form(
     item = crud_cred_type.get_by_id(db, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return render(
-        request,
-        "reference/credential_type_form.html",
-        user=user,
-        current_site=site,
-        form_action=f"/reference/credential-types/{item_id}/edit",
-        is_edit=True,
-        form_data={"name": item.name, "description": item.description or ""},
-    )
+    return _ref_form(
+            request,
+            user,
+            site,
+            "reference/credential_type_form.html",
+            f"/reference/credential-types/{item_id}/edit",
+            True,
+            {"name": item.name, "description": item.description or ""},
+        )
 
 @router.post("/credential-types/{item_id}/edit")
 async def credential_types_edit_submit(
@@ -869,15 +874,15 @@ async def credential_types_edit_submit(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return render(
+        return _ref_form(
             request,
+            user,
+            site,
             "reference/credential_type_form.html",
-            user=user,
-            current_site=site,
-            form_action=f"/reference/credential-types/{item_id}/edit",
-            is_edit=True,
+            f"/reference/credential-types/{item_id}/edit",
+            True,
+            {"name": name, "description": description or ""},
             error=e.message,
-            form_data={"name": name, "description": description or ""},
         )
     return RedirectResponse("/reference/credential-types", status_code=303)
 
@@ -888,16 +893,12 @@ def credential_types_delete(
     user: User = Depends(require_admin),
     site: Site = Depends(require_site),
 ):
-    from urllib.parse import quote
     try:
         crud_cred_type.delete(db, item_id)
         db.commit()
     except ValidationError as e:
         db.rollback()
-        return RedirectResponse(
-            f"/reference/credential-types?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/reference/credential-types", e.message)
     return RedirectResponse("/reference/credential-types", status_code=303)
 
 def _network_form_data(form) -> dict:

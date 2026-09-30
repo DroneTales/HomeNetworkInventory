@@ -1,3 +1,8 @@
+from urllib.parse import quote
+
+from fastapi.responses import RedirectResponse
+
+
 def to_int(value) -> int | None:
     if value is None:
         return None
@@ -8,6 +13,7 @@ def to_int(value) -> int | None:
         return int(value)
     except ValueError:
         return None
+
 
 def parse_ipv4(ip_str: str) -> tuple[int, int, int, int] | None:
     if not ip_str:
@@ -22,3 +28,8 @@ def parse_ipv4(ip_str: str) -> tuple[int, int, int, int] | None:
     if any(o < 0 or o > 255 for o in octets):
         return None
     return octets
+
+
+def redirect_with_error(url: str, message: str, status: int = 303):
+    sep = "&" if "?" in url else "?"
+    return RedirectResponse(f"{url}{sep}error={quote(message)}", status_code=status)

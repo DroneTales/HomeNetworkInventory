@@ -6,6 +6,7 @@ from app.core.constants import ROLE_USER
 from app.core.deps import require_admin
 from app.core.exceptions import ValidationError
 from app.core.templating import render
+from app.core.utils import redirect_with_error
 from app.crud import site as crud_site
 from app.crud import user as crud_user
 from app.database import get_db
@@ -301,11 +302,7 @@ def delete_user(
         db.commit()
     except ValidationError as e:
         db.rollback()
-        from urllib.parse import quote
-        return RedirectResponse(
-            f"/users?error={quote(e.message)}",
-            status_code=303,
-        )
+        return redirect_with_error("/users", e.message)
 
     return RedirectResponse("/users", status_code=303)
 
