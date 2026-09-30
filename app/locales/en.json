@@ -272,5 +272,10 @@
   "devices.badge.pf_in": "Port forward target",
   "devices.badge.services": "Service count",
   "users.form.perm.can_change_own_password": "Can change own password",
-  "users.list.change_own_password": "Own password"
+  "users.list.change_own_password": "Own password",
+  "connections.wireless.title": "Wi-Fi connections",
+  "connections.wireless.empty": "No Wi-Fi connections.",
+  "connections.wireless.broadcast_by": "Broadcast by",
+  "connections.wireless.clients": "Clients",
+  "devices.view.section.wifi_clients": "Wi-Fi clients"
 }

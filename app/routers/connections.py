@@ -7,6 +7,7 @@ from app.core.exceptions import ValidationError
 from app.core.templating import render
 from app.crud import connection as crud_connection
 from app.crud import device as crud_device
+from app.crud import wifi_network as crud_wifi
 from app.database import get_db
 from app.models.site import Site
 from app.models.user import User
@@ -22,12 +23,36 @@ def list_connections(
 ):
     connections = crud_connection.list_all(db, site.id)
     warning = request.session.pop("warning", None)
+
+    wifi_nets = crud_wifi.list_by_site(db, site.id)
+    wireless = []
+    for w in wifi_nets:
+        clients = []
+        seen = set()
+        for iface in w.connected_interfaces:
+            dev = iface.device
+            if dev is None or dev.id in seen:
+                continue
+            seen.add(dev.id)
+            clients.append({
+                "device": dev,
+                "interface": iface,
+            })
+        if clients:
+            clients.sort(key=lambda c: c["device"].hostname.lower())
+            wireless.append({
+                "wifi": w,
+                "device": w.device,
+                "clients": clients,
+            })
+
     return render(
         request,
         "connections/list.html",
         user=user,
         current_site=site,
         connections=connections,
+        wireless=wireless,
         warning=warning,
     )
 

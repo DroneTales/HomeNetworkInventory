@@ -162,6 +162,20 @@ def view_device(
             if ip.address:
                 device_ips.append(ip.address)
 
+    wifi_clients = []
+    for w in wifi_networks:
+        clients = []
+        seen = set()
+        for iface in w.connected_interfaces:
+            cli_dev = iface.device
+            if cli_dev is None or cli_dev.id == device_id or cli_dev.id in seen:
+                continue
+            seen.add(cli_dev.id)
+            clients.append(cli_dev)
+        clients.sort(key=lambda c: c.hostname.lower())
+        if clients:
+            wifi_clients.append({"wifi": w, "clients": clients})
+
     incoming_pfs = crud_pf.list_incoming(db, device_id, site.id, device_ips)
     incoming = []
     for pf in incoming_pfs:
@@ -190,6 +204,7 @@ def view_device(
         services=services,
         port_forwards=port_forwards,
         incoming_port_forwards=incoming,
+        wifi_clients=wifi_clients,
     )
 
 @router.get("/{device_id}/edit", response_class=HTMLResponse)

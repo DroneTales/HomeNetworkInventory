@@ -133,5 +133,52 @@
 </div>
 
 {% endif %}
+
+{# ---------- Wireless ---------- #}
+<div class="mt-4 mb-3">
+    <h2 class="h4 mb-0">
+        <i class="fa-solid fa-wifi me-2"></i>{{ t('connections.wireless.title') }}
+    </h2>
+</div>
+
+{% if not wireless %}
+<div class="alert alert-info">{{ t('connections.wireless.empty') }}</div>
+{% else %}
+<div class="row g-3">
+    {% for w in wireless %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card info-card h-100">
+            <div class="card-header">
+                <i class="fa-solid fa-wifi me-1"></i>
+                <span class="fw-bold">{{ w.wifi.ssid }}</span>
+                {% if w.wifi.band %}<span class="badge bg-secondary ms-1">{{ w.wifi.band }} GHz</span>{% endif %}
+                {% if w.wifi.is_guest %}<span class="badge bg-info text-dark ms-1">{{ t('devices.form.field.guest') }}</span>{% endif %}
+            </div>
+            <div class="card-body">
+                <div class="small text-muted mb-2">
+                    {{ t('connections.wireless.broadcast_by') }}:
+                    {% if w.device %}
+                    <a href="/devices/{{ w.device.id }}">{{ w.device.hostname }}</a>
+                    {% else %}—{% endif %}
+                </div>
+                <div class="small text-muted mb-1">{{ t('connections.wireless.clients') }} ({{ w.clients|length }}):</div>
+                <ul class="list-unstyled mb-0 small">
+                    {% for c in w.clients %}
+                    <li class="py-1">
+                        <i class="fa-solid fa-plug text-muted me-1"></i>
+                        <a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a>
+                        {% if c.device.human_readable_name %}
+                        <span class="text-muted">— {{ c.device.human_readable_name }}</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% endblock %}
 

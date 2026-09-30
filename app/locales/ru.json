@@ -272,5 +272,10 @@
   "devices.badge.pf_in": "Цель проброса портов",
   "devices.badge.services": "Количество сервисов",
   "users.form.perm.can_change_own_password": "Может менять свой пароль",
-  "users.list.change_own_password": "Свой пароль"
+  "users.list.change_own_password": "Свой пароль",
+  "connections.wireless.title": "Wi-Fi подключения",
+  "connections.wireless.empty": "Wi-Fi подключений нет.",
+  "connections.wireless.broadcast_by": "Раздаёт",
+  "connections.wireless.clients": "Клиенты",
+  "devices.view.section.wifi_clients": "Wi-Fi клиенты"
 }

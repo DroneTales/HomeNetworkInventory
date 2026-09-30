@@ -26,6 +26,16 @@ def list_by_device(db: Session, device_id: int) -> list[WiFiNetwork]:
 def list_all(db: Session) -> list[WiFiNetwork]:
     return db.query(WiFiNetwork).order_by(WiFiNetwork.ssid).all()
 
+
+def list_by_site(db: Session, site_id: int) -> list[WiFiNetwork]:
+    return (
+        db.query(WiFiNetwork)
+        .join(Device, WiFiNetwork.device_id == Device.id)
+        .filter(Device.site_id == site_id)
+        .order_by(WiFiNetwork.ssid)
+        .all()
+    )
+
 def get_by_id(db: Session, wifi_id: int) -> WiFiNetwork | None:
     return db.get(WiFiNetwork, wifi_id)
 

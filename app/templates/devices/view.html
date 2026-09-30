@@ -95,6 +95,7 @@
 </div>
 
 {# ---------- Interfaces ---------- #}
+{% if interfaces %}
 <div class="card info-card section-interfaces mb-3">
     <div class="card-header">
         <i class="fa-solid fa-ethernet"></i>
@@ -173,237 +174,10 @@
         {% endif %}
     </div>
 </div>
-
-{# ---------- Ports ---------- #}
-<div class="card info-card section-ports mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-plug"></i>
-        <span>{{ t('devices.view.section.ports') }}</span>
-        <span class="section-count">({{ ports|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not ports %}
-        <div class="text-muted small">{{ t('devices.view.empty.ports') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.list.name') }}</th>
-                    <th>{{ t('devices.form.field.interface') }}</th>
-                    <th>{{ t('devices.form.field.description') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for p in ports %}
-                <tr>
-                    <td><code>{{ p.name }}</code></td>
-                    <td><code>{{ p.interface.name }}</code></td>
-                    <td>{{ p.description or '—' }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-{# ---------- Wi-Fi networks ---------- #}
-<div class="card info-card section-wifi mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-wifi"></i>
-        <span>{{ t('devices.view.section.wifi') }}</span>
-        <span class="section-count">({{ wifi_networks|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not wifi_networks %}
-        <div class="text-muted small">{{ t('devices.view.empty.wifi') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.form.field.ssid') }}</th>
-                    <th>{{ t('devices.form.field.band') }}</th>
-                    <th>{{ t('devices.form.field.encryption') }}</th>
-                    <th>{{ t('devices.form.field.password') }}</th>
-                    <th>{{ t('devices.form.field.guest') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for w in wifi_networks %}
-                <tr>
-                    <td>{{ w.ssid }}</td>
-                    <td>{{ w.band or '—' }}</td>
-                    <td>{{ w.encryption or '—' }}</td>
-                    <td>
-                        {% if w.password %}
-                            {% if current_user.role == 'admin' or current_user.can_view_passwords %}
-                            <span class="password-cell" data-password="{{ w.password }}">
-                                <span class="password-mask">••••••••</span>
-                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">{{ t('devices.view.btn.show_password') }}</button>
-                            </span>
-                            {% else %}
-                            <span class="text-muted">••••••••</span>
-                            {% endif %}
-                        {% else %}
-                        —
-                        {% endif %}
-                    </td>
-                    <td>{% if w.is_guest %}✓{% else %}—{% endif %}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-{# ---------- DHCP pools ---------- #}
-<div class="card info-card section-dhcp mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-server"></i>
-        <span>{{ t('devices.view.section.dhcp') }}</span>
-        <span class="section-count">({{ dhcp_pools|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not dhcp_pools %}
-        <div class="text-muted small">{{ t('devices.view.empty.dhcp') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.list.name') }}</th>
-                    <th>{{ t('devices.list.type') }}</th>
-                    <th>{{ t('devices.view.field.range') }}</th>
-                    <th>{{ t('devices.list.gateway') }}</th>
-                    <th>{{ t('devices.form.field.dns') }}</th>
-                    <th>{{ t('devices.form.field.description') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for p in dhcp_pools %}
-                <tr>
-                    <td>{{ p.name or '—' }}</td>
-                    <td>{{ p.type }}</td>
-                    <td>{{ p.start_ip }} – {{ p.end_ip }}</td>
-                    <td>{{ p.gateway or '—' }}</td>
-                    <td>{{ p.dns or '—' }}</td>
-                    <td>{{ p.description or '—' }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-{# ---------- Credentials ---------- #}
-<div class="card info-card section-credentials mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-key"></i>
-        <span>{{ t('devices.view.section.credentials') }}</span>
-        <span class="section-count">({{ credentials|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not credentials %}
-        <div class="text-muted small">{{ t('devices.view.empty.credentials') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.list.type') }}</th>
-                    <th>{{ t('devices.form.field.username') }}</th>
-                    <th>{{ t('devices.form.field.password') }}</th>
-                    <th>{{ t('devices.form.field.description') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for c in credentials %}
-                <tr>
-                    <td>{{ c.type.name if c.type else '—' }}</td>
-                    <td>{{ c.username or '—' }}</td>
-                    <td>
-                        {% if c.password %}
-                            {% if current_user.role == 'admin' or current_user.can_view_passwords %}
-                            <span class="password-cell" data-password="{{ c.password }}">
-                                <span class="password-mask">••••••••</span>
-                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">{{ t('devices.view.btn.show_password') }}</button>
-                            </span>
-                            {% else %}
-                            <span class="text-muted">••••••••</span>
-                            {% endif %}
-                        {% else %}
-                        —
-                        {% endif %}
-                    </td>
-                    <td>{{ c.description or '—' }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-{# ---------- Services ---------- #}
-<div class="card info-card section-services mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-cogs"></i>
-        <span>{{ t('devices.view.section.services') }}</span>
-        <span class="section-count">({{ services|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not services %}
-        <div class="text-muted small">{{ t('devices.view.empty.services') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.list.name') }}</th>
-                    <th>{{ t('devices.form.field.protocol') }}</th>
-                    <th>{{ t('devices.form.field.port') }}</th>
-                    <th>{{ t('devices.form.field.url') }}</th>
-                    <th>{{ t('devices.form.field.path') }}</th>
-                    <th>{{ t('devices.form.field.description') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for s in services %}
-                <tr>
-                    <td>{{ s.name }}</td>
-                    <td>{{ s.protocol or '—' }}</td>
-                    <td>{{ s.port if s.port is not none else '—' }}</td>
-                    <td>
-                        {% if s.url %}
-                            {% if s.url.startswith('http://') or s.url.startswith('https://') or s.url.startswith('rtsp://') %}
-                            <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url }}</a>
-                            {% else %}
-                            {{ s.url }}
-                            {% endif %}
-                        {% else %}
-                        —
-                        {% endif %}
-                    </td>
-                    <td>{{ s.path or '—' }}</td>
-                    <td>{{ s.description or '—' }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
+{% endif %}
 
 {# ---------- Port forwarding ---------- #}
+{% if port_forwards %}
 <div class="card info-card section-port-forwarding mb-3">
     <div class="card-header">
         <i class="fa-solid fa-right-left"></i>
@@ -463,8 +237,10 @@
         {% endif %}
     </div>
 </div>
+{% endif %}
 
 {# ---------- Incoming port forwarding ---------- #}
+{% if incoming_port_forwards %}
 <div class="card info-card section-port-forwarding mb-3">
     <div class="card-header">
         <i class="fa-solid fa-right-to-bracket"></i>
@@ -523,8 +299,47 @@
         {% endif %}
     </div>
 </div>
+{% endif %}
+
+{# ---------- Ports ---------- #}
+{% if ports %}
+<div class="card info-card section-ports mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-plug"></i>
+        <span>{{ t('devices.view.section.ports') }}</span>
+        <span class="section-count">({{ ports|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not ports %}
+        <div class="text-muted small">{{ t('devices.view.empty.ports') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.form.field.interface') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in ports %}
+                <tr>
+                    <td><code>{{ p.name }}</code></td>
+                    <td><code>{{ p.interface.name }}</code></td>
+                    <td>{{ p.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 
 {# ---------- Connections ---------- #}
+{% if connections %}
 <div class="card info-card section-connections mb-3">
     <div class="card-header">
         <i class="fa-solid fa-link"></i>
@@ -589,6 +404,242 @@
         {% endif %}
     </div>
 </div>
+{% endif %}
+
+{# ---------- Wi-Fi networks ---------- #}
+{% if wifi_networks %}
+<div class="card info-card section-wifi mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-wifi"></i>
+        <span>{{ t('devices.view.section.wifi') }}</span>
+        <span class="section-count">({{ wifi_networks|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not wifi_networks %}
+        <div class="text-muted small">{{ t('devices.view.empty.wifi') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.form.field.ssid') }}</th>
+                    <th>{{ t('devices.form.field.band') }}</th>
+                    <th>{{ t('devices.form.field.encryption') }}</th>
+                    <th>{{ t('devices.form.field.password') }}</th>
+                    <th>{{ t('devices.form.field.guest') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for w in wifi_networks %}
+                <tr>
+                    <td>{{ w.ssid }}</td>
+                    <td>{{ w.band or '—' }}</td>
+                    <td>{{ w.encryption or '—' }}</td>
+                    <td>
+                        {% if w.password %}
+                            {% if current_user.role == 'admin' or current_user.can_view_passwords %}
+                            <span class="password-cell" data-password="{{ w.password }}">
+                                <span class="password-mask">••••••••</span>
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">{{ t('devices.view.btn.show_password') }}</button>
+                            </span>
+                            {% else %}
+                            <span class="text-muted">••••••••</span>
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{% if w.is_guest %}✓{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{# ---------- Wi-Fi clients ---------- #}
+{% if wifi_clients %}
+<div class="card info-card section-wifi mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-wifi"></i>
+        <span>{{ t('devices.view.section.wifi_clients') }}</span>
+    </div>
+    <div class="card-body">
+        {% for wc in wifi_clients %}
+        <div class="mb-3{% if not loop.last %} pb-3 border-bottom{% endif %}">
+            <div class="mb-2">
+                <span class="fw-bold">{{ wc.wifi.ssid }}</span>
+                {% if wc.wifi.band %}<span class="badge bg-secondary ms-1">{{ wc.wifi.band }} GHz</span>{% endif %}
+                {% if wc.wifi.is_guest %}<span class="badge bg-info text-dark ms-1">{{ t('devices.form.field.guest') }}</span>{% endif %}
+                <span class="text-muted small ms-2">({{ wc.clients|length }})</span>
+            </div>
+            <ul class="list-unstyled mb-0 small">
+                {% for c in wc.clients %}
+                <li class="py-1">
+                    <i class="fa-solid fa-plug text-muted me-1"></i>
+                    <a href="/devices/{{ c.id }}" class="text-decoration-none">{{ c.hostname }}</a>
+                    {% if c.human_readable_name %}
+                    <span class="text-muted">— {{ c.human_readable_name }}</span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{# ---------- DHCP pools ---------- #}
+{% if dhcp_pools %}
+<div class="card info-card section-dhcp mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-server"></i>
+        <span>{{ t('devices.view.section.dhcp') }}</span>
+        <span class="section-count">({{ dhcp_pools|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not dhcp_pools %}
+        <div class="text-muted small">{{ t('devices.view.empty.dhcp') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.list.type') }}</th>
+                    <th>{{ t('devices.view.field.range') }}</th>
+                    <th>{{ t('devices.list.gateway') }}</th>
+                    <th>{{ t('devices.form.field.dns') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in dhcp_pools %}
+                <tr>
+                    <td>{{ p.name or '—' }}</td>
+                    <td>{{ p.type }}</td>
+                    <td>{{ p.start_ip }} – {{ p.end_ip }}</td>
+                    <td>{{ p.gateway or '—' }}</td>
+                    <td>{{ p.dns or '—' }}</td>
+                    <td>{{ p.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{# ---------- Credentials ---------- #}
+{% if credentials %}
+<div class="card info-card section-credentials mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-key"></i>
+        <span>{{ t('devices.view.section.credentials') }}</span>
+        <span class="section-count">({{ credentials|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not credentials %}
+        <div class="text-muted small">{{ t('devices.view.empty.credentials') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.list.type') }}</th>
+                    <th>{{ t('devices.form.field.username') }}</th>
+                    <th>{{ t('devices.form.field.password') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in credentials %}
+                <tr>
+                    <td>{{ c.type.name if c.type else '—' }}</td>
+                    <td>{{ c.username or '—' }}</td>
+                    <td>
+                        {% if c.password %}
+                            {% if current_user.role == 'admin' or current_user.can_view_passwords %}
+                            <span class="password-cell" data-password="{{ c.password }}">
+                                <span class="password-mask">••••••••</span>
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">{{ t('devices.view.btn.show_password') }}</button>
+                            </span>
+                            {% else %}
+                            <span class="text-muted">••••••••</span>
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{{ c.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{# ---------- Services ---------- #}
+{% if services %}
+<div class="card info-card section-services mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-cogs"></i>
+        <span>{{ t('devices.view.section.services') }}</span>
+        <span class="section-count">({{ services|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not services %}
+        <div class="text-muted small">{{ t('devices.view.empty.services') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.form.field.protocol') }}</th>
+                    <th>{{ t('devices.form.field.port') }}</th>
+                    <th>{{ t('devices.form.field.url') }}</th>
+                    <th>{{ t('devices.form.field.path') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in services %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.protocol or '—' }}</td>
+                    <td>{{ s.port if s.port is not none else '—' }}</td>
+                    <td>
+                        {% if s.url %}
+                            {% if s.url.startswith('http://') or s.url.startswith('https://') or s.url.startswith('rtsp://') %}
+                            <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url }}</a>
+                            {% else %}
+                            {{ s.url }}
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{{ s.path or '—' }}</td>
+                    <td>{{ s.description or '—' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 
 {# ---------- Remarks ---------- #}
 {% if device.remarks %}
