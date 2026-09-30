@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found
 from app.models.vendor import Vendor
 
 
@@ -27,9 +28,7 @@ def create(db: Session, name: str) -> Vendor:
     return vendor
 
 def update(db: Session, vendor_id: int, name: str) -> Vendor:
-    vendor = get_by_id(db, vendor_id)
-    if vendor is None:
-        raise ValidationError("Vendor not found", field="id")
+    vendor = require_found(get_by_id(db, vendor_id), "Vendor")
 
     name = (name or "").strip()
     if not name:

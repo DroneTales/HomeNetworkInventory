@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found
 from app.models.device import Device
 from app.models.location import Location
 from app.models.network import Network
@@ -58,9 +59,7 @@ def update(
     photo_mime: str | None = None,
     is_active: bool = True,
 ) -> Site:
-    site = get_by_id(db, site_id)
-    if site is None:
-        raise ValidationError("Home not found", field="id")
+    site = require_found(get_by_id(db, site_id), "Home")
 
     name = (name or "").strip()
     if not name:
@@ -82,9 +81,7 @@ def update(
     return site
 
 def clear_photo(db: Session, site_id: int) -> Site:
-    site = get_by_id(db, site_id)
-    if site is None:
-        raise ValidationError("Home not found", field="id")
+    site = require_found(get_by_id(db, site_id), "Home")
     site.photo = None
     site.photo_mime = None
     db.flush()
@@ -122,10 +119,8 @@ def is_user_assigned(db: Session, user_id: int, site_id: int) -> bool:
     )
 
 def assign_user(db: Session, user_id: int, site_id: int) -> None:
-    if db.get(User, user_id) is None:
-        raise ValidationError("User not found", field="user_id")
-    if db.get(Site, site_id) is None:
-        raise ValidationError("Home not found", field="site_id")
+    require_found(db.get(User, user_id), "User", field="user_id")
+    require_found(db.get(Site, site_id), "Home", field="site_id")
 
     if is_user_assigned(db, user_id, site_id):
         return

@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found
 from app.models.credential_type import CredentialType
 
 
@@ -36,9 +37,7 @@ def update(
     name: str,
     description: str | None = None,
 ) -> CredentialType:
-    ct = get_by_id(db, type_id)
-    if ct is None:
-        raise ValidationError("Credential type not found", field="id")
+    ct = require_found(get_by_id(db, type_id), "Credential type")
 
     name = (name or "").strip()
     if not name:

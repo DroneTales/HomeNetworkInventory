@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found
 from app.models.device import Device
 from app.models.interface import Interface
 from app.models.port import Port
@@ -37,9 +38,7 @@ def _validate(
     if len(name) > 50:
         raise ValidationError("Port name must be at most 50 characters", field="name")
 
-    iface = db.get(Interface, interface_id)
-    if iface is None:
-        raise ValidationError("Interface not found", field="interface_id")
+    iface = require_found(db.get(Interface, interface_id), "Interface", field="interface_id")
     if iface.device_id != device_id:
         raise ValidationError(
             "Interface belongs to a different device",
@@ -62,8 +61,7 @@ def create(
     name: str,
     description: str | None = None,
 ) -> Port:
-    if db.get(Device, device_id) is None:
-        raise ValidationError("Device not found", field="device_id")
+    require_found(db.get(Device, device_id), "Device", field="device_id")
 
     name = _validate(db, device_id, interface_id, name)
 
@@ -84,9 +82,7 @@ def update(
     name: str,
     description: str | None = None,
 ) -> Port:
-    port = get_by_id(db, port_id)
-    if port is None:
-        raise ValidationError("Port not found", field="id")
+    port = require_found(get_by_id(db, port_id), "Port")
 
     name = _validate(db, port.device_id, interface_id, name, exclude_id=port_id)
 

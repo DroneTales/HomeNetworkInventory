@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import VALID_SERVICE_PROTOCOLS
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found, validate_choice
 from app.models.device import Device
 from app.models.service import Service
 
@@ -27,13 +28,9 @@ def _validate(
         raise ValidationError("Name is required", field="name")
 
     if protocol is not None and protocol.strip():
-        protocol = protocol.strip().lower()
-        if protocol not in VALID_SERVICE_PROTOCOLS:
-            raise ValidationError(
-                f"Invalid protocol: {protocol}. "
-                f"Allowed: {', '.join(sorted(VALID_SERVICE_PROTOCOLS))}",
-                field="protocol",
-            )
+        protocol = validate_choice(
+            protocol.strip().lower(), VALID_SERVICE_PROTOCOLS, "protocol", "protocol"
+        )
     else:
         protocol = None
 
@@ -55,8 +52,7 @@ def create(
     path: str | None = None,
     description: str | None = None,
 ) -> Service:
-    if db.get(Device, device_id) is None:
-        raise ValidationError("Device not found", field="device_id")
+    require_found(db.get(Device, device_id), "Device", field="device_id")
 
     name, protocol, port = _validate(name, protocol, port)
 
@@ -83,9 +79,7 @@ def update(
     path: str | None = None,
     description: str | None = None,
 ) -> Service:
-    service = get_by_id(db, service_id)
-    if service is None:
-        raise ValidationError("Service not found", field="id")
+    service = require_found(get_by_id(db, service_id), "Service")
 
     name, protocol, port = _validate(name, protocol, port)
 
@@ -99,8 +93,6 @@ def update(
     return service
 
 def delete(db: Session, service_id: int) -> None:
-    service = get_by_id(db, service_id)
-    if service is None:
-        raise ValidationError("Service not found", field="id")
+    service = require_found(get_by_id(db, service_id), "Service")
     db.delete(service)
     db.flush()

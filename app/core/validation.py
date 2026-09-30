@@ -66,6 +66,19 @@ def validate_same_subnet(
             field=field,
         )
 
+def require_found(obj, name: str, field: str = "id"):
+    if obj is None:
+        raise ValidationError(f"{name} not found", field=field)
+    return obj
+
+def validate_choice(value: str, allowed: set[str], label: str, field: str) -> str:
+    if value not in allowed:
+        raise ValidationError(
+            f"Invalid {label}: {value}. Allowed: {', '.join(sorted(allowed))}",
+            field=field,
+        )
+    return value
+
 def is_ip_in_range(ip: str, start: str, end: str) -> bool:
     try:
         addr = ipaddress.IPv4Address(ip)

@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found, validate_choice
 from app.models.device import Device
 from app.models.wifi_network import WiFiNetwork
 
@@ -62,23 +63,14 @@ def _validate(
         raise ValidationError("SSID must be at most 100 characters", field="ssid")
 
     if band is not None and band.strip():
-        band = band.strip()
-        if band not in VALID_BANDS:
-            raise ValidationError(
-                f"Invalid band: {band}. Allowed: {', '.join(sorted(VALID_BANDS))}",
-                field="band",
-            )
+        band = validate_choice(band.strip(), VALID_BANDS, "band", "band")
     else:
         band = None
 
     if encryption is not None and encryption.strip():
-        encryption = encryption.strip()
-        if encryption not in VALID_ENCRYPTIONS:
-            raise ValidationError(
-                f"Invalid encryption: {encryption}. "
-                f"Allowed: {', '.join(sorted(VALID_ENCRYPTIONS))}",
-                field="encryption",
-            )
+        encryption = validate_choice(
+            encryption.strip(), VALID_ENCRYPTIONS, "encryption", "encryption"
+        )
     else:
         encryption = None
 
@@ -93,8 +85,7 @@ def create(
     password: str | None = None,
     is_guest: bool = False,
 ) -> WiFiNetwork:
-    if db.get(Device, device_id) is None:
-        raise ValidationError("Device not found", field="device_id")
+    require_found(db.get(Device, device_id), "Device", field="device_id")
 
     ssid, band, encryption = _validate(ssid, band, encryption)
 
@@ -125,9 +116,7 @@ def update(
     password: str | None = None,
     is_guest: bool = False,
 ) -> WiFiNetwork:
-    wifi = get_by_id(db, wifi_id)
-    if wifi is None:
-        raise ValidationError("Wi-Fi network not found", field="id")
+    wifi = require_found(get_by_id(db, wifi_id), "Wi-Fi network")
 
     ssid, band, encryption = _validate(ssid, band, encryption)
 
@@ -147,8 +136,6 @@ def update(
     return wifi
 
 def delete(db: Session, wifi_id: int) -> None:
-    wifi = get_by_id(db, wifi_id)
-    if wifi is None:
-        raise ValidationError("Wi-Fi network not found", field="id")
+    wifi = require_found(get_by_id(db, wifi_id), "Wi-Fi network")
     db.delete(wifi)
     db.flush()

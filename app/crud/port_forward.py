@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import PF_PROTOCOL_BOTH, VALID_PF_PROTOCOLS
 from app.core.exceptions import ValidationError
-from app.core.validation import validate_ipv4
+from app.core.validation import require_found, validate_choice, validate_ipv4
 from app.models.device import Device
 from app.models.port_forward import PortForward
 
@@ -121,9 +121,7 @@ def _validate(
     internal_port_end,
     exclude_id: int | None = None,
 ) -> tuple:
-    device = db.get(Device, device_id)
-    if device is None:
-        raise ValidationError("Device not found", field="device_id")
+    device = require_found(db.get(Device, device_id), "Device", field="device_id")
 
     external_port_start, external_port_end = _validate_ports(
         external_port_start,
@@ -138,13 +136,9 @@ def _validate(
         "internal_port_end",
     )
 
-    protocol = (protocol or "").strip().lower()
-    if protocol not in VALID_PF_PROTOCOLS:
-        raise ValidationError(
-            f"Invalid protocol: {protocol}. "
-            f"Allowed: {', '.join(sorted(VALID_PF_PROTOCOLS))}",
-            field="protocol",
-        )
+    protocol = validate_choice(
+        (protocol or "").strip().lower(), VALID_PF_PROTOCOLS, "protocol", "protocol"
+    )
 
     has_device_target = internal_device_id is not None
     manual = (internal_ip_manual or "").strip()
@@ -260,9 +254,7 @@ def update(
     description: str | None = None,
     is_active: bool = True,
 ) -> PortForward:
-    pf = get_by_id(db, pf_id)
-    if pf is None:
-        raise ValidationError("Port forward rule not found", field="id")
+    pf = require_found(get_by_id(db, pf_id), "Port forward rule")
 
     (
         external_port_start,

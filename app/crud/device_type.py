@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found
 from app.models.device_type import DeviceType
 
 
@@ -45,9 +46,7 @@ def update(
     supports_port_forwarding: bool = False,
     description: str | None = None,
 ) -> DeviceType:
-    device_type = get_by_id(db, type_id)
-    if device_type is None:
-        raise ValidationError("Device type not found", field="id")
+    device_type = require_found(get_by_id(db, type_id), "Device type")
 
     name = (name or "").strip()
     if not name:

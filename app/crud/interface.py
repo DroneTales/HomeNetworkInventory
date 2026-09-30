@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import IFACE_TYPE_WIFI, VALID_IFACE_TYPES
 from app.core.exceptions import ValidationError
-from app.core.validation import validate_mac
+from app.core.validation import require_found, validate_choice, validate_mac
 from app.models.device import Device
 from app.models.interface import Interface
 from app.models.wifi_network import WiFiNetwork
@@ -43,19 +43,15 @@ def create(
     is_active: bool = True,
     connected_wifi_network_id: int | None = None,
 ) -> Interface:
-    if db.get(Device, device_id) is None:
-        raise ValidationError("Device not found", field="device_id")
+    require_found(db.get(Device, device_id), "Device", field="device_id")
 
     name = (name or "").strip()
     if not name:
         raise ValidationError("Name is required", field="name")
 
-    type = (type or "").strip().lower()
-    if type not in VALID_IFACE_TYPES:
-        raise ValidationError(
-            f"Invalid interface type: {type}. Allowed: {', '.join(sorted(VALID_IFACE_TYPES))}",
-            field="type",
-        )
+    type = validate_choice(
+        (type or "").strip().lower(), VALID_IFACE_TYPES, "interface type", "type"
+    )
 
     if mac is not None and mac.strip():
         mac = validate_mac(mac, field="mac")
@@ -69,8 +65,11 @@ def create(
                 "Only Wi-Fi interfaces can be connected to a Wi-Fi network",
                 field="connected_wifi_network_id",
             )
-        if db.get(WiFiNetwork, connected_wifi_network_id) is None:
-            raise ValidationError("Wi-Fi network not found", field="connected_wifi_network_id")
+        require_found(
+            db.get(WiFiNetwork, connected_wifi_network_id),
+            "Wi-Fi network",
+            field="connected_wifi_network_id",
+        )
 
     iface = Interface(
         device_id=device_id,
@@ -93,20 +92,15 @@ def update(
     is_active: bool = True,
     connected_wifi_network_id: int | None = None,
 ) -> Interface:
-    iface = get_by_id(db, interface_id)
-    if iface is None:
-        raise ValidationError("Interface not found", field="id")
+    iface = require_found(get_by_id(db, interface_id), "Interface")
 
     name = (name or "").strip()
     if not name:
         raise ValidationError("Name is required", field="name")
 
-    type = (type or "").strip().lower()
-    if type not in VALID_IFACE_TYPES:
-        raise ValidationError(
-            f"Invalid interface type: {type}. Allowed: {', '.join(sorted(VALID_IFACE_TYPES))}",
-            field="type",
-        )
+    type = validate_choice(
+        (type or "").strip().lower(), VALID_IFACE_TYPES, "interface type", "type"
+    )
 
     if mac is not None and mac.strip():
         mac = validate_mac(mac, field="mac")
@@ -120,8 +114,11 @@ def update(
                 "Only Wi-Fi interfaces can be connected to a Wi-Fi network",
                 field="connected_wifi_network_id",
             )
-        if db.get(WiFiNetwork, connected_wifi_network_id) is None:
-            raise ValidationError("Wi-Fi network not found", field="connected_wifi_network_id")
+        require_found(
+            db.get(WiFiNetwork, connected_wifi_network_id),
+            "Wi-Fi network",
+            field="connected_wifi_network_id",
+        )
 
     iface.name = name
     iface.type = type

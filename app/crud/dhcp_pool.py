@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import DHCP_POOL_TYPE_DYNAMIC, VALID_DHCP_POOL_TYPES
 from app.core.exceptions import ValidationError
-from app.core.validation import validate_ipv4
+from app.core.validation import require_found, validate_choice, validate_ipv4
 from app.models.device import Device
 from app.models.dhcp_pool import DhcpPool
 
@@ -32,15 +32,11 @@ def create(
     dns: str | None = None,
     description: str | None = None,
 ) -> DhcpPool:
-    if db.get(Device, device_id) is None:
-        raise ValidationError("Device not found", field="device_id")
+    require_found(db.get(Device, device_id), "Device", field="device_id")
 
-    type = (type or "").strip().lower()
-    if type not in VALID_DHCP_POOL_TYPES:
-        raise ValidationError(
-            f"Invalid pool type: {type}. Allowed: {', '.join(sorted(VALID_DHCP_POOL_TYPES))}",
-            field="type",
-        )
+    type = validate_choice(
+        (type or "").strip().lower(), VALID_DHCP_POOL_TYPES, "pool type", "type"
+    )
 
     start_ip = validate_ipv4(start_ip, field="start_ip")
     end_ip = validate_ipv4(end_ip, field="end_ip")
@@ -85,16 +81,11 @@ def update(
     dns: str | None = None,
     description: str | None = None,
 ) -> DhcpPool:
-    pool = get_by_id(db, pool_id)
-    if pool is None:
-        raise ValidationError("DHCP pool not found", field="id")
+    pool = require_found(get_by_id(db, pool_id), "DHCP pool")
 
-    type = (type or "").strip().lower()
-    if type not in VALID_DHCP_POOL_TYPES:
-        raise ValidationError(
-            f"Invalid pool type: {type}. Allowed: {', '.join(sorted(VALID_DHCP_POOL_TYPES))}",
-            field="type",
-        )
+    type = validate_choice(
+        (type or "").strip().lower(), VALID_DHCP_POOL_TYPES, "pool type", "type"
+    )
 
     start_ip = validate_ipv4(start_ip, field="start_ip")
     end_ip = validate_ipv4(end_ip, field="end_ip")
@@ -125,8 +116,6 @@ def update(
     return pool
 
 def delete(db: Session, pool_id: int) -> None:
-    pool = get_by_id(db, pool_id)
-    if pool is None:
-        raise ValidationError("DHCP pool not found", field="id")
+    pool = require_found(get_by_id(db, pool_id), "DHCP pool")
     db.delete(pool)
     db.flush()

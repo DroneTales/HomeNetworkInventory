@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import CONNECTION_TYPE_PHYSICAL, VALID_CONNECTION_TYPES
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found, validate_choice
 from app.models.connection import Connection
 from app.models.device import Device
 from app.models.port import Port
@@ -63,9 +64,7 @@ def get_by_id(
     return conn
 
 def _check_port(db: Session, port_id: int, site_id: int, field: str) -> Port:
-    port = db.get(Port, port_id)
-    if port is None:
-        raise ValidationError("Port not found", field=field)
+    port = require_found(db.get(Port, port_id), "Port", field=field)
 
     device = db.get(Device, port.device_id)
     if device is None or device.site_id != site_id:
@@ -113,13 +112,12 @@ def _validate(
     connection_type: str,
     exclude_id: int | None = None,
 ) -> str:
-    connection_type = (connection_type or "").strip().lower()
-    if connection_type not in VALID_CONNECTION_TYPES:
-        raise ValidationError(
-            f"Invalid connection type: {connection_type}. "
-            f"Allowed: {', '.join(sorted(VALID_CONNECTION_TYPES))}",
-            field="connection_type",
-        )
+    connection_type = validate_choice(
+        (connection_type or "").strip().lower(),
+        VALID_CONNECTION_TYPES,
+        "connection type",
+        "connection_type",
+    )
 
     _check_port(db, source_port_id, site_id, field="source_port_id")
     _check_port(db, target_port_id, site_id, field="target_port_id")
@@ -165,9 +163,9 @@ def update(
     description: str | None = None,
     is_active: bool = True,
 ) -> Connection:
-    conn = get_by_id(db, connection_id, site_id=site_id)
-    if conn is None:
-        raise ValidationError("Connection not found", field="id")
+    conn = require_found(
+        get_by_id(db, connection_id, site_id=site_id), "Connection"
+    )
 
     connection_type = _validate(
         db, site_id, source_port_id, target_port_id, connection_type,

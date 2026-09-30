@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
-from app.core.validation import validate_ipv4, validate_mask, validate_same_subnet
+from app.core.validation import require_found, validate_ipv4, validate_mask, validate_same_subnet
 from app.models.network import Network
 
 
@@ -81,9 +81,7 @@ def update(
     vlan: int | None = None,
     description: str | None = None,
 ) -> Network:
-    network = get_by_id(db, network_id)
-    if network is None:
-        raise ValidationError("Network not found", field="id")
+    network = require_found(get_by_id(db, network_id), "Network")
 
     name = (name or "").strip()
     if not name:

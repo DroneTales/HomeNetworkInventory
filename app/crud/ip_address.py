@@ -9,6 +9,8 @@ from app.core.constants import (
 )
 from app.core.exceptions import ValidationError
 from app.core.validation import (
+    require_found,
+    validate_choice,
     validate_ipv4,
     validate_mask,
     validate_same_subnet,
@@ -60,9 +62,7 @@ def _check_interface_type(
     interface_id: int,
     address_type: str,
 ) -> Interface:
-    iface = db.get(Interface, interface_id)
-    if iface is None:
-        raise ValidationError("Interface not found", field="interface_id")
+    iface = require_found(db.get(Interface, interface_id), "Interface", field="interface_id")
 
     if iface.type == IFACE_TYPE_PORT:
         raise ValidationError(
@@ -89,13 +89,12 @@ def validate(
     dns: str | None = None,
     exclude_id: int | None = None,
 ) -> tuple[str | None, str | None, str | None, str | None]:
-    address_type = (address_type or "").strip().lower()
-    if address_type not in VALID_IP_ADDRESS_TYPES:
-        raise ValidationError(
-            f"Invalid address type: {address_type}. "
-            f"Allowed: {', '.join(sorted(VALID_IP_ADDRESS_TYPES))}",
-            field="address_type",
-        )
+    address_type = validate_choice(
+        (address_type or "").strip().lower(),
+        VALID_IP_ADDRESS_TYPES,
+        "address type",
+        "address_type",
+    )
 
     address = (address or "").strip()
     mask = (mask or "").strip()
@@ -120,9 +119,7 @@ def validate(
     dns = validate_ipv4(dns, field="dns") if dns is not None and dns.strip() else None
 
     iface = _check_interface_type(db, interface_id, address_type)
-    device = db.get(Device, iface.device_id)
-    if device is None:
-        raise ValidationError("Device not found", field="interface_id")
+    device = require_found(db.get(Device, iface.device_id), "Device", field="interface_id")
 
     if address is not None:
         _check_ip_unique(db, address, site_id=device.site_id, exclude_id=exclude_id)
@@ -173,9 +170,7 @@ def update(
     network_id: int | None = None,
     is_primary: bool = True,
 ) -> IPAddress:
-    ip = get_by_id(db, ip_id)
-    if ip is None:
-        raise ValidationError("IP address not found", field="id")
+    ip = require_found(get_by_id(db, ip_id), "IP address")
 
     address, mask, gateway, dns = validate(
         db, interface_id, address, mask, address_type,

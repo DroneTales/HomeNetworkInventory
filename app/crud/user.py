@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.constants import ROLE_ADMIN, ROLE_USER, VALID_ROLES
 from app.core.exceptions import ValidationError
 from app.core.security import hash_password
+from app.core.validation import require_found
 from app.models.user import User
 
 
@@ -105,9 +106,7 @@ def update(
     language: str = "en",
     theme: str = "auto",
 ) -> User:
-    user = get_by_id(db, user_id)
-    if user is None:
-        raise ValidationError("User not found", field="id")
+    user = require_found(get_by_id(db, user_id), "User")
 
     username = _validate_username(username)
 
@@ -138,9 +137,7 @@ def reset_password(
     new_password: str,
     must_change_password: bool = True,
 ) -> User:
-    user = get_by_id(db, user_id)
-    if user is None:
-        raise ValidationError("User not found", field="id")
+    user = require_found(get_by_id(db, user_id), "User")
 
     if not new_password or len(new_password) < 1:
         raise ValidationError("Password is required", field="password")
@@ -153,9 +150,7 @@ def reset_password(
 def change_own_password(db: Session, user_id: int, old_password: str, new_password: str) -> User:
     from app.core.security import verify_password
 
-    user = get_by_id(db, user_id)
-    if user is None:
-        raise ValidationError("User not found", field="id")
+    user = require_found(get_by_id(db, user_id), "User")
 
     if not verify_password(old_password, user.password_hash):
         raise ValidationError("Current password is incorrect", field="old_password")
@@ -174,9 +169,7 @@ def update_preferences(
     language: str,
     theme: str,
 ) -> User:
-    user = get_by_id(db, user_id)
-    if user is None:
-        raise ValidationError("User not found", field="id")
+    user = require_found(get_by_id(db, user_id), "User")
 
     if language not in ("en", "ru"):
         raise ValidationError(f"Unsupported language: {language}", field="language")
@@ -190,9 +183,7 @@ def update_preferences(
     return user
 
 def delete(db: Session, user_id: int) -> None:
-    user = get_by_id(db, user_id)
-    if user is None:
-        raise ValidationError("User not found", field="id")
+    user = require_found(get_by_id(db, user_id), "User")
 
     if user.username == "Admin":
         raise ValidationError("The default Admin user cannot be deleted", field="id")

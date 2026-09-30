@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found
 from app.models.credential import Credential
 from app.models.credential_type import CredentialType
 from app.models.device import Device
@@ -41,11 +42,10 @@ def create(
     password: str | None = None,
     description: str | None = None,
 ) -> Credential:
-    if db.get(Device, device_id) is None:
-        raise ValidationError("Device not found", field="device_id")
+    require_found(db.get(Device, device_id), "Device", field="device_id")
 
-    if type_id is not None and db.get(CredentialType, type_id) is None:
-        raise ValidationError("Credential type not found", field="type_id")
+    if type_id is not None:
+        require_found(db.get(CredentialType, type_id), "Credential type", field="type_id")
 
     type_id, username, password = _validate(type_id, username, password)
 
@@ -68,12 +68,10 @@ def update(
     password: str | None = None,
     description: str | None = None,
 ) -> Credential:
-    cred = get_by_id(db, credential_id)
-    if cred is None:
-        raise ValidationError("Credential not found", field="id")
+    cred = require_found(get_by_id(db, credential_id), "Credential")
 
-    if type_id is not None and db.get(CredentialType, type_id) is None:
-        raise ValidationError("Credential type not found", field="type_id")
+    if type_id is not None:
+        require_found(db.get(CredentialType, type_id), "Credential type", field="type_id")
 
     type_id, username, password = _validate(type_id, username, password)
 
@@ -85,8 +83,6 @@ def update(
     return cred
 
 def delete(db: Session, credential_id: int) -> None:
-    cred = get_by_id(db, credential_id)
-    if cred is None:
-        raise ValidationError("Credential not found", field="id")
+    cred = require_found(get_by_id(db, credential_id), "Credential")
     db.delete(cred)
     db.flush()

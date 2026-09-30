@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
+from app.core.validation import require_found
 from app.models.location import Location
 
 
@@ -58,9 +59,7 @@ def update(
     name: str,
     description: str | None = None,
 ) -> Location:
-    location = get_by_id(db, location_id)
-    if location is None:
-        raise ValidationError("Location not found", field="id")
+    location = require_found(get_by_id(db, location_id), "Location")
 
     name = (name or "").strip()
     if not name:

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
-from app.core.validation import validate_hostname
+from app.core.validation import require_found, validate_hostname
 from app.models.device import Device
 from app.models.device_type import DeviceType
 from app.models.interface import Interface
@@ -57,17 +57,15 @@ def _check_references(
     location_id: int | None,
     network_id: int | None,
 ) -> None:
-    if device_type_id is not None and db.get(DeviceType, device_type_id) is None:
-        raise ValidationError("Device type not found", field="device_type_id")
-    if vendor_id is not None and db.get(Vendor, vendor_id) is None:
-        raise ValidationError("Vendor not found", field="vendor_id")
-    if model_id is not None and db.get(Model, model_id) is None:
-        raise ValidationError("Model not found", field="model_id")
+    if device_type_id is not None:
+        require_found(db.get(DeviceType, device_type_id), "Device type", field="device_type_id")
+    if vendor_id is not None:
+        require_found(db.get(Vendor, vendor_id), "Vendor", field="vendor_id")
+    if model_id is not None:
+        require_found(db.get(Model, model_id), "Model", field="model_id")
 
     if location_id is not None:
-        loc = db.get(Location, location_id)
-        if loc is None:
-            raise ValidationError("Location not found", field="location_id")
+        loc = require_found(db.get(Location, location_id), "Location", field="location_id")
         if loc.site_id != site_id:
             raise ValidationError(
                 "Location belongs to a different home",
@@ -75,9 +73,7 @@ def _check_references(
             )
 
     if network_id is not None:
-        net = db.get(Network, network_id)
-        if net is None:
-            raise ValidationError("Network not found", field="network_id")
+        net = require_found(db.get(Network, network_id), "Network", field="network_id")
         if net.site_id != site_id:
             raise ValidationError(
                 "Network belongs to a different home",
@@ -159,9 +155,7 @@ def update(
     network_id: int | None = None,
     is_active: bool = True,
 ) -> Device:
-    device = get_by_id(db, device_id)
-    if device is None:
-        raise ValidationError("Device not found", field="id")
+    device = require_found(get_by_id(db, device_id), "Device")
 
     hostname = validate_hostname(hostname, field="hostname")
 
