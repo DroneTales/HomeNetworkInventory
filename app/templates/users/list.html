@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import check, delete_form with context %}
 
 {% block title %}{{ t('nav.users') }}{% endblock %}
 
@@ -57,20 +58,17 @@
                 user
                 {% endif %}
             </td>
-            <td>{% if u.role == 'admin' or u.can_edit %}✓{% else %}—{% endif %}</td>
-            <td>{% if u.role == 'admin' or u.can_view_passwords %}✓{% else %}—{% endif %}</td>
-            <td>{% if u.role == 'admin' or u.can_change_passwords %}✓{% else %}—{% endif %}</td>
-            <td>{% if u.role == 'admin' or u.can_change_own_password %}✓{% else %}—{% endif %}</td>
-            <td>{% if u.is_active %}✓{% else %}—{% endif %}</td>
+            <td>{{ check(u.role == 'admin' or u.can_edit) }}</td>
+            <td>{{ check(u.role == 'admin' or u.can_view_passwords) }}</td>
+            <td>{{ check(u.role == 'admin' or u.can_change_passwords) }}</td>
+            <td>{{ check(u.role == 'admin' or u.can_change_own_password) }}</td>
+            <td>{{ check(u.is_active) }}</td>
             <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
             <td class="text-end">
                 <a href="/users/{{ u.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
                 <a href="/users/{{ u.id }}/reset-password" class="btn btn-sm btn-outline-secondary">{{ t('users.list.btn.reset_password') }}</a>
                 {% if u.username != 'Admin' %}
-                <form method="post" action="/users/{{ u.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('{{ t('users.list.confirm_delete') }}');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
-                </form>
+                {{ delete_form('/users/' ~ u.id ~ '/delete', t('users.list.confirm_delete')) }}
                 {% endif %}
             </td>
         </tr>
@@ -95,29 +93,26 @@
                 <div class="col-6">{% if u.role == 'admin' %}{{ t('users.list.role_admin') }}{% else %}{{ t('users.list.role_user') }}{% endif %}</div>
 
                 <div class="col-6 text-muted">{{ t('users.list.can_edit') }}</div>
-                <div class="col-6">{% if u.role == 'admin' or u.can_edit %}✓{% else %}—{% endif %}</div>
+                <div class="col-6">{{ check(u.role == 'admin' or u.can_edit) }}</div>
 
                 <div class="col-6 text-muted">{{ t('users.list.view_passwords') }}</div>
-                <div class="col-6">{% if u.role == 'admin' or u.can_view_passwords %}✓{% else %}—{% endif %}</div>
+                <div class="col-6">{{ check(u.role == 'admin' or u.can_view_passwords) }}</div>
 
                 <div class="col-6 text-muted">{{ t('users.list.change_passwords') }}</div>
-                <div class="col-6">{% if u.role == 'admin' or u.can_change_passwords %}✓{% else %}—{% endif %}</div>
+                <div class="col-6">{{ check(u.role == 'admin' or u.can_change_passwords) }}</div>
 
                 <div class="col-6 text-muted">{{ t('users.list.change_own_password') }}</div>
-                <div class="col-6">{% if u.role == 'admin' or u.can_change_own_password %}✓{% else %}—{% endif %}</div>
+                <div class="col-6">{{ check(u.role == 'admin' or u.can_change_own_password) }}</div>
 
                 <div class="col-6 text-muted">{{ t('devices.form.field.active') }}</div>
-                <div class="col-6">{% if u.is_active %}✓{% else %}—{% endif %}</div>
+                <div class="col-6">{{ check(u.is_active) }}</div>
             </div>
 
             <div class="mt-2">
                 <a href="/users/{{ u.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
                 <a href="/users/{{ u.id }}/reset-password" class="btn btn-sm btn-outline-secondary">{{ t('users.list.btn.reset') }}</a>
                 {% if u.username != 'Admin' %}
-                <form method="post" action="/users/{{ u.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('{{ t('users.list.confirm_delete') }}');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
-                </form>
+                {{ delete_form('/users/' ~ u.id ~ '/delete', t('users.list.confirm_delete')) }}
                 {% endif %}
             </div>
         </div>

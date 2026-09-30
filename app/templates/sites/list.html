@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import delete_icon_form with context %}
 
 {% block title %}{% if lang == 'ru' %}Выбор дома{% else %}Choose a home{% endif %}{% endblock %}
 
@@ -89,13 +90,8 @@
                        class="btn btn-sm btn-outline-secondary flex-fill">
                         <i class="fa-solid fa-pen"></i>
                     </a>
-                    <form method="post" action="/sites/{{ site.id }}/delete"
-                          class="flex-fill"
-                          onsubmit="return confirm('{% if lang == 'ru' %}Удалить дом «{{ site.name }}»? Это возможно только если он пуст.{% else %}Delete home &quot;{{ site.name }}&quot;? Only possible if it is empty.{% endif %}');">
-                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </form>
+                    {% set confirm_msg %}{% if lang == 'ru' %}Удалить дом «{{ site.name }}»? Это возможно только если он пуст.{% else %}Delete home &quot;{{ site.name }}&quot;? Only possible if it is empty.{% endif %}{% endset %}
+                    {{ delete_icon_form('/sites/' ~ site.id ~ '/delete', confirm_msg) }}
                 </div>
                 {% endif %}
             </div>

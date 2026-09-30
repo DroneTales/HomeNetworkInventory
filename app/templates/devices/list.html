@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import dash %}
 
 {% block title %}{{ t('devices.title') }}{% endblock %}
 
@@ -101,7 +102,7 @@
                 <span class="badge bg-secondary ms-1">{{ t('common.inactive') }}</span>
                 {% endif %}
             </td>
-            <td>{{ d.human_readable_name or '—' }}</td>
+            <td>{{ dash(d.human_readable_name) }}</td>
             <td>{{ d.device_type.name if d.device_type else '—' }}</td>
             <td>{{ d.vendor.name if d.vendor else '—' }}</td>
             <td>{{ d.model.name if d.model else '—' }}</td>

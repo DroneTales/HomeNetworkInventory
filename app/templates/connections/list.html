@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import dash, delete_form with context %}
 
 {% block title %}{{ t('nav.connections') }}{% endblock %}
 
@@ -63,14 +64,11 @@
                 <span class="text-muted small">({{ c.target_port.interface.name }})</span>
             </td>
             <td>{{ c.connection_type }}</td>
-            <td>{{ c.cable_type or '—' }}</td>
-            <td>{{ c.description or '—' }}</td>
+            <td>{{ dash(c.cable_type) }}</td>
+            <td>{{ dash(c.description) }}</td>
             <td class="text-end">
                 {% if current_user.role == 'admin' %}
-                <form method="post" action="/connections/{{ c.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('{{ t('connections.list.confirm_delete') }}');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
-                </form>
+                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete')) }}
                 {% endif %}
             </td>
         </tr>
@@ -121,10 +119,7 @@
 
             {% if current_user.role == 'admin' %}
             <div class="mt-2">
-                <form method="post" action="/connections/{{ c.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('{{ t('connections.list.confirm_delete') }}');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
-                </form>
+                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete')) }}
             </div>
             {% endif %}
         </div>

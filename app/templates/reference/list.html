@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import delete_form with context %}
 
 {% block title %}{{ t(title_key) }}{% endblock %}
 
@@ -40,10 +41,7 @@
             {% endfor %}
             <td class="text-end">
                 <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
-                <form method="post" action="{{ delete_url_prefix }}{{ row.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('{{ t('reference.list.confirm_delete') }}');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
-                </form>
+                {{ delete_form(delete_url_prefix ~ row.id ~ '/delete', t('reference.list.confirm_delete')) }}
             </td>
         </tr>
         {% endfor %}
@@ -63,10 +61,7 @@
             {% endfor %}
             <div class="mt-2">
                 <a href="{{ edit_url_prefix }}{{ row.id }}/edit" class="btn btn-sm btn-outline-secondary">{{ t('common.edit') }}</a>
-                <form method="post" action="{{ delete_url_prefix }}{{ row.id }}/delete" class="d-inline"
-                      onsubmit="return confirm('{{ t('reference.list.confirm_delete') }}');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
-                </form>
+                {{ delete_form(delete_url_prefix ~ row.id ~ '/delete', t('reference.list.confirm_delete')) }}
             </div>
         </div>
     </div>

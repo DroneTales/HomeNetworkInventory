@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import dash %}
 
 {% block title %}{% if is_edit %}{{ t('users.form.title.edit') }}{% else %}{{ t('users.form.title.add') }}{% endif %}{% endblock %}
 
@@ -160,7 +161,7 @@
                     <td>
                         <i class="fa-solid fa-house me-1 text-muted"></i>{{ s.name }}
                     </td>
-                    <td>{{ s.address or '—' }}</td>
+                    <td>{{ dash(s.address) }}</td>
                     <td class="text-end">
                         <form method="post" action="/users/{{ target_user.id }}/sites/{{ s.id }}/remove"
                               class="d-inline"

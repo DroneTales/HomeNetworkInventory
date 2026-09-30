@@ -1,0 +1,19 @@
+{% macro dash(value) %}{% if value is none or value == '' %}—{% else %}{{ value }}{% endif %}{% endmacro %}
+
+{% macro check(value) %}{% if value %}✓{% else %}—{% endif %}{% endmacro %}
+
+{% macro delete_form(action, confirm) %}
+<form method="post" action="{{ action }}" class="d-inline"
+      onsubmit="return confirm('{{ confirm|safe }}');">
+    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
+</form>
+{% endmacro %}
+
+{% macro delete_icon_form(action, confirm) %}
+<form method="post" action="{{ action }}" class="flex-fill"
+      onsubmit="return confirm('{{ confirm|safe }}');">
+    <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+        <i class="fa-solid fa-trash"></i>
+    </button>
+</form>
+{% endmacro %}
