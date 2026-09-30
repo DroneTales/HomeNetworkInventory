@@ -113,3 +113,124 @@
     border-left: 4px solid var(--section-color, #dee2e6);
 }
 
+.pf-row .form-label.small {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pf-row .form-control-sm,
+.pf-row .form-select-sm {
+    font-size: 0.8rem;
+}
+.pf-row input[type="checkbox"].form-check-input {
+    margin-top: 0;
+}
+
+
+
+
+
+
+
+@media (max-width: 767.98px) {
+    
+    
+}
+
+
+.credential-row .form-control-sm,
+.credential-row .form-select-sm {
+    font-size: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+@media (max-width: 767.98px) {
+    .credential-row .cred-fields-row {
+        flex-wrap: wrap !important;
+    }
+    .credential-row .cred-col-type,
+    .credential-row .cred-col-username,
+    .credential-row .cred-col-password,
+    .credential-row .cred-col-description,
+    .credential-row .cred-col-remove {
+        flex: 0 0 calc(50% - 0.5rem) !important;
+        width: auto !important;
+    }
+    .credential-row .cred-col-description,
+    .credential-row .cred-col-remove {
+        flex: 0 0 100% !important;
+    }
+}
+
+.interface-row .form-label.small {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.interface-row .form-control-sm,
+.interface-row .form-select-sm {
+    font-size: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.credential-row .form-label.small {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.credential-row .form-control-sm,
+.credential-row .form-select-sm {
+    font-size: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.dhcp-row .form-label.small {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dhcp-row .form-control-sm,
+.dhcp-row .form-select-sm {
+    font-size: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.service-row .form-label.small {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.service-row .form-control-sm,
+.service-row .form-select-sm {
+    font-size: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.port-row .form-label.small {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.port-row .form-control-sm,
+.port-row .form-select-sm {
+    font-size: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}

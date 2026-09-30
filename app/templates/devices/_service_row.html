@@ -2,17 +2,17 @@
     <input type="hidden" name="service_id" class="service-id"
            value="{{ svc.id if svc and svc.id else '' }}">
 
-    <div class="row g-2 align-items-end">
-        <div class="col-6 col-md-3">
+    <div class="row g-1 align-items-end">
+        <div class="col-6 col-md-2">
             <label class="form-label small mb-0">{{ t('devices.form.field.name') }}</label>
-            <input type="text" class="form-control form-control-sm service-name"
+            <input type="text" class="form-control form-control-sm service-name px-1"
                    name="service_name"
                    value="{{ svc.name if svc else '' }}"
                    placeholder="HomeBridge" maxlength="100">
         </div>
-        <div class="col-6 col-md-2">
+        <div class="col-6 col-md-1">
             <label class="form-label small mb-0">{{ t('devices.form.field.protocol') }}</label>
-            <select class="form-select form-select-sm service-protocol" name="service_protocol">
+            <select class="form-select form-select-sm service-protocol px-1" name="service_protocol">
                 <option value="">—</option>
                 {% set cur_p = svc.protocol if svc and svc.protocol else '' %}
                 <option value="http" {% if cur_p == 'http' %}selected{% endif %}>http</option>
@@ -24,35 +24,34 @@
         </div>
         <div class="col-6 col-md-1">
             <label class="form-label small mb-0">{{ t('devices.form.field.port') }}</label>
-            <input type="number" class="form-control form-control-sm service-port"
+            <input type="text" inputmode="numeric" maxlength="5"
+                   class="form-control form-control-sm service-port px-1"
                    name="service_port"
-                   value="{{ svc.port if svc and svc.port else '' }}"
-                   min="1" max="65535">
+                   value="{{ svc.port if svc and svc.port else '' }}">
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
             <label class="form-label small mb-0">{{ t('devices.form.field.url') }}</label>
-            <input type="text" class="form-control form-control-sm service-url"
+            <input type="text" class="form-control form-control-sm service-url px-1"
                    name="service_url"
                    value="{{ svc.url if svc and svc.url else '' }}"
                    placeholder="http://192.168.1.13" maxlength="255">
         </div>
-        <div class="col-6 col-md-2 text-end">
-            <button type="button" class="btn btn-sm btn-outline-danger remove-service-btn">{{ t('devices.form.btn.remove') }}</button>
-        </div>
-        <div class="col-12">
+        <div class="col-6 col-md-2">
             <label class="form-label small mb-0">{{ t('devices.form.field.path') }}</label>
-            <input type="text" class="form-control form-control-sm service-path"
+            <input type="text" class="form-control form-control-sm service-path px-1"
                    name="service_path"
                    value="{{ svc.path if svc and svc.path else '' }}"
                    placeholder="/api/v1" maxlength="255">
         </div>
-        <div class="col-12">
+        <div class="col-12 col-md-2">
             <label class="form-label small mb-0">{{ t('devices.form.field.description') }}</label>
-            <input type="text" class="form-control form-control-sm service-description"
+            <input type="text" class="form-control form-control-sm service-description px-1"
                    name="service_description"
                    value="{{ svc.description if svc and svc.description else '' }}"
                    maxlength="255">
         </div>
+        <div class="col-12 col-md-1 text-end">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-service-btn px-1">{{ t('devices.form.btn.remove') }}</button>
+        </div>
     </div>
 </div>
-

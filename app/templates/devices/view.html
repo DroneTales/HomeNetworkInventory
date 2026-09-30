@@ -418,17 +418,18 @@
             <table class="table table-sm align-middle mb-0">
                 <thead>
                 <tr>
+                    <th>{{ t('devices.form.field.description') }}</th>
                     <th>{{ t('devices.view.field.external') }}</th>
                     <th>{{ t('devices.form.field.protocol') }}</th>
                     <th>{{ t('devices.form.field.target') }}</th>
                     <th>{{ t('devices.view.field.internal') }}</th>
-                    <th>{{ t('devices.form.field.description') }}</th>
                     <th>{{ t('devices.form.field.active') }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for pf in port_forwards %}
                 <tr>
+                    <td>{{ pf.description or '—' }}</td>
                     <td>
                         {% if pf.external_port_start == pf.external_port_end %}
                             {{ pf.external_port_start }}
@@ -453,7 +454,6 @@
                             {{ pf.internal_port_start }}–{{ pf.internal_port_end }}
                         {% endif %}
                     </td>
-                    <td>{{ pf.description or '—' }}</td>
                     <td>{% if pf.is_active %}✓{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}

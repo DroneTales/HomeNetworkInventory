@@ -77,6 +77,9 @@
                     if (el) el.classList.toggle("d-none", fieldsToHide);
                 });
 
+            const addrTypeField = row.querySelector(".iface-field-address-type");
+            if (addrTypeField) addrTypeField.classList.toggle("d-none", isPort);
+
             const note = row.querySelector(".iface-field-dhcp-note");
             if (note) {
                 note.classList.toggle("d-none", !(!isPort && isDhcp));

@@ -2,16 +2,16 @@
     <input type="hidden" name="wifi_id" class="wifi-id"
            value="{{ wifi.id if wifi and wifi.id else '' }}">
 
-    <div class="row g-2 align-items-end">
+    <div class="row g-1 align-items-end">
         <div class="col-12 col-md-3">
             <label class="form-label small mb-0">{{ t('devices.form.field.ssid') }}</label>
-            <input type="text" class="form-control form-control-sm wifi-ssid"
+            <input type="text" class="form-control form-control-sm wifi-ssid px-1"
                    name="wifi_ssid" value="{{ wifi.ssid if wifi else '' }}"
                    placeholder="homekit2" required>
         </div>
-        <div class="col-6 col-md-2">
+        <div class="col-6 col-md-1">
             <label class="form-label small mb-0">{{ t('devices.form.field.band') }}</label>
-            <select class="form-select form-select-sm wifi-band" name="wifi_band">
+            <select class="form-select form-select-sm wifi-band px-1" name="wifi_band">
                 <option value="">—</option>
                 {% set cur_band = wifi.band if wifi else '' %}
                 <option value="2.4" {% if cur_band == '2.4' %}selected{% endif %}>2.4</option>
@@ -19,9 +19,9 @@
                 <option value="6" {% if cur_band == '6' %}selected{% endif %}>6</option>
             </select>
         </div>
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-2">
             <label class="form-label small mb-0">{{ t('devices.form.field.encryption') }}</label>
-            <select class="form-select form-select-sm wifi-encryption" name="wifi_encryption">
+            <select class="form-select form-select-sm wifi-encryption px-1" name="wifi_encryption">
                 <option value="">—</option>
                 {% set cur_enc = wifi.encryption if wifi else '' %}
                 <option value="WPA2-PSK/AES" {% if cur_enc == 'WPA2-PSK/AES' %}selected{% endif %}>WPA2-PSK/AES</option>
@@ -40,12 +40,12 @@
                 {% endif %}
             </label>
             {% if can_view_passwords %}
-            <input type="text" class="form-control form-control-sm wifi-password"
+            <input type="text" class="form-control form-control-sm wifi-password px-1"
                    name="wifi_password"
                    value="{{ wifi.password if wifi and wifi.password else '' }}"
                    {% if not can_change_passwords %}readonly{% endif %}>
             {% else %}
-            <input type="password" class="form-control form-control-sm wifi-password"
+            <input type="password" class="form-control form-control-sm wifi-password px-1"
                    name="wifi_password"
                    value=""
                    placeholder="••••••••"
@@ -53,15 +53,14 @@
             {% endif %}
         </div>
         <div class="col-6 col-md-1">
-            <div class="form-check">
+            <div class="form-check mb-0">
                 <input class="form-check-input wifi-is-guest" type="checkbox" name="wifi_is_guest"
                        {% if wifi and wifi.is_guest %}checked{% endif %}>
                 <label class="form-check-label small">{{ t('devices.form.field.guest') }}</label>
             </div>
         </div>
-        <div class="col-6 col-md-12 text-end mt-1">
-            <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-btn">{{ t('devices.form.btn.remove') }}</button>
+        <div class="col-6 col-md-2 text-end">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-btn px-1">{{ t('devices.form.btn.remove') }}</button>
         </div>
     </div>
 </div>
-
