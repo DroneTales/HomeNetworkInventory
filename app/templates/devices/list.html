@@ -3,6 +3,31 @@
 {% block title %}{{ t('devices.title') }}{% endblock %}
 
 {% block content %}
+{% if not current_user.password_warning_dismissed %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div class="d-flex gap-3">
+        <div class="fs-3 text-warning-emphasis"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="flex-grow-1">
+            <div class="fw-bold mb-1">{{ t('security_warning.title') }}</div>
+            <div class="small mb-2">{{ t('security_warning.body') }}</div>
+            <div class="small">
+                {{ t('security_warning.recommend') }}
+                <a href="https://github.com/DroneTales/HomeNetworkInventory"
+                   target="_blank" rel="noopener" class="alert-link">
+                    github.com/DroneTales/HomeNetworkInventory
+                </a>
+            </div>
+            <form method="post" action="/profile/dismiss-password-warning" class="mt-2">
+                <button type="submit" class="btn btn-sm btn-outline-dark">
+                    <i class="fa-solid fa-check me-1"></i>{{ t('security_warning.dismiss') }}
+                </button>
+            </form>
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
 {% if warning %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ warning }}

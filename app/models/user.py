@@ -19,6 +19,7 @@ class User(Base):
 
     must_change_password: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    password_warning_dismissed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     language: Mapped[str] = mapped_column(String(10), nullable=False, default="en")
     theme: Mapped[str] = mapped_column(String(10), nullable=False, default="auto")

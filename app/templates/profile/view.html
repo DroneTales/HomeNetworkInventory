@@ -49,6 +49,23 @@
     </div>
 </div>
 
+{# ---------- Security notice ---------- #}
+<div class="card mb-3 border-warning">
+    <div class="card-header bg-warning-subtle text-warning-emphasis">
+        <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ t('security_warning.title') }}
+    </div>
+    <div class="card-body">
+        <div class="small mb-2">{{ t('security_warning.body') }}</div>
+        <div class="small">
+            {{ t('security_warning.recommend') }}
+            <a href="https://github.com/DroneTales/HomeNetworkInventory"
+               target="_blank" rel="noopener">
+                github.com/DroneTales/HomeNetworkInventory
+            </a>
+        </div>
+    </div>
+</div>
+
 {# ---------- Preferences ---------- #}
 <div class="card mb-3">
     <div class="card-header">{{ t('profile.section.preferences') }}</div>

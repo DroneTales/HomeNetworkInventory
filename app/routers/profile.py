@@ -50,6 +50,19 @@ async def update_preferences(
     request.session["warning"] = "Preferences saved."
     return RedirectResponse("/profile", status_code=303)
 
+@router.post("/dismiss-password-warning")
+def dismiss_password_warning(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_user),
+):
+    user.password_warning_dismissed = True
+    db.commit()
+
+    referer = request.headers.get("referer") or "/devices"
+    return RedirectResponse(referer, status_code=303)
+
+
 @router.post("/change-password")
 async def change_password(
     request: Request,

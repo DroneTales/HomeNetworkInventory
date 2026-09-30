@@ -245,5 +245,9 @@
   "topology.open_device": "Open device",
   "topology.section.ports": "Ports",
   "topology.port.none": "not connected",
-  "topology.ports.empty": "No ports"
+  "topology.ports.empty": "No ports",
+  "security_warning.title": "Device passwords are stored in plain text",
+  "security_warning.body": "Anyone with access to this home and the appropriate permissions (including admins) can see device passwords. In the public demo, please do not enter real passwords. The database is not encrypted.",
+  "security_warning.recommend": "For personal use, download the app from GitHub and install it on your own server:",
+  "security_warning.dismiss": "Do not show again"
 }
