@@ -3,6 +3,26 @@
 {% block title %}{{ t('devices.title') }}{% endblock %}
 
 {% block content %}
+{% macro dev_badges(flags) %}
+<span class="dev-badges">
+    {% if flags.dhcp %}
+    <span class="dev-badge dev-badge-dhcp" title="{{ t('devices.badge.dhcp') }}"><i class="fa-solid fa-network-wired"></i></span>
+    {% endif %}
+    {% if flags.ports > 1 %}
+    <span class="dev-badge dev-badge-ports" title="{{ t('devices.badge.ports') }}"><i class="fa-solid fa-plug"></i><span class="dev-badge-count">{{ flags.ports }}</span></span>
+    {% endif %}
+    {% if flags.pf_out %}
+    <span class="dev-badge dev-badge-pf-out" title="{{ t('devices.badge.pf_out') }}"><i class="fa-solid fa-right-left"></i></span>
+    {% endif %}
+    {% if flags.pf_in %}
+    <span class="dev-badge dev-badge-pf-in" title="{{ t('devices.badge.pf_in') }}"><i class="fa-solid fa-right-to-bracket"></i></span>
+    {% endif %}
+    {% if flags.services > 0 %}
+    <span class="dev-badge dev-badge-svc" title="{{ t('devices.badge.services') }}"><i class="fa-solid fa-server"></i><span class="dev-badge-count">{{ flags.services }}</span></span>
+    {% endif %}
+</span>
+{% endmacro %}
+
 {% if not current_user.password_warning_dismissed %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <div class="d-flex gap-3">
@@ -76,6 +96,7 @@
         <tr class="{% if not d.is_active %}text-muted{% endif %}">
             <td>
                 <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
+                {{ dev_badges(row.flags) }}
                 {% if not d.is_active %}
                 <span class="badge bg-secondary ms-1">{{ t('common.inactive') }}</span>
                 {% endif %}
@@ -119,6 +140,7 @@
         <div class="card-body">
             <h5 class="card-title mb-1">
                 <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
+                {{ dev_badges(row.flags) }}
                 {% if not d.is_active %}
                 <span class="badge bg-secondary ms-1">{{ t('common.inactive') }}</span>
                 {% endif %}

@@ -440,7 +440,7 @@
                     <td>{{ pf.protocol }}</td>
                     <td>
                         {% if pf.internal_device %}
-                            {{ pf.internal_device.hostname }}
+                            <a href="/devices/{{ pf.internal_device.id }}">{{ pf.internal_device.hostname }}</a>
                         {% elif pf.internal_ip_manual %}
                             {{ pf.internal_ip_manual }}
                         {% else %}

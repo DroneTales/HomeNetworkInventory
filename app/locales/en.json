@@ -265,5 +265,10 @@
   "topology.legend.unassigned": "No location",
   "devices.view.section.pf_incoming": "Incoming port forwards (this device is target)",
   "devices.view.empty.pf_incoming": "No incoming port forwards to this device.",
-  "devices.view.field.pf_source": "Source"
+  "devices.view.field.pf_source": "Source",
+  "devices.badge.dhcp": "Runs DHCP",
+  "devices.badge.ports": "Port count",
+  "devices.badge.pf_out": "Forwards ports",
+  "devices.badge.pf_in": "Port forward target",
+  "devices.badge.services": "Service count"
 }

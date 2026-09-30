@@ -591,3 +591,57 @@
     background: #334155;
     margin: 6px 0;
 }
+
+.dev-badges {
+    display: inline-flex;
+    gap: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+.dev-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 4px;
+    font-size: 10px;
+    line-height: 1;
+    background: #334155;
+    color: #cbd5e1;
+    border: 1px solid #475569;
+}
+.dev-badge i {
+    font-size: 10px;
+}
+.dev-badge-count {
+    font-size: 10px;
+    font-weight: 600;
+}
+.dev-badge-pf-out {
+    background: #1e3a8a;
+    border-color: #3b82f6;
+    color: #bfdbfe;
+}
+.dev-badge-pf-in {
+    background: #14532d;
+    border-color: #22c55e;
+    color: #bbf7d0;
+}
+.dev-badge-dhcp {
+    background: #4c1d95;
+    border-color: #a78bfa;
+    color: #ddd6fe;
+}
+.dev-badge-svc {
+    background: #134e4a;
+    border-color: #2dd4bf;
+    color: #99f6e4;
+}
+.dev-badge-ports {
+    background: #3f3f46;
+    border-color: #71717a;
+    color: #e4e4e7;
+}

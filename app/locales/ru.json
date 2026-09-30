@@ -265,5 +265,10 @@
   "topology.legend.unassigned": "Без локации",
   "devices.view.section.pf_incoming": "Входящие пробросы (это устройство — цель)",
   "devices.view.empty.pf_incoming": "На это устройство пробросов нет.",
-  "devices.view.field.pf_source": "Источник"
+  "devices.view.field.pf_source": "Источник",
+  "devices.badge.dhcp": "Раздаёт DHCP",
+  "devices.badge.ports": "Количество портов",
+  "devices.badge.pf_out": "Пробрасывает порты",
+  "devices.badge.pf_in": "Цель проброса портов",
+  "devices.badge.services": "Количество сервисов"
 }

@@ -81,7 +81,17 @@ def list_devices(
             if primary_ip:
                 break
 
-        rows.append({"device": d, "primary_ip": primary_ip})
+        rows.append({
+            "device": d,
+            "primary_ip": primary_ip,
+            "flags": {
+                "dhcp": len(d.dhcp_pools) > 0,
+                "ports": len(d.ports),
+                "pf_out": len(d.port_forwards) > 0,
+                "pf_in": len(d.port_forwards_targeted) > 0,
+                "services": len(d.services),
+            },
+        })
 
     warning = request.session.pop("warning", None)
 
