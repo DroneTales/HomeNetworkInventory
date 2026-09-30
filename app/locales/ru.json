@@ -249,5 +249,21 @@
   "security_warning.title": "Пароли устройств хранятся в открытом виде",
   "security_warning.body": "Любой, у кого есть доступ к этому дому и соответствующие права (включая администратора), увидит пароли устройств. В публичном демо не вводите реальные пароли — база данных не шифруется.",
   "security_warning.recommend": "Для личного использования скачайте приложение с GitHub и установите на свой сервер:",
-  "security_warning.dismiss": "Больше не показывать"
+  "security_warning.dismiss": "Больше не показывать",
+  "topology.legend.title": "Легенда",
+  "topology.legend.modem": "Модем (внешний IP)",
+  "topology.legend.hub": "Хаб / коммутатор",
+  "topology.legend.wifi_router": "Wi-Fi роутер",
+  "topology.legend.wifi_ap": "Wi-Fi точка доступа",
+  "topology.legend.router": "Маршрутизатор",
+  "topology.legend.camera": "Камера",
+  "topology.legend.video_server": "Видеосервер",
+  "topology.legend.server": "Сервер",
+  "topology.legend.other": "Прочее",
+  "topology.legend.wifi_host": "Раздаёт Wi-Fi",
+  "topology.legend.wifi_client": "Подключён по Wi-Fi",
+  "topology.legend.unassigned": "Без локации",
+  "devices.view.section.pf_incoming": "Входящие пробросы (это устройство — цель)",
+  "devices.view.empty.pf_incoming": "На это устройство пробросов нет.",
+  "devices.view.field.pf_source": "Источник"
 }

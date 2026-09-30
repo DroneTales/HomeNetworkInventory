@@ -4,6 +4,14 @@
     const container = document.getElementById("topology-container");
     if (!container) return;
 
+    const legend = document.getElementById("topo-legend");
+    const legendToggle = document.getElementById("topo-legend-toggle");
+    if (legend && legendToggle) {
+        legendToggle.addEventListener("click", function () {
+            legend.classList.toggle("open");
+        });
+    }
+
     const dataUrl = container.dataset.dataUrl || "/topology/data";
 
     fetch(dataUrl, { credentials: "same-origin" })
@@ -206,6 +214,14 @@
                         "border-color": "#3b82f6",
                         "border-width": 3,
                     }
+                },
+                {
+                    selector: "node.topo-highlighted",
+                    style: {
+                        "border-color": "#fbbf24",
+                        "border-width": 3,
+                        "border-style": "solid",
+                    }
                 }
             ],
             layout: {
@@ -315,8 +331,21 @@
         const panelBody = document.getElementById("topo-panel-body");
         const panelClose = document.getElementById("topo-panel-close");
 
+        function clearHighlight() {
+            cy.elements("node.topo-highlighted").removeClass("topo-highlighted");
+        }
+
+        function setHighlight(nodeId) {
+            clearHighlight();
+            const n = cy.getElementById(nodeId);
+            if (n && !n.empty()) {
+                n.addClass("topo-highlighted");
+            }
+        }
+
         function closePanel() {
             panel.classList.remove("open");
+            clearHighlight();
         }
 
         if (panelClose) {
@@ -332,7 +361,10 @@
             const devicesPayload = devicesById[deviceId];
             if (!devicesPayload) return;
 
+            clearHighlight();
+
             if (focus) {
+                setHighlight(deviceNodeId);
                 cy.animate({
                     center: { eles: node },
                     zoom: Math.max(cy.zoom(), 1.2),

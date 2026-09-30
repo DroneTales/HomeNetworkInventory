@@ -1,3 +1,4 @@
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
@@ -19,6 +20,27 @@ def list_by_device(db: Session, device_id: int) -> list[PortForward]:
 
 def get_by_id(db: Session, pf_id: int) -> PortForward | None:
     return db.get(PortForward, pf_id)
+
+
+def list_incoming(
+    db: Session,
+    device_id: int,
+    site_id: int,
+    ip_addresses: list[str],
+) -> list[PortForward]:
+    conds = [PortForward.internal_device_id == device_id]
+    if ip_addresses:
+        conds.append(PortForward.internal_ip_manual.in_(ip_addresses))
+    return (
+        db.query(PortForward)
+        .join(Device, PortForward.device_id == Device.id)
+        .filter(
+            Device.site_id == site_id,
+            or_(*conds),
+        )
+        .order_by(PortForward.external_port_start, PortForward.protocol)
+        .all()
+    )
 
 
 def _validate_ports(

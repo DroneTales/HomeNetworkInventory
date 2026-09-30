@@ -146,6 +146,25 @@ def view_device(
     services = crud_service.list_by_device(db, device_id)
     port_forwards = crud_pf.list_by_device(db, device_id)
 
+    device_ips = []
+    for iface in interfaces:
+        for ip in crud_ip.list_by_interface(db, iface.id):
+            if ip.address:
+                device_ips.append(ip.address)
+
+    incoming_pfs = crud_pf.list_incoming(db, device_id, site.id, device_ips)
+    incoming = []
+    for pf in incoming_pfs:
+        src_device = crud_device.get_by_id(db, pf.device_id, site_id=site.id)
+        matched_ip = None
+        if pf.internal_device_id is None and pf.internal_ip_manual:
+            matched_ip = pf.internal_ip_manual
+        incoming.append({
+            "pf": pf,
+            "source_device": src_device,
+            "matched_ip": matched_ip,
+        })
+
     return render(
         request,
         "devices/view.html",
@@ -160,6 +179,7 @@ def view_device(
         credentials=credentials,
         services=services,
         port_forwards=port_forwards,
+        incoming_port_forwards=incoming,
     )
 
 @router.get("/{device_id}/edit", response_class=HTMLResponse)

@@ -28,6 +28,65 @@
                     {{ t('topology.loading') }}
                 </div>
             </div>
+
+            <div class="topo-legend" id="topo-legend">
+                <button type="button" class="topo-legend-toggle" id="topo-legend-toggle">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>{{ t('topology.legend.title') }}</span>
+                </button>
+                <div class="topo-legend-body" id="topo-legend-body">
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-modem"><i class="fa-solid fa-tower-broadcast"></i></span>
+                        <span>{{ t('topology.legend.modem') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-hub"><i class="fa-solid fa-circle-nodes"></i></span>
+                        <span>{{ t('topology.legend.hub') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-wifi_router"><i class="fa-solid fa-wifi"></i></span>
+                        <span>{{ t('topology.legend.wifi_router') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-wifi_ap"><i class="fa-solid fa-wifi"></i></span>
+                        <span>{{ t('topology.legend.wifi_ap') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-router"><i class="fa-solid fa-router"></i></span>
+                        <span>{{ t('topology.legend.router') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-camera"><i class="fa-solid fa-video"></i></span>
+                        <span>{{ t('topology.legend.camera') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-video_server"><i class="fa-solid fa-clapperboard"></i></span>
+                        <span>{{ t('topology.legend.video_server') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-server"><i class="fa-solid fa-server"></i></span>
+                        <span>{{ t('topology.legend.server') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-cat-other"><i class="fa-solid fa-plug"></i></span>
+                        <span>{{ t('topology.legend.other') }}</span>
+                    </div>
+                    <div class="topo-legend-sep"></div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-badge topo-legend-badge-wifi"><i class="fa-solid fa-wifi"></i></span>
+                        <span>{{ t('topology.legend.wifi_host') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-badge topo-legend-badge-wifi-client"><i class="fa-solid fa-wifi"></i></span>
+                        <span>{{ t('topology.legend.wifi_client') }}</span>
+                    </div>
+                    <div class="topo-legend-row">
+                        <span class="topo-legend-swatch topo-legend-unassigned"></span>
+                        <span>{{ t('topology.legend.unassigned') }}</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="topo-panel" id="topo-panel">
                 <div class="topo-panel-header">
                     <div class="topo-panel-title" id="topo-panel-title"></div>

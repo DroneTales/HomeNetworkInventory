@@ -249,5 +249,21 @@
   "security_warning.title": "Device passwords are stored in plain text",
   "security_warning.body": "Anyone with access to this home and the appropriate permissions (including admins) can see device passwords. In the public demo, please do not enter real passwords. The database is not encrypted.",
   "security_warning.recommend": "For personal use, download the app from GitHub and install it on your own server:",
-  "security_warning.dismiss": "Do not show again"
+  "security_warning.dismiss": "Do not show again",
+  "topology.legend.title": "Legend",
+  "topology.legend.modem": "Modem (external IP)",
+  "topology.legend.hub": "Hub / switch",
+  "topology.legend.wifi_router": "Wi-Fi router",
+  "topology.legend.wifi_ap": "Wi-Fi access point",
+  "topology.legend.router": "Router",
+  "topology.legend.camera": "Camera",
+  "topology.legend.video_server": "Video server",
+  "topology.legend.server": "Server",
+  "topology.legend.other": "Other",
+  "topology.legend.wifi_host": "Broadcasts Wi-Fi",
+  "topology.legend.wifi_client": "Connected via Wi-Fi",
+  "topology.legend.unassigned": "No location",
+  "devices.view.section.pf_incoming": "Incoming port forwards (this device is target)",
+  "devices.view.empty.pf_incoming": "No incoming port forwards to this device.",
+  "devices.view.field.pf_source": "Source"
 }

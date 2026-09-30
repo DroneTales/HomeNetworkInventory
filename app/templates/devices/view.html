@@ -464,6 +464,66 @@
     </div>
 </div>
 
+{# ---------- Incoming port forwarding ---------- #}
+<div class="card info-card section-port-forwarding mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>{{ t('devices.view.section.pf_incoming') }}</span>
+        <span class="section-count">({{ incoming_port_forwards|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not incoming_port_forwards %}
+        <div class="text-muted small">{{ t('devices.view.empty.pf_incoming') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.view.field.pf_source') }}</th>
+                    <th>{{ t('devices.view.field.external') }}</th>
+                    <th>{{ t('devices.form.field.protocol') }}</th>
+                    <th>{{ t('devices.view.field.internal') }}</th>
+                    <th>{{ t('devices.form.field.active') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in incoming_port_forwards %}
+                <tr>
+                    <td>
+                        {% if item.source_device %}
+                            <a href="/devices/{{ item.source_device.id }}">{{ item.source_device.hostname }}</a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.pf.external_port_start == item.pf.external_port_end %}
+                            {{ item.pf.external_port_start }}
+                        {% else %}
+                            {{ item.pf.external_port_start }}–{{ item.pf.external_port_end }}
+                        {% endif %}
+                    </td>
+                    <td>{{ item.pf.protocol }}</td>
+                    <td>
+                        {% if item.pf.internal_port_start == item.pf.internal_port_end %}
+                            {{ item.pf.internal_port_start }}
+                        {% else %}
+                            {{ item.pf.internal_port_start }}–{{ item.pf.internal_port_end }}
+                        {% endif %}
+                        {% if item.matched_ip %}
+                            <span class="text-muted small">({{ item.matched_ip }})</span>
+                        {% endif %}
+                    </td>
+                    <td>{% if item.pf.is_active %}✓{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 {# ---------- Connections ---------- #}
 <div class="card info-card section-connections mb-3">
     <div class="card-header">
