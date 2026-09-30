@@ -35,6 +35,7 @@
             <th>{{ t('users.list.can_edit') }}</th>
             <th>{{ t('users.list.view_passwords') }}</th>
             <th>{{ t('users.list.change_passwords') }}</th>
+            <th>{{ t('users.list.change_own_password') }}</th>
             <th>{{ t('devices.form.field.active') }}</th>
             <th>{{ t('devices.view.field.created') }}</th>
             <th class="text-end">{{ t('common.actions') }}</th>
@@ -59,6 +60,7 @@
             <td>{% if u.role == 'admin' or u.can_edit %}✓{% else %}—{% endif %}</td>
             <td>{% if u.role == 'admin' or u.can_view_passwords %}✓{% else %}—{% endif %}</td>
             <td>{% if u.role == 'admin' or u.can_change_passwords %}✓{% else %}—{% endif %}</td>
+            <td>{% if u.role == 'admin' or u.can_change_own_password %}✓{% else %}—{% endif %}</td>
             <td>{% if u.is_active %}✓{% else %}—{% endif %}</td>
             <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
             <td class="text-end">
@@ -100,6 +102,9 @@
 
                 <div class="col-6 text-muted">{{ t('users.list.change_passwords') }}</div>
                 <div class="col-6">{% if u.role == 'admin' or u.can_change_passwords %}✓{% else %}—{% endif %}</div>
+
+                <div class="col-6 text-muted">{{ t('users.list.change_own_password') }}</div>
+                <div class="col-6">{% if u.role == 'admin' or u.can_change_own_password %}✓{% else %}—{% endif %}</div>
 
                 <div class="col-6 text-muted">{{ t('devices.form.field.active') }}</div>
                 <div class="col-6">{% if u.is_active %}✓{% else %}—{% endif %}</div>

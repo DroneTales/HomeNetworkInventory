@@ -69,6 +69,9 @@ async def change_password(
     db: Session = Depends(get_db),
     user: User = Depends(require_user),
 ):
+    if user.role != "admin" and not user.can_change_own_password:
+        return RedirectResponse("/profile", status_code=303)
+
     form = await request.form()
     old_password = (form.get("old_password") or "").strip()
     new_password = (form.get("new_password") or "").strip()

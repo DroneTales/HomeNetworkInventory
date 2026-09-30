@@ -16,6 +16,7 @@ class User(Base):
     can_edit: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_view_passwords: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     can_change_passwords: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    can_change_own_password: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     must_change_password: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

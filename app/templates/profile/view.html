@@ -35,16 +35,6 @@
                 {% endif %}
             </dd>
 
-            {% if current_user.role != 'admin' %}
-            <dt class="col-sm-3">{{ t('users.list.can_edit') }}</dt>
-            <dd class="col-sm-9">{% if current_user.can_edit %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</dd>
-
-            <dt class="col-sm-3">{{ t('users.list.view_passwords') }}</dt>
-            <dd class="col-sm-9">{% if current_user.can_view_passwords %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</dd>
-
-            <dt class="col-sm-3">{{ t('users.list.change_passwords') }}</dt>
-            <dd class="col-sm-9">{% if current_user.can_change_passwords %}{{ t('common.yes') }}{% else %}{{ t('common.no') }}{% endif %}</dd>
-            {% endif %}
         </dl>
     </div>
 </div>
@@ -94,6 +84,7 @@
 </div>
 
 {# ---------- Change password ---------- #}
+{% if current_user.role == 'admin' or current_user.can_change_own_password %}
 <div class="card mb-3">
     <div class="card-header">{{ t('auth.change_password') }}</div>
     <div class="card-body">
@@ -119,5 +110,6 @@
         </form>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 

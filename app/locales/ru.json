@@ -270,5 +270,7 @@
   "devices.badge.ports": "Количество портов",
   "devices.badge.pf_out": "Пробрасывает порты",
   "devices.badge.pf_in": "Цель проброса портов",
-  "devices.badge.services": "Количество сервисов"
+  "devices.badge.services": "Количество сервисов",
+  "users.form.perm.can_change_own_password": "Может менять свой пароль",
+  "users.list.change_own_password": "Свой пароль"
 }

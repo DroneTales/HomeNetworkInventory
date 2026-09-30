@@ -60,6 +60,7 @@ def create(
     can_edit: bool = False,
     can_view_passwords: bool = False,
     can_change_passwords: bool = False,
+    can_change_own_password: bool = True,
     must_change_password: bool = False,
     is_active: bool = True,
     language: str = "en",
@@ -83,6 +84,7 @@ def create(
         can_edit=can_edit,
         can_view_passwords=can_view_passwords,
         can_change_passwords=can_change_passwords,
+        can_change_own_password=can_change_own_password,
         must_change_password=must_change_password,
         is_active=is_active,
         language=language,
@@ -100,6 +102,7 @@ def update(
     can_edit: bool,
     can_view_passwords: bool,
     can_change_passwords: bool,
+    can_change_own_password: bool = True,
     is_active: bool = True,
     language: str = "en",
     theme: str = "auto",
@@ -124,6 +127,7 @@ def update(
     user.can_edit = can_edit
     user.can_view_passwords = can_view_passwords
     user.can_change_passwords = can_change_passwords
+    user.can_change_own_password = can_change_own_password
     user.is_active = is_active
     user.language = language
     user.theme = theme

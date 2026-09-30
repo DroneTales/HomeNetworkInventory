@@ -270,5 +270,7 @@
   "devices.badge.ports": "Port count",
   "devices.badge.pf_out": "Forwards ports",
   "devices.badge.pf_in": "Port forward target",
-  "devices.badge.services": "Service count"
+  "devices.badge.services": "Service count",
+  "users.form.perm.can_change_own_password": "Can change own password",
+  "users.list.change_own_password": "Own password"
 }
