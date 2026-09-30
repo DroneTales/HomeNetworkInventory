@@ -1,12 +1,12 @@
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
+from app.core.constants import CONNECTION_TYPE_PHYSICAL, VALID_CONNECTION_TYPES
 from app.core.exceptions import ValidationError
 from app.models.connection import Connection
 from app.models.device import Device
 from app.models.port import Port
 
-VALID_TYPES = {"physical", "logical"}
 
 def list_all(db: Session, site_id: int) -> list[Connection]:
     return (
@@ -114,10 +114,10 @@ def _validate(
     exclude_id: int | None = None,
 ) -> str:
     connection_type = (connection_type or "").strip().lower()
-    if connection_type not in VALID_TYPES:
+    if connection_type not in VALID_CONNECTION_TYPES:
         raise ValidationError(
             f"Invalid connection type: {connection_type}. "
-            f"Allowed: {', '.join(sorted(VALID_TYPES))}",
+            f"Allowed: {', '.join(sorted(VALID_CONNECTION_TYPES))}",
             field="connection_type",
         )
 
@@ -133,7 +133,7 @@ def create(
     site_id: int,
     source_port_id: int,
     target_port_id: int,
-    connection_type: str = "physical",
+    connection_type: str = CONNECTION_TYPE_PHYSICAL,
     cable_type: str | None = None,
     description: str | None = None,
     is_active: bool = True,
@@ -160,7 +160,7 @@ def update(
     site_id: int,
     source_port_id: int,
     target_port_id: int,
-    connection_type: str = "physical",
+    connection_type: str = CONNECTION_TYPE_PHYSICAL,
     cable_type: str | None = None,
     description: str | None = None,
     is_active: bool = True,

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlalchemy.orm import Session
 
+from app.core.constants import ROLE_ADMIN
 from app.core.deps import (
     clear_current_site_cookie,
     get_accessible_sites,
@@ -31,7 +32,7 @@ def list_sites(
 ):
     sites = get_accessible_sites(db, user)
 
-    if len(sites) == 1 and user.role != "admin":
+    if len(sites) == 1 and user.role != ROLE_ADMIN:
         response = RedirectResponse("/devices", status_code=303)
         set_current_site_cookie(response, sites[0].id)
         return response

@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.core.constants import ROLE_ADMIN
 from app.database import get_db
 from app.models.site import Site
 from app.models.user import User
@@ -43,17 +44,17 @@ def require_user(request: Request, db: Session = Depends(get_db)) -> User:
     return user
 
 def require_admin(user: User = Depends(require_user)) -> User:
-    if user.role != "admin":
+    if user.role != ROLE_ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
     return user
 
 def require_edit(user: User = Depends(require_user)) -> User:
-    if user.role == "admin" or user.can_edit:
+    if user.role == ROLE_ADMIN or user.can_edit:
         return user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
 def get_accessible_sites(db: Session, user: User) -> list[Site]:
-    if user.role == "admin":
+    if user.role == ROLE_ADMIN:
         return (
             db.query(Site)
             .filter(Site.is_active == True)  # noqa: E712
@@ -71,7 +72,7 @@ def get_accessible_sites(db: Session, user: User) -> list[Site]:
     )
 
 def user_can_access_site(db: Session, user: User, site_id: int) -> bool:
-    if user.role == "admin":
+    if user.role == ROLE_ADMIN:
         return db.get(Site, site_id) is not None
 
     return (

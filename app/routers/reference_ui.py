@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import require_admin, require_edit, require_site
 from app.core.exceptions import ValidationError
 from app.core.templating import render
+from app.core.utils import to_int
 from app.crud import credential_type as crud_cred_type
 from app.crud import device_type as crud_device_type
 from app.crud import location as crud_location
@@ -511,7 +512,7 @@ async def models_new_submit(
 ):
     form = await request.form()
     name = (form.get("name") or "").strip()
-    vendor_id = _to_int(form.get("vendor_id"))
+    vendor_id = to_int(form.get("vendor_id"))
 
     try:
         crud_model.create(db, vendor_id=vendor_id, name=name)
@@ -565,7 +566,7 @@ async def models_edit_submit(
 ):
     form = await request.form()
     name = (form.get("name") or "").strip()
-    vendor_id = _to_int(form.get("vendor_id"))
+    vendor_id = to_int(form.get("vendor_id"))
 
     try:
         crud_model.update(db, model_id=item_id, vendor_id=vendor_id, name=name)
@@ -899,23 +900,12 @@ def credential_types_delete(
         )
     return RedirectResponse("/reference/credential-types", status_code=303)
 
-def _to_int(value) -> int | None:
-    if value is None:
-        return None
-    value = str(value).strip()
-    if not value:
-        return None
-    try:
-        return int(value)
-    except ValueError:
-        return None
-
 def _network_form_data(form) -> dict:
     return {
         "name": (form.get("name") or "").strip(),
         "network_address": (form.get("network_address") or "").strip(),
         "mask": (form.get("mask") or "").strip(),
         "gateway": (form.get("gateway") or "").strip() or None,
-        "vlan": _to_int(form.get("vlan")),
+        "vlan": to_int(form.get("vlan")),
         "description": (form.get("description") or "").strip() or None,
     }

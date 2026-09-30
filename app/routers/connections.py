@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
+from app.core.constants import CONNECTION_TYPE_PHYSICAL
 from app.core.deps import require_admin, require_edit, require_site, require_user
 from app.core.exceptions import ValidationError
 from app.core.templating import render
+from app.core.utils import to_int
 from app.crud import connection as crud_connection
 from app.crud import device as crud_device
 from app.crud import wifi_network as crud_wifi
@@ -83,9 +85,9 @@ async def new_connection_submit(
 ):
     form = await request.form()
 
-    source_port_id = _to_int(form.get("source_port_id"))
-    target_port_id = _to_int(form.get("target_port_id"))
-    connection_type = (form.get("connection_type") or "physical").strip().lower()
+    source_port_id = to_int(form.get("source_port_id"))
+    target_port_id = to_int(form.get("target_port_id"))
+    connection_type = (form.get("connection_type") or CONNECTION_TYPE_PHYSICAL).strip().lower()
     cable_type = (form.get("cable_type") or "").strip() or None
     description = (form.get("description") or "").strip() or None
     is_active = form.get("is_active") == "on"
@@ -159,14 +161,3 @@ def _devices_with_ports(db: Session, site_id: int) -> list[dict]:
                 "ports": ports,
             })
     return payload
-
-def _to_int(value) -> int | None:
-    if value is None:
-        return None
-    value = str(value).strip()
-    if not value:
-        return None
-    try:
-        return int(value)
-    except ValueError:
-        return None

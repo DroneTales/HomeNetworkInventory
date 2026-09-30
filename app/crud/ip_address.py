@@ -1,5 +1,12 @@
 from sqlalchemy.orm import Session
 
+from app.core.constants import (
+    IFACE_TYPE_PORT,
+    IP_TYPE_DHCP,
+    IP_TYPE_EXTERNAL,
+    MAC_REQUIRED_IP_TYPES,
+    VALID_IP_ADDRESS_TYPES,
+)
 from app.core.exceptions import ValidationError
 from app.core.validation import (
     validate_ipv4,
@@ -10,8 +17,6 @@ from app.models.device import Device
 from app.models.interface import Interface
 from app.models.ip_address import IPAddress
 
-VALID_ADDRESS_TYPES = {"static", "dhcp", "external", "reserved"}
-MAC_REQUIRED_TYPES = {"dhcp", "reserved"}
 EXTERNAL_DEFAULT_MASK = "255.255.255.255"
 
 
@@ -59,13 +64,13 @@ def _check_interface_type(
     if iface is None:
         raise ValidationError("Interface not found", field="interface_id")
 
-    if iface.type == "port":
+    if iface.type == IFACE_TYPE_PORT:
         raise ValidationError(
             "Interface of type 'port' cannot have an IP address",
             field="interface_id",
         )
 
-    if address_type in MAC_REQUIRED_TYPES and not iface.mac:
+    if address_type in MAC_REQUIRED_IP_TYPES and not iface.mac:
         raise ValidationError(
             f"MAC address is required on the interface for address type '{address_type}'",
             field="mac",
@@ -85,29 +90,29 @@ def validate(
     exclude_id: int | None = None,
 ) -> tuple[str | None, str | None, str | None, str | None]:
     address_type = (address_type or "").strip().lower()
-    if address_type not in VALID_ADDRESS_TYPES:
+    if address_type not in VALID_IP_ADDRESS_TYPES:
         raise ValidationError(
             f"Invalid address type: {address_type}. "
-            f"Allowed: {', '.join(sorted(VALID_ADDRESS_TYPES))}",
+            f"Allowed: {', '.join(sorted(VALID_IP_ADDRESS_TYPES))}",
             field="address_type",
         )
 
     address = (address or "").strip()
     mask = (mask or "").strip()
 
-    if address_type == "dhcp":
+    if address_type == IP_TYPE_DHCP:
         address = validate_ipv4(address, field="address") if address else None
         mask = validate_mask(mask, field="mask") if mask else None
     else:
         address = validate_ipv4(address, field="address")
-        if address_type == "external":
+        if address_type == IP_TYPE_EXTERNAL:
             mask = validate_mask(mask, field="mask") if mask else EXTERNAL_DEFAULT_MASK
         else:
             mask = validate_mask(mask, field="mask")
 
     if gateway is not None and gateway.strip():
         gateway = validate_ipv4(gateway, field="gateway")
-        if address is not None and mask is not None and address_type != "external":
+        if address is not None and mask is not None and address_type != IP_TYPE_EXTERNAL:
             validate_same_subnet(address, mask, gateway, field="gateway")
     else:
         gateway = None

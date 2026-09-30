@@ -1,6 +1,7 @@
 from sqlalchemy import Boolean, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.constants import CONNECTION_TYPE_PHYSICAL
 from app.database import Base
 
 
@@ -14,7 +15,7 @@ class Connection(Base):
     target_port_id: Mapped[int] = mapped_column(
         ForeignKey("ports.id", ondelete="CASCADE"), nullable=False
     )
-    connection_type: Mapped[str] = mapped_column(String(20), nullable=False, default="physical")
+    connection_type: Mapped[str] = mapped_column(String(20), nullable=False, default=CONNECTION_TYPE_PHYSICAL)
     cable_type: Mapped[str | None] = mapped_column(String(50))
     description: Mapped[str | None] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

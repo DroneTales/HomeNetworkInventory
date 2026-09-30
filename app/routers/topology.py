@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 
+from app.core.constants import IP_TYPE_EXTERNAL
 from app.core.deps import require_site, require_user
 from app.core.templating import render
 from app.crud import device as crud_device
@@ -71,7 +72,7 @@ def topology_data(
     for d in devices:
         ports_count = len(d.ports)
         has_external_ip = any(
-            ip.address_type == "external"
+            ip.address_type == IP_TYPE_EXTERNAL
             for iface in d.interfaces
             for ip in iface.ip_addresses
         )

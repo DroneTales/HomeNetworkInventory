@@ -1,12 +1,10 @@
 from sqlalchemy.orm import Session
 
+from app.core.constants import ROLE_ADMIN, ROLE_USER, VALID_ROLES
 from app.core.exceptions import ValidationError
 from app.core.security import hash_password
 from app.models.user import User
 
-ROLE_ADMIN = "admin"
-ROLE_USER = "user"
-VALID_ROLES = {ROLE_ADMIN, ROLE_USER}
 
 def list_all(db: Session) -> list[User]:
     return db.query(User).order_by(User.username).all()

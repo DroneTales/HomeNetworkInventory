@@ -1,12 +1,11 @@
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
+from app.core.constants import PF_PROTOCOL_BOTH, VALID_PF_PROTOCOLS
 from app.core.exceptions import ValidationError
 from app.core.validation import validate_ipv4
 from app.models.device import Device
 from app.models.port_forward import PortForward
-
-VALID_PROTOCOLS = {"tcp", "udp", "both"}
 
 
 def list_by_device(db: Session, device_id: int) -> list[PortForward]:
@@ -68,7 +67,7 @@ def _validate_ports(
 
 
 def _protocols_overlap(a: str, b: str) -> bool:
-    if a == "both" or b == "both":
+    if a == PF_PROTOCOL_BOTH or b == PF_PROTOCOL_BOTH:
         return True
     return a == b
 
@@ -140,10 +139,10 @@ def _validate(
     )
 
     protocol = (protocol or "").strip().lower()
-    if protocol not in VALID_PROTOCOLS:
+    if protocol not in VALID_PF_PROTOCOLS:
         raise ValidationError(
             f"Invalid protocol: {protocol}. "
-            f"Allowed: {', '.join(sorted(VALID_PROTOCOLS))}",
+            f"Allowed: {', '.join(sorted(VALID_PF_PROTOCOLS))}",
             field="protocol",
         )
 

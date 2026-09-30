@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
+from app.core.constants import ROLE_ADMIN
 from app.core.deps import require_user
 from app.core.exceptions import ValidationError
 from app.core.templating import render
@@ -69,7 +70,7 @@ async def change_password(
     db: Session = Depends(get_db),
     user: User = Depends(require_user),
 ):
-    if user.role != "admin" and not user.can_change_own_password:
+    if user.role != ROLE_ADMIN and not user.can_change_own_password:
         return RedirectResponse("/profile", status_code=303)
 
     form = await request.form()

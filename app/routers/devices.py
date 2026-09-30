@@ -2,9 +2,20 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
+from app.core.constants import (
+    DHCP_POOL_TYPE_DYNAMIC,
+    IFACE_TYPE_ETHERNET,
+    IFACE_TYPE_PORT,
+    IFACE_TYPE_WIFI,
+    IP_TYPE_DHCP,
+    IP_TYPE_STATIC,
+    PF_PROTOCOL_TCP,
+    ROLE_ADMIN,
+)
 from app.core.deps import require_admin, require_edit, require_site, require_user
 from app.core.exceptions import ValidationError
 from app.core.templating import render
+from app.core.utils import parse_ipv4, to_int
 from app.crud import connection as crud_connection
 from app.crud import credential as crud_credential
 from app.crud import credential_type as crud_cred_type
@@ -30,24 +41,10 @@ from app.models.user import User
 router = APIRouter(prefix="/devices", tags=["devices"])
 
 def _can_view_passwords(user: User) -> bool:
-    return user.role == "admin" or user.can_view_passwords
+    return user.role == ROLE_ADMIN or user.can_view_passwords
 
 def _can_change_passwords(user: User) -> bool:
-    return user.role == "admin" or user.can_change_passwords
-
-def _parse_ipv4(ip_str: str) -> tuple[int, int, int, int] | None:
-    if not ip_str:
-        return None
-    parts = ip_str.split(".")
-    if len(parts) != 4:
-        return None
-    try:
-        octets = tuple(int(p) for p in parts)
-    except ValueError:
-        return None
-    if any(o < 0 or o > 255 for o in octets):
-        return None
-    return octets
+    return user.role == ROLE_ADMIN or user.can_change_passwords
 
 @router.get("")
 def list_devices(
@@ -62,7 +59,7 @@ def list_devices(
         parsed = []
         for iface in d.interfaces:
             for ip in iface.ip_addresses:
-                octets = _parse_ipv4(ip.address)
+                octets = parse_ipv4(ip.address)
                 if octets is not None:
                     parsed.append(octets)
         if not parsed:
@@ -282,11 +279,11 @@ def _process_device_form(
     hostname = (form.get("hostname") or "").strip()
     human_readable_name = (form.get("human_readable_name") or "").strip() or None
     remarks = (form.get("remarks") or "").strip() or None
-    device_type_id = _to_int(form.get("device_type_id"))
-    vendor_id = _to_int(form.get("vendor_id"))
-    model_id = _to_int(form.get("model_id"))
-    location_id = _to_int(form.get("location_id"))
-    network_id = _to_int(form.get("network_id"))
+    device_type_id = to_int(form.get("device_type_id"))
+    vendor_id = to_int(form.get("vendor_id"))
+    model_id = to_int(form.get("model_id"))
+    location_id = to_int(form.get("location_id"))
+    network_id = to_int(form.get("network_id"))
     is_active = form.get("is_active") == "on"
 
     interfaces = _collect_interfaces(form)
@@ -433,7 +430,7 @@ def _sync_interfaces(
     for data in items:
         item_id = data.get("id")
         connected_id = None
-        if data["type"] == "wifi":
+        if data["type"] == IFACE_TYPE_WIFI:
             connected_id = _resolve_wifi_id(data.get("connected_wifi_network_id"), wifi_map)
 
         if item_id and item_id in existing:
@@ -459,8 +456,8 @@ def _sync_interfaces(
 
         existing_ips = {ip.id: ip for ip in iface.ip_addresses}
         needs_ip_record = (
-            data["type"] != "port"
-            and (bool(data.get("address")) or data.get("address_type") == "dhcp")
+            data["type"] != IFACE_TYPE_PORT
+            and (bool(data.get("address")) or data.get("address_type") == IP_TYPE_DHCP)
         )
 
         if needs_ip_record:
@@ -673,7 +670,7 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
             "mac": iface.mac or "",
             "address": ip.address if ip else "",
             "mask": ip.mask if ip else "255.255.255.0",
-            "address_type": ip.address_type if ip else "static",
+            "address_type": ip.address_type if ip else IP_TYPE_STATIC,
             "gateway": (ip.gateway if ip and ip.gateway else "") or "",
             "dns": (ip.dns if ip and ip.dns else "") or "",
             "connected_wifi_network_id": iface.connected_wifi_network_id or "",
@@ -788,17 +785,6 @@ def _form_dict(form) -> dict:
         "port_forwards": _collect_port_forwards(form),
     }
 
-def _to_int(value) -> int | None:
-    if value is None:
-        return None
-    value = str(value).strip()
-    if not value:
-        return None
-    try:
-        return int(value)
-    except ValueError:
-        return None
-
 def _resolve_wifi_id(value, wifi_map: dict[int, int]) -> int | None:
     if value is None:
         return None
@@ -834,13 +820,13 @@ def _collect_interfaces(form) -> list[dict]:
         if not name:
             continue
 
-        item_id = _to_int(ids[i] if i < len(ids) else None)
-        iface_type = (types[i] if i < len(types) else "ethernet").strip().lower()
+        item_id = to_int(ids[i] if i < len(ids) else None)
+        iface_type = (types[i] if i < len(types) else IFACE_TYPE_ETHERNET).strip().lower()
         mac = (macs[i] if i < len(macs) else "").strip() or None
 
         address = (addresses[i] if i < len(addresses) else "").strip() or None
         mask = (masks[i] if i < len(masks) else "").strip() or None
-        address_type = (address_types[i] if i < len(address_types) else "static").strip().lower()
+        address_type = (address_types[i] if i < len(address_types) else IP_TYPE_STATIC).strip().lower()
         gateway = (gateways[i] if i < len(gateways) else "").strip() or None
         dns = (dns_list[i] if i < len(dns_list) else "").strip() or None
         connected_wifi = (wifi_links[i] if i < len(wifi_links) else "").strip() or None
@@ -872,8 +858,8 @@ def _collect_ports(form) -> list[dict]:
         if not name:
             continue
 
-        item_id = _to_int(ids[i] if i < len(ids) else None)
-        interface_id = _to_int(interface_ids[i] if i < len(interface_ids) else None)
+        item_id = to_int(ids[i] if i < len(ids) else None)
+        interface_id = to_int(interface_ids[i] if i < len(interface_ids) else None)
         description = (descriptions[i] if i < len(descriptions) else "").strip() or None
 
         result.append({
@@ -899,7 +885,7 @@ def _collect_wifi_networks(form) -> list[dict]:
         if not ssid:
             continue
 
-        item_id = _to_int(ids[i] if i < len(ids) else None)
+        item_id = to_int(ids[i] if i < len(ids) else None)
         band = (bands[i] if i < len(bands) else "").strip() or None
         encryption = (encryptions[i] if i < len(encryptions) else "").strip() or None
         password = (passwords[i] if i < len(passwords) else "").strip() or None
@@ -933,11 +919,11 @@ def _collect_dhcp_pools(form) -> list[dict]:
         if not start and not end:
             continue
 
-        item_id = _to_int(ids[i] if i < len(ids) else None)
+        item_id = to_int(ids[i] if i < len(ids) else None)
         result.append({
             "id": item_id,
             "name": (names[i] if i < len(names) else "").strip() or None,
-            "type": (types[i] if i < len(types) else "dynamic").strip().lower(),
+            "type": (types[i] if i < len(types) else DHCP_POOL_TYPE_DYNAMIC).strip().lower(),
             "start_ip": start,
             "end_ip": end,
             "gateway": (gateways[i] if i < len(gateways) else "").strip() or None,
@@ -958,8 +944,8 @@ def _collect_credentials(form) -> list[dict]:
     max_len = max(len(usernames), len(passwords), len(type_ids), len(ids))
 
     for i in range(max_len):
-        item_id = _to_int(ids[i] if i < len(ids) else None)
-        type_id = _to_int(type_ids[i] if i < len(type_ids) else None)
+        item_id = to_int(ids[i] if i < len(ids) else None)
+        type_id = to_int(type_ids[i] if i < len(type_ids) else None)
         username = (usernames[i] if i < len(usernames) else "").strip() or None
         password = (passwords[i] if i < len(passwords) else "").strip() or None
         description = (descriptions[i] if i < len(descriptions) else "").strip() or None
@@ -992,9 +978,9 @@ def _collect_services(form) -> list[dict]:
         if not name:
             continue
 
-        item_id = _to_int(ids[i] if i < len(ids) else None)
+        item_id = to_int(ids[i] if i < len(ids) else None)
         protocol = (protocols[i] if i < len(protocols) else "").strip() or None
-        port = _to_int(ports[i] if i < len(ports) else None)
+        port = to_int(ports[i] if i < len(ports) else None)
         url = (urls[i] if i < len(urls) else "").strip() or None
         path = (paths[i] if i < len(paths) else "").strip() or None
         description = (descriptions[i] if i < len(descriptions) else "").strip() or None
@@ -1027,7 +1013,7 @@ def _check_dhcp_conflicts(
     )
     conflicts = []
     for ip, address_type in ips:
-        if address_type != "static":
+        if address_type != IP_TYPE_STATIC:
             continue
         for pool in pools:
             from app.core.validation import is_ip_in_range
@@ -1071,9 +1057,9 @@ def _collect_port_forwards(form) -> list[dict]:
         if not ext_start and not ext_end:
             continue
 
-        item_id = _to_int(ids[i] if i < len(ids) else None)
+        item_id = to_int(ids[i] if i < len(ids) else None)
         target_type = (target_types[i] if i < len(target_types) else "device").strip().lower()
-        internal_device_id = _to_int(internal_device_ids[i] if i < len(internal_device_ids) else None)
+        internal_device_id = to_int(internal_device_ids[i] if i < len(internal_device_ids) else None)
         internal_ip_manual = (internal_ip_manual_list[i] if i < len(internal_ip_manual_list) else "").strip() or None
 
         if target_type == "ip":
@@ -1089,7 +1075,7 @@ def _collect_port_forwards(form) -> list[dict]:
             "id": item_id,
             "external_port_start": ext_start,
             "external_port_end": ext_end,
-            "protocol": (protocols[i] if i < len(protocols) else "tcp").strip().lower(),
+            "protocol": (protocols[i] if i < len(protocols) else PF_PROTOCOL_TCP).strip().lower(),
             "internal_device_id": internal_device_id,
             "internal_ip_manual": internal_ip_manual,
             "internal_port_start": (internal_starts[i] if i < len(internal_starts) else "").strip(),

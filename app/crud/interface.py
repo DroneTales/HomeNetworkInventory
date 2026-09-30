@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
 
+from app.core.constants import IFACE_TYPE_WIFI, VALID_IFACE_TYPES
 from app.core.exceptions import ValidationError
 from app.core.validation import validate_mac
 from app.models.device import Device
 from app.models.interface import Interface
 from app.models.wifi_network import WiFiNetwork
 
-VALID_TYPES = {"ethernet", "wifi", "wan", "virtual", "port"}
 
 def list_by_device(db: Session, device_id: int) -> list[Interface]:
     return (
@@ -51,9 +51,9 @@ def create(
         raise ValidationError("Name is required", field="name")
 
     type = (type or "").strip().lower()
-    if type not in VALID_TYPES:
+    if type not in VALID_IFACE_TYPES:
         raise ValidationError(
-            f"Invalid interface type: {type}. Allowed: {', '.join(sorted(VALID_TYPES))}",
+            f"Invalid interface type: {type}. Allowed: {', '.join(sorted(VALID_IFACE_TYPES))}",
             field="type",
         )
 
@@ -64,7 +64,7 @@ def create(
         mac = None
 
     if connected_wifi_network_id is not None:
-        if type != "wifi":
+        if type != IFACE_TYPE_WIFI:
             raise ValidationError(
                 "Only Wi-Fi interfaces can be connected to a Wi-Fi network",
                 field="connected_wifi_network_id",
@@ -102,9 +102,9 @@ def update(
         raise ValidationError("Name is required", field="name")
 
     type = (type or "").strip().lower()
-    if type not in VALID_TYPES:
+    if type not in VALID_IFACE_TYPES:
         raise ValidationError(
-            f"Invalid interface type: {type}. Allowed: {', '.join(sorted(VALID_TYPES))}",
+            f"Invalid interface type: {type}. Allowed: {', '.join(sorted(VALID_IFACE_TYPES))}",
             field="type",
         )
 
@@ -115,7 +115,7 @@ def update(
         mac = None
 
     if connected_wifi_network_id is not None:
-        if type != "wifi":
+        if type != IFACE_TYPE_WIFI:
             raise ValidationError(
                 "Only Wi-Fi interfaces can be connected to a Wi-Fi network",
                 field="connected_wifi_network_id",

@@ -1,6 +1,7 @@
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.constants import DHCP_POOL_TYPE_DYNAMIC
 from app.database import Base
 
 
@@ -14,7 +15,7 @@ class DhcpPool(Base):
     name: Mapped[str | None] = mapped_column(String(100))
     start_ip: Mapped[str] = mapped_column(String(45), nullable=False)
     end_ip: Mapped[str] = mapped_column(String(45), nullable=False)
-    type: Mapped[str] = mapped_column(String(20), nullable=False, default="dynamic")
+    type: Mapped[str] = mapped_column(String(20), nullable=False, default=DHCP_POOL_TYPE_DYNAMIC)
     gateway: Mapped[str | None] = mapped_column(String(45))
     dns: Mapped[str | None] = mapped_column(String(45))
     description: Mapped[str | None] = mapped_column(String(255))

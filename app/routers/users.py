@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
+from app.core.constants import ROLE_USER
 from app.core.deps import require_admin
 from app.core.exceptions import ValidationError
 from app.core.templating import render
@@ -312,7 +313,7 @@ def _collect_form(form) -> dict:
     return {
         "username": (form.get("username") or "").strip(),
         "password": (form.get("password") or "").strip(),
-        "role": (form.get("role") or "user").strip().lower(),
+        "role": (form.get("role") or ROLE_USER).strip().lower(),
         "can_edit": form.get("can_edit") == "on",
         "can_view_passwords": form.get("can_view_passwords") == "on",
         "can_change_passwords": form.get("can_change_passwords") == "on",
