@@ -12,9 +12,14 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">{{ t('nav.connections') }}</h1>
-    {% if current_user.role == 'admin' or current_user.can_edit %}
-    <a href="/connections/new" class="btn btn-primary">{{ t('connections.list.add') }}</a>
-    {% endif %}
+    <div class="d-flex gap-2">
+        <a href="/topology" class="btn btn-outline-primary">
+            <i class="fa-solid fa-diagram-project me-1"></i>{{ t('connections.list.map') }}
+        </a>
+        {% if current_user.role == 'admin' or current_user.can_edit %}
+        <a href="/connections/new" class="btn btn-primary">{{ t('connections.list.add') }}</a>
+        {% endif %}
+    </div>
 </div>
 
 {% if not connections %}

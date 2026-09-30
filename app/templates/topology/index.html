@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('topology.title') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">
+        <i class="fa-solid fa-diagram-project me-2"></i>{{ t('topology.title') }}
+    </h1>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="topology-fit-btn">
+            <i class="fa-solid fa-expand me-1"></i>{{ t('topology.btn.fit') }}
+        </button>
+        <a href="/connections" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i>{{ t('topology.btn.back') }}
+        </a>
+    </div>
+</div>
+
+<div class="card info-card mb-3">
+    <div class="card-body p-2">
+        <div class="topo-wrap" style="position: relative;">
+            <div id="topology-container"
+                 style="height: 78vh; min-height: 500px;"
+                 data-site-id="{{ current_site.id }}"
+                 data-data-url="/topology/data">
+                <div class="text-muted small d-flex align-items-center justify-content-center h-100">
+                    {{ t('topology.loading') }}
+                </div>
+            </div>
+            <div class="topo-panel" id="topo-panel">
+                <div class="topo-panel-header">
+                    <div class="topo-panel-title" id="topo-panel-title"></div>
+                    <button type="button" class="topo-panel-close" id="topo-panel-close" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="topo-panel-body" id="topo-panel-body"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/layout-base@2.0.1/layout-base.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cose-base@2.2.0/cose-base.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.2.0/cytoscape-fcose.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-node-html-label@1.2.2/dist/cytoscape-node-html-label.min.js"></script>
+<script>
+window.TOPO_I18N = {
+    "topology.open_device": "{{ t('topology.open_device') }}",
+    "topology.section.ports": "{{ t('topology.section.ports') }}",
+    "topology.port.none": "{{ t('topology.port.none') }}",
+    "topology.ports.empty": "{{ t('topology.ports.empty') }}"
+};
+</script>
+<script src="/static/js/topology.js"></script>
+{% endblock %}

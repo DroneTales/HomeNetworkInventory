@@ -236,5 +236,14 @@
   "connections.form.field.port": "Порт",
   "reference.col.pf": "Проброс портов",
   "auth.demo_hint": "Демо-доступ — имя пользователя: test, пароль: test",
-  "auth.personal_hint": "Для личного аккаунта свяжитесь:"
+  "auth.personal_hint": "Для личного аккаунта свяжитесь:",
+  "topology.title": "Карта сети",
+  "topology.btn.back": "Назад к связям",
+  "topology.loading": "Загрузка…",
+  "connections.list.map": "Карта сети",
+  "topology.btn.fit": "По размеру",
+  "topology.open_device": "Открыть устройство",
+  "topology.section.ports": "Порты",
+  "topology.port.none": "не подключён",
+  "topology.ports.empty": "Портов нет"
 }

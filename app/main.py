@@ -16,7 +16,7 @@ from app.models.user import User
 
 from app import models  # noqa: F401
 
-from app.routers import auth, connections, devices, help, profile, reference, reference_ui, sites, users
+from app.routers import auth, connections, devices, help, profile, reference, reference_ui, sites, topology, users
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -50,6 +50,7 @@ app.include_router(connections.router)
 app.include_router(users.router)
 app.include_router(profile.router)
 app.include_router(help.router)
+app.include_router(topology.router)
 
 @app.get("/")
 def root(

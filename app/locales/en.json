@@ -236,5 +236,14 @@
   "connections.form.field.port": "Port",
   "reference.col.pf": "Port forwarding",
   "auth.demo_hint": "Demo access — username: test, password: test",
-  "auth.personal_hint": "For a personal account, contact:"
+  "auth.personal_hint": "For a personal account, contact:",
+  "topology.title": "Network map",
+  "topology.btn.back": "Back to connections",
+  "topology.loading": "Loading…",
+  "connections.list.map": "Network map",
+  "topology.btn.fit": "Fit",
+  "topology.open_device": "Open device",
+  "topology.section.ports": "Ports",
+  "topology.port.none": "not connected",
+  "topology.ports.empty": "No ports"
 }

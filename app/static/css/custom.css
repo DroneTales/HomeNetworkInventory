@@ -234,3 +234,271 @@
     padding-left: 0.25rem;
     padding-right: 0.25rem;
 }
+
+.topo-node-label {
+    font-size: 9px;
+    line-height: 1;
+    text-align: center;
+    max-width: 56px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.cytoscape-node-html-label {
+    pointer-events: none !important;
+}
+#topology-container {
+    overflow: hidden;
+}
+
+.topo-node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: #334155;
+    border: 2px solid #475569;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    color: #f1f5f9;
+    cursor: pointer;
+    user-select: none;
+    pointer-events: none;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.topo-node i {
+    font-size: 24px;
+    color: #ffffff;
+}
+.topo-cat-modem        { background: linear-gradient(135deg, #6d28d9, #8b5cf6); border-color: #a78bfa; }
+.topo-cat-hub          { background: linear-gradient(135deg, #475569, #64748b); border-color: #94a3b8; }
+.topo-cat-wifi_router  { background: linear-gradient(135deg, #0e7490, #06b6d4); border-color: #22d3ee; }
+.topo-cat-wifi_ap      { background: linear-gradient(135deg, #0891b2, #22d3ee); border-color: #67e8f9; }
+.topo-cat-router       { background: linear-gradient(135deg, #1d4ed8, #3b82f6); border-color: #60a5fa; }
+.topo-cat-camera       { background: linear-gradient(135deg, #b91c1c, #ef4444); border-color: #f87171; }
+.topo-cat-video_server { background: linear-gradient(135deg, #7f1d1d, #dc2626); border-color: #fca5a5; }
+.topo-cat-server       { background: linear-gradient(135deg, #047857, #10b981); border-color: #34d399; }
+.topo-cat-other        { background: linear-gradient(135deg, #374151, #4b5563); border-color: #6b7280; }
+
+.topo-tooltip {
+    position: fixed;
+    z-index: 99999;
+    pointer-events: none;
+    background: #0f172a;
+    border: 1px solid #3b82f6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+    max-width: 260px;
+    min-width: 140px;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    text-align: left;
+}
+.topo-tooltip.visible {
+    opacity: 1;
+}
+.topo-tooltip-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #ffffff;
+    line-height: 1.25;
+    margin-bottom: 2px;
+}
+.topo-tooltip-sub {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+}
+.topo-tooltip-value {
+    font-size: 12px;
+    color: #e2e8f0;
+    line-height: 1.4;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.topo-node {
+    position: relative;
+}
+.topo-badge {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+.topo-badge-wifi {
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #0891b2;
+    border: 2px solid #0b0f14;
+    color: #ffffff;
+    font-size: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.topo-badge-wifi-client {
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2563eb;
+    border: 2px solid #0b0f14;
+    color: #ffffff;
+    font-size: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.topo-tooltip-wifi {
+    font-size: 11px;
+    color: #22d3ee;
+    line-height: 1.5;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #1e293b;
+    font-weight: 600;
+}
+
+.topo-wrap {
+    overflow: hidden;
+}
+.topo-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 360px;
+    max-width: 90%;
+    height: 100%;
+    background: #0f172a;
+    border-left: 1px solid #334155;
+    transform: translateX(105%);
+    transition: transform 0.2s ease;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -12px 0 24px rgba(0, 0, 0, 0.35);
+}
+.topo-panel.open {
+    transform: translateX(0);
+}
+.topo-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid #1e293b;
+    gap: 10px;
+}
+.topo-panel-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #f8fafc;
+    line-height: 1.2;
+    word-break: break-word;
+}
+.topo-panel-title .topo-panel-sub {
+    display: block;
+    font-weight: 400;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+}
+.topo-panel-close {
+    background: transparent;
+    border: 0;
+    color: #94a3b8;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.topo-panel-close:hover {
+    color: #f1f5f9;
+    background: #1e293b;
+}
+.topo-panel-body {
+    padding: 12px 14px;
+    overflow-y: auto;
+    flex: 1;
+    color: #cbd5e1;
+    font-size: 12px;
+}
+.topo-panel-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.topo-panel-actions a {
+    flex: 1;
+    text-align: center;
+    padding: 6px 10px;
+    background: #1d4ed8;
+    color: #ffffff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+}
+.topo-panel-actions a:hover {
+    background: #2563eb;
+    color: #ffffff;
+}
+.topo-panel-section {
+    margin-top: 14px;
+}
+.topo-panel-section-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+.topo-port-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.topo-port-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: #1e293b;
+    border-radius: 6px;
+    font-size: 11px;
+}
+.topo-port-name {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    color: #e2e8f0;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.topo-port-arrow {
+    color: #64748b;
+    font-size: 10px;
+}
+.topo-port-target {
+    color: #60a5fa;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    word-break: break-word;
+}
+.topo-port-target:hover {
+    text-decoration: underline;
+}
+.topo-port-none {
+    color: #64748b;
+    font-style: italic;
+}
