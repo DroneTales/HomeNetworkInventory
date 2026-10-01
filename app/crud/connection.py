@@ -96,6 +96,7 @@ def _check_duplicate(
     target_port_id: int,
     exclude_id: int | None = None,
 ) -> None:
+    # A->B and B->A describe the same physical link, so both orders are checked
     query = db.query(Connection).filter(
         or_(
             (Connection.source_port_id == source_port_id)

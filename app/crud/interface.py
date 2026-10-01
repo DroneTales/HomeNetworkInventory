@@ -33,6 +33,7 @@ def _check_mac_unique(
     mac: str | None,
     exclude_id: int | None = None,
 ) -> None:
+    # MAC addresses are unique globally (across all sites)
     if not mac:
         return
 

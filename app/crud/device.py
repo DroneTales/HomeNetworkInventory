@@ -73,6 +73,7 @@ def _check_references(
     if model_id is not None:
         require_found(db.get(Model, model_id), "Model", field="model_id")
 
+    # All references must be scoped to the same site as the device
     if location_id is not None:
         loc = require_found(db.get(Location, location_id), "Location", field="location_id")
         if loc.site_id != site_id:
@@ -90,6 +91,7 @@ def _check_references(
             )
 
 def _validate_consistency(db: Session, device: Device) -> None:
+    # Active device types require at least one IP; passive ones must have none
     if device.device_type is None:
         return
 

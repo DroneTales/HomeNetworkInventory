@@ -25,6 +25,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User | 
     if user_id is None:
         return None
 
+    # Idle timeout: refresh last_seen on each request, expire after threshold
     now = int(time.time())
     last_seen = request.session.get("last_seen")
 
@@ -63,6 +64,7 @@ def require_edit(user: User = Depends(require_user)) -> User:
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
 def get_accessible_sites(db: Session, user: User) -> list[Site]:
+    # Admins see every active site; regular users only see assigned ones
     if user.role == ROLE_ADMIN:
         return (
             db.query(Site)

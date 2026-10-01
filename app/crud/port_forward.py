@@ -76,6 +76,7 @@ def _validate_ports(
 
 
 def _protocols_overlap(a: str, b: str) -> bool:
+    # "both" covers tcp and udp, so it overlaps with any protocol
     if a == PF_PROTOCOL_BOTH or b == PF_PROTOCOL_BOTH:
         return True
     return a == b
@@ -93,6 +94,7 @@ def _check_overlap(
     protocol: str,
     exclude_id: int | None = None,
 ) -> None:
+    # Only active rules can conflict with a new forwarding rule
     query = db.query(PortForward).filter(
         PortForward.device_id == device_id,
         PortForward.is_active.is_(True),
@@ -170,6 +172,7 @@ def _validate(
             raise ValidationError(
                 "Internal device not found", field="internal_device_id"
             )
+        # Forward target must live in the same site as the rule owner
         if internal.site_id != device.site_id:
             raise ValidationError(
                 "Internal device belongs to a different home",

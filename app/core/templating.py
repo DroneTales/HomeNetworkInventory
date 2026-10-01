@@ -40,6 +40,7 @@ def render(
     else:
         lang = detect_language(request.headers.get("accept-language"))
 
+    # Extra args are substituted via str.format, e.g. t('x', name)
     def _t(key, *args):
         s = translate(key, lang)
         return s.format(*args) if args else s

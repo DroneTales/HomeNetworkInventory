@@ -113,6 +113,8 @@ def topology_data(
             has_rtsp, has_other_service,
         )
 
+        # Prefer the IP flagged as primary; otherwise fall back to the
+        # first non-empty address on any interface
         primary_ip = None
         for iface in d.interfaces:
             for ip in iface.ip_addresses:
@@ -160,6 +162,8 @@ def topology_data(
                 "interface_name": p.interface.name if p.interface else "",
             })
 
+    # Edges come from outgoing connections only; a symmetric connection
+    # row already covers both ports, so iterating incoming would duplicate
     edges = []
     for d in devices:
         for p in d.ports:
@@ -175,6 +179,8 @@ def topology_data(
                     "is_active": c.is_active,
                 })
 
+    # Only locations that actually contain devices are emitted,
+    # so the graph never renders empty compound nodes
     locations = {}
     for d in devices:
         if d.location:

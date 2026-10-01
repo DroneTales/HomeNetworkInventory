@@ -11,6 +11,7 @@
 
 {% macro check(value) %}{% if value %}✓{% else %}—{% endif %}{% endmacro %}
 
+{# confirm is passed through |tojson so quotes/backslashes are safe in the attribute #}
 {% macro delete_form(action, confirm) %}
 <form method="post" action="{{ action }}" class="d-inline"
       onsubmit='return confirm({{ confirm|tojson }});'>
@@ -18,6 +19,7 @@
 </form>
 {% endmacro %}
 
+{# confirm is passed through |tojson so quotes/backslashes are safe in the attribute #}
 {% macro delete_icon_form(action, confirm) %}
 <form method="post" action="{{ action }}" class="flex-fill"
       onsubmit='return confirm({{ confirm|tojson }});'>

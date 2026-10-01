@@ -50,6 +50,8 @@ def _check_ip_unique(
     site_id: int,
     exclude_id: int | None = None,
 ) -> None:
+    # Uniqueness is enforced per site, not globally: different homes
+    # may use the same private subnet without conflict
     query = (
         db.query(IPAddress)
         .join(Interface, IPAddress.interface_id == Interface.id)
@@ -73,12 +75,14 @@ def _check_interface_type(
 ) -> Interface:
     iface = require_found(db.get(Interface, interface_id), "Interface", field="interface_id")
 
+    # "port" is a passive socket without an address
     if iface.type == IFACE_TYPE_PORT:
         raise ValidationError(
             "Interface of type 'port' cannot have an IP address",
             field="interface_id",
         )
 
+    # dhcp/reserved addresses are bound to a MAC, so MAC must be known
     if address_type in MAC_REQUIRED_IP_TYPES and not iface.mac:
         raise ValidationError(
             f"MAC address is required on the interface for address type '{address_type}'",

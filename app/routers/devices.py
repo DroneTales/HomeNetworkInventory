@@ -383,6 +383,9 @@ def _process_device_form(
 
     return RedirectResponse("/devices", status_code=303)
 
+# _sync_* helpers reconcile submitted form rows with existing children:
+# rows with an "id" are updated, rows without are created, rows missing
+# from the submission are deleted. The pattern is shared by all _sync_* below.
 def _sync_wifi_networks(db: Session, device: Device, items: list[dict]) -> dict[int, int]:
     wifi_map: dict[int, int] = {}
     existing = {w.id: w for w in device.wifi_networks}
