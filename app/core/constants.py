@@ -1,3 +1,12 @@
+# Home Network Inventory
+# Shared string constants (roles, types, protocols).
+#
+# Copyright (C) Mike Petrichenko
+# e-mail: btframework@gmail.com
+# Project repository: https://github.com/DroneTales/HomeNetworkInventory
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 ROLE_ADMIN = "admin"
 ROLE_USER = "user"
 VALID_ROLES = {ROLE_ADMIN, ROLE_USER}

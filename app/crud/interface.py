@@ -1,3 +1,12 @@
+# Home Network Inventory
+# Device interfaces CRUD with MAC uniqueness.
+#
+# Copyright (C) Mike Petrichenko
+# e-mail: btframework@gmail.com
+# Project repository: https://github.com/DroneTales/HomeNetworkInventory
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 from sqlalchemy.orm import Session
 
 from app.core.constants import IFACE_TYPE_WIFI, VALID_IFACE_TYPES

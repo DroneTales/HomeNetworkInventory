@@ -1,3 +1,12 @@
+# Home Network Inventory
+# First-run defaults (default Admin user).
+#
+# Copyright (C) Mike Petrichenko
+# e-mail: btframework@gmail.com
+# Project repository: https://github.com/DroneTales/HomeNetworkInventory
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 from sqlalchemy.orm import Session
 
 from app.core.constants import ROLE_ADMIN

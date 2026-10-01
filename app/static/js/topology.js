@@ -1,3 +1,12 @@
+// Home Network Inventory
+// Topology graph rendering and side panel.
+//
+// Copyright (C) Mike Petrichenko
+// e-mail: btframework@gmail.com
+// Project repository: https://github.com/DroneTales/HomeNetworkInventory
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 (function () {
     "use strict";
 

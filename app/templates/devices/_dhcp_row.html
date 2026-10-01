@@ -1,3 +1,12 @@
+{# Home Network Inventory #}
+{# Device form: DHCP pool row fragment. #}
+{# #}
+{# Copyright (C) Mike Petrichenko #}
+{# e-mail: btframework@gmail.com #}
+{# Project repository: https://github.com/DroneTales/HomeNetworkInventory #}
+{# #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
 <div class="dhcp-row border rounded p-2 mb-2">
     <input type="hidden" name="dhcp_id" class="dhcp-id"
            value="{{ pool.id if pool and pool.id else '' }}">
