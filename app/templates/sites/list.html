@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "_macros.html" import delete_icon_form with context %}
 
-{% block title %}{% if lang == 'ru' %}Выбор дома{% else %}Choose a home{% endif %}{% endblock %}
+{% block title %}{{ t('sites.list.title') }}{% endblock %}
 
 {% block content %}
 {% if error %}
@@ -15,20 +15,16 @@
     <div>
         <h1 class="mb-0">
             <i class="fa-solid fa-house me-2"></i>
-            {% if lang == 'ru' %}Выберите дом{% else %}Choose a home{% endif %}
+            {{ t('sites.list.heading') }}
         </h1>
         <div class="text-muted small">
-            {% if lang == 'ru' %}
-            Выберите дом, чтобы перейти к его инвентарю.
-            {% else %}
-            Pick a home to work with its inventory.
-            {% endif %}
+            {{ t('sites.list.subtitle') }}
         </div>
     </div>
     {% if current_user.role == 'admin' %}
     <a href="/sites/new" class="btn btn-primary">
         <i class="fa-solid fa-plus me-1"></i>
-        {% if lang == 'ru' %}Добавить дом{% else %}Add home{% endif %}
+        {{ t('sites.list.add') }}
     </a>
     {% endif %}
 </div>
@@ -37,17 +33,9 @@
 <div class="alert alert-info">
     <i class="fa-solid fa-circle-info me-1"></i>
     {% if current_user.role == 'admin' %}
-        {% if lang == 'ru' %}
-        Пока нет ни одного дома. Нажмите «Добавить дом», чтобы создать первый.
-        {% else %}
-        No homes yet. Click "Add home" to create the first one.
-        {% endif %}
+        {{ t('sites.list.empty_admin') }}
     {% else %}
-        {% if lang == 'ru' %}
-        Вам не назначено ни одного дома. Обратитесь к администратору.
-        {% else %}
-        You have no homes assigned. Please contact the administrator.
-        {% endif %}
+        {{ t('sites.list.empty_user') }}
     {% endif %}
 </div>
 {% else %}
@@ -80,7 +68,7 @@
                 <form method="post" action="/sites/{{ site.id }}/select" class="mt-auto">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>
-                        {% if lang == 'ru' %}Войти{% else %}Enter{% endif %}
+                        {{ t('sites.list.enter') }}
                     </button>
                 </form>
 
@@ -90,8 +78,7 @@
                        class="btn btn-sm btn-outline-secondary flex-fill">
                         <i class="fa-solid fa-pen"></i>
                     </a>
-                    {% set confirm_msg %}{% if lang == 'ru' %}Удалить дом «{{ site.name }}»? Это возможно только если он пуст.{% else %}Delete home &quot;{{ site.name }}&quot;? Only possible if it is empty.{% endif %}{% endset %}
-                    {{ delete_icon_form('/sites/' ~ site.id ~ '/delete', confirm_msg) }}
+                    {{ delete_icon_form('/sites/' ~ site.id ~ '/delete', t('sites.list.confirm_delete', site.name)) }}
                 </div>
                 {% endif %}
             </div>

@@ -31,9 +31,13 @@ def render(
     else:
         lang = detect_language(request.headers.get("accept-language"))
 
+    def _t(key, *args):
+        s = translate(key, lang)
+        return s.format(*args) if args else s
+
     context = {
         "request": request,
-        "t": lambda key: translate(key, lang),
+        "t": _t,
         "lang": lang,
         "current_user": user,
         "current_site": current_site,
