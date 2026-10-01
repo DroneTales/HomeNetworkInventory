@@ -9,12 +9,12 @@
 
 {% extends "base.html" %}
 
-{% block title %}{{ t('connections.form.title') }}{% endblock %}
+{% block title %}{% if is_edit %}{{ t('connections.form.title.edit') }}{% else %}{{ t('connections.form.title') }}{% endif %}{% endblock %}
 
 {% block content %}
 {% set fd = form_data or {} %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">{{ t('connections.form.title') }}</h1>
+    <h1 class="mb-0">{% if is_edit %}{{ t('connections.form.title.edit') }}{% else %}{{ t('connections.form.title') }}{% endif %}</h1>
     <a href="/connections" class="btn btn-outline-secondary">{{ t('common.cancel') }}</a>
 </div>
 
@@ -109,6 +109,10 @@
 </form>
 
 <script id="devices-payload" type="application/json">{{ devices_payload | tojson }}</script>
-<script src="/static/js/connections.js"></script>
+<script id="form-state" type="application/json">{{ {
+    "source_port_id": (fd.source_port_id if fd.source_port_id is defined else "") or "",
+    "target_port_id": (fd.target_port_id if fd.target_port_id is defined else "") or "",
+} | tojson }}</script>
+<script src="/static/js/connections.js?v=2"></script>
 {% endblock %}
 

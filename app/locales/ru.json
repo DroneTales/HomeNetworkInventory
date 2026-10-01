@@ -303,5 +303,7 @@
   "help.toc.permissions": "10. Права и роли",
   "help.toc.tips": "11. Полезные советы",
   "help.toc.problems": "12. Проблемы",
-  "help.toc.hotkeys": "13. Клавиши"
+  "help.toc.hotkeys": "13. Клавиши",
+  "connections.form.title.edit": "Редактирование связи",
+  "connections.list.edit": "Редактировать"
 }

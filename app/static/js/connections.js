@@ -64,9 +64,18 @@
     const source = setupSide("source");
     const target = setupSide("target");
 
-    // Restore after validation error: preselect from saved port ids in form_data.
-    const initialSourcePortId = "{{ form_data.source_port_id if form_data else '' }}";
-    const initialTargetPortId = "{{ form_data.target_port_id if form_data else '' }}";
+    // Initial values (edit mode or validation-error restore) come from a JSON tag.
+    const stateEl = document.getElementById("form-state");
+    let state = {};
+    if (stateEl) {
+        try {
+            state = JSON.parse(stateEl.textContent || "{}");
+        } catch (e) {
+            state = {};
+        }
+    }
+    const initialSourcePortId = state.source_port_id || "";
+    const initialTargetPortId = state.target_port_id || "";
 
     function findDeviceByPort(portId) {
         if (!portId) return null;

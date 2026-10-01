@@ -303,5 +303,7 @@
   "help.toc.permissions": "10. Permissions",
   "help.toc.tips": "11. Tips",
   "help.toc.problems": "12. Problems",
-  "help.toc.hotkeys": "13. Hotkeys"
+  "help.toc.hotkeys": "13. Hotkeys",
+  "connections.form.title.edit": "Edit connection",
+  "connections.list.edit": "Edit"
 }

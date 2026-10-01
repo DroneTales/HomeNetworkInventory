@@ -76,6 +76,11 @@
             <td>{{ dash(c.cable_type) }}</td>
             <td>{{ dash(c.description) }}</td>
             <td class="text-end">
+                {% if current_user.role == 'admin' or current_user.can_edit %}
+                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                {% endif %}
                 {% if current_user.role == 'admin' %}
                 {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete')) }}
                 {% endif %}
@@ -126,11 +131,16 @@
                 {% endif %}
             </div>
 
-            {% if current_user.role == 'admin' %}
-            <div class="mt-2">
+            <div class="mt-2 d-flex gap-1">
+                {% if current_user.role == 'admin' or current_user.can_edit %}
+                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary flex-fill">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                {% endif %}
+                {% if current_user.role == 'admin' %}
                 {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete')) }}
+                {% endif %}
             </div>
-            {% endif %}
         </div>
     </div>
     {% endfor %}

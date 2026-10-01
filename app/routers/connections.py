@@ -82,6 +82,7 @@ def new_connection_form(
         current_site=site,
         devices_payload=devices_payload,
         form_action="/connections/new",
+        is_edit=False,
         form_data={},
     )
 
@@ -124,6 +125,93 @@ async def new_connection_submit(
             current_site=site,
             devices_payload=devices_payload,
             form_action="/connections/new",
+            is_edit=False,
+            error=e.message,
+            form_data={
+                "source_port_id": source_port_id or "",
+                "target_port_id": target_port_id or "",
+                "connection_type": connection_type,
+                "cable_type": cable_type or "",
+                "description": description or "",
+                "is_active": is_active,
+            },
+        )
+
+    return RedirectResponse("/connections", status_code=303)
+
+@router.get("/{connection_id}/edit", response_class=HTMLResponse)
+def edit_connection_form(
+    connection_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_edit),
+    site: Site = Depends(require_site),
+):
+    connection = crud_connection.get_by_id(db, connection_id, site_id=site.id)
+    if connection is None:
+        raise HTTPException(status_code=404, detail="Connection not found")
+
+    devices_payload = _devices_with_ports(db, site.id)
+    return render(
+        request,
+        "connections/form.html",
+        user=user,
+        current_site=site,
+        devices_payload=devices_payload,
+        form_action=f"/connections/{connection_id}/edit",
+        is_edit=True,
+        form_data={
+            "source_port_id": connection.source_port_id,
+            "target_port_id": connection.target_port_id,
+            "connection_type": connection.connection_type,
+            "cable_type": connection.cable_type or "",
+            "description": connection.description or "",
+            "is_active": connection.is_active,
+        },
+    )
+
+@router.post("/{connection_id}/edit")
+async def edit_connection_submit(
+    connection_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_edit),
+    site: Site = Depends(require_site),
+):
+    form = await request.form()
+
+    source_port_id = to_int(form.get("source_port_id"))
+    target_port_id = to_int(form.get("target_port_id"))
+    connection_type = (form.get("connection_type") or CONNECTION_TYPE_PHYSICAL).strip().lower()
+    cable_type = (form.get("cable_type") or "").strip() or None
+    description = (form.get("description") or "").strip() or None
+    is_active = form.get("is_active") == "on"
+
+    try:
+        crud_connection.update(
+            db,
+            connection_id=connection_id,
+            site_id=site.id,
+            source_port_id=source_port_id,
+            target_port_id=target_port_id,
+            connection_type=connection_type,
+            cable_type=cable_type,
+            description=description,
+            is_active=is_active,
+        )
+        db.commit()
+
+    except ValidationError as e:
+        db.rollback()
+        devices_payload = _devices_with_ports(db, site.id)
+        return render(
+            request,
+            "connections/form.html",
+            user=user,
+            current_site=site,
+            devices_payload=devices_payload,
+            form_action=f"/connections/{connection_id}/edit",
+            is_edit=True,
             error=e.message,
             form_data={
                 "source_port_id": source_port_id or "",
