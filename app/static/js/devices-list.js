@@ -38,13 +38,15 @@
     function getCellValue(tr, colIndex, type) {
         const cell = tr.children[colIndex];
         if (!cell) return null;
-        const text = cell.textContent.trim();
-        if (!text || text === "—") return null;
+
+        const sortValue = cell.dataset.sortValue;
+        const raw = sortValue !== undefined ? sortValue : cell.textContent.trim();
+        if (!raw || raw === "—") return null;
 
         if (type === "ip") {
-            return parseIPv4(text);
+            return parseIPv4(raw);
         }
-        return text.toLowerCase();
+        return raw.toLowerCase();
     }
 
     function compareValues(va, vb, type) {

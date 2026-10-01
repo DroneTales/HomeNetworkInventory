@@ -16,7 +16,6 @@ from app.core.constants import (
     IFACE_TYPE_ETHERNET,
     IFACE_TYPE_PORT,
     IFACE_TYPE_WIFI,
-    IP_TYPE_DHCP,
     IP_TYPE_STATIC,
     PF_PROTOCOL_TCP,
     ROLE_ADMIN,
@@ -79,17 +78,18 @@ def list_devices(
 
     rows = []
     for d in devices:
-        primary_ip = None
+        ips = []
+        gateway = None
         for iface in d.interfaces:
             for ip in iface.ip_addresses:
-                primary_ip = ip
-                break
-            if primary_ip:
-                break
+                ips.append(ip)
+                if gateway is None and ip.gateway:
+                    gateway = ip.gateway
 
         rows.append({
             "device": d,
-            "primary_ip": primary_ip,
+            "ips": ips,
+            "gateway": gateway,
             "flags": {
                 "dhcp": len(d.dhcp_pools) > 0,
                 "ports": len(d.ports),
@@ -467,10 +467,9 @@ def _sync_interfaces(
             )
 
         existing_ips = {ip.id: ip for ip in iface.ip_addresses}
-        needs_ip_record = (
-            data["type"] != IFACE_TYPE_PORT
-            and (bool(data.get("address")) or data.get("address_type") == IP_TYPE_DHCP)
-        )
+        # Always attempt to create/update the IP record (except for port);
+        # required-ness of the address is enforced inside crud_ip.validate
+        needs_ip_record = data["type"] != IFACE_TYPE_PORT
 
         if needs_ip_record:
             if existing_ips:

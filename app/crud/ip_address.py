@@ -115,12 +115,17 @@ def validate(
     if address_type == IP_TYPE_DHCP:
         address = validate_ipv4(address, field="address") if address else None
         mask = validate_mask(mask, field="mask") if mask else None
-    else:
-        address = validate_ipv4(address, field="address")
-        if address_type == IP_TYPE_EXTERNAL:
+    elif address_type == IP_TYPE_EXTERNAL:
+        # External without an address = dynamic external (assigned by ISP)
+        # External with an address = static external
+        address = validate_ipv4(address, field="address") if address else None
+        if address is not None:
             mask = validate_mask(mask, field="mask") if mask else EXTERNAL_DEFAULT_MASK
         else:
-            mask = validate_mask(mask, field="mask")
+            mask = None
+    else:
+        address = validate_ipv4(address, field="address")
+        mask = validate_mask(mask, field="mask")
 
     if gateway is not None and gateway.strip():
         gateway = validate_ipv4(gateway, field="gateway")

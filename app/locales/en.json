@@ -35,7 +35,7 @@
   "devices.list.vendor": "Vendor",
   "devices.list.model": "Model",
   "devices.list.location": "Location",
-  "devices.list.local_ip": "Local IP",
+  "devices.list.local_ip": "IP Addresses",
   "devices.list.gateway": "Gateway",
   "devices.list.mac": "MAC",
   "devices.form.edit_title": "Edit device",

@@ -35,7 +35,7 @@
   "devices.list.vendor": "Производитель",
   "devices.list.model": "Модель",
   "devices.list.location": "Расположение",
-  "devices.list.local_ip": "Локальный IP",
+  "devices.list.local_ip": "IP-адреса",
   "devices.list.gateway": "Шлюз",
   "devices.list.mac": "MAC",
   "devices.form.edit_title": "Редактировать устройство",
