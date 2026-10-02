@@ -85,7 +85,7 @@ inventory clean and searchable.
 
 ### Topology
 
-![Topology](docs/screenshots/04-topology.png)
+![Topology](docs/screenshots/07-topology.png)
 
 ### Connections
 

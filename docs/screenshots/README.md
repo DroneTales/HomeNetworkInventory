@@ -10,20 +10,22 @@ under ~500 KB each; use an image optimiser if needed.
 
 | File | What to capture |
 |---|---|
-| `02-devices-list.png` | The devices list page, desktop layout, with a few devices |
+| `02-devices-list.png` | Devices list (desktop), several devices, column "IP Addresses" showing multiple IPs with type icons (globe = external, thumbtack = static, lock = reserved, bolt = dhcp) |
 | `03-device-view.png` | A device page with all colour-coded blocks visible |
-| `05-connections.png` | The connections list with at least one link |
+| `05-connections.png` | Connections list with Edit and Delete buttons |
+| `07-topology.png` | Network topology graph with compound nodes (Site → Locations → devices), side panel, legend |
 
 ## Core screens
 
 | File | What to capture |
 |---|---|
 | `01-login.png` | The sign-in form |
-| `02-devices-list.png` | The devices list page, desktop layout |
+| `02-devices-list.png` | The devices list page, desktop layout (see above) |
 | `03-device-view.png` | A device page with all colour-coded blocks |
 | `04-device-edit.png` | The device edit form (top part is enough) |
-| `05-connections.png` | The connections list |
+| `05-connections.png` | The connections list (see above) |
 | `06-connections-new.png` | The "Add connection" form with device/port pickers |
+| `07-topology.png` | The topology graph (see above) |
 
 ## Homes
 
@@ -47,9 +49,10 @@ under ~500 KB each; use an image optimiser if needed.
 
 | File | What to capture |
 |---|---|
-| `30-mobile-devices.png` | The devices list on a phone (card layout) |
+| `30-mobile-devices.png` | The devices list on a phone (card layout) with the new IP row (multiple IPs + icons) |
 | `31-mobile-choose-home.png` | The "Choose a home" page on a phone |
-| `32-dark-theme.png` | Any page in dark theme |
+| `32-dark-theme.png` | Any page in dark theme (devices list recommended) |
+| `33-footer.png` | Optional: close-up of the site footer (brand + social icons + copyright) |
 
 ## Tips
 
@@ -61,4 +64,5 @@ under ~500 KB each; use an image optimiser if needed.
   generic placeholder photo, one without a photo — so both states are shown.
 - For mobile screenshots, a physical device or DevTools device emulation
   works fine.
-
+- Show at least one device with multiple IPs (a modem or router with an
+  external + a local address) so the new IP column is fully demonstrated.
