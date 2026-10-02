@@ -305,5 +305,9 @@
   "help.toc.problems": "12. Проблемы",
   "help.toc.hotkeys": "13. Клавиши",
   "connections.form.title.edit": "Редактирование связи",
-  "connections.list.edit": "Редактировать"
+  "connections.list.edit": "Редактировать",
+  "connections.locations.title": "Устройства по локациям",
+  "connections.locations.undefined": "Не определено",
+  "connections.locations.empty": "Устройств пока нет.",
+  "connections.locations.count": "Устройства"
 }

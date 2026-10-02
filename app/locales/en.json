@@ -305,5 +305,9 @@
   "help.toc.problems": "12. Problems",
   "help.toc.hotkeys": "13. Hotkeys",
   "connections.form.title.edit": "Edit connection",
-  "connections.list.edit": "Edit"
+  "connections.list.edit": "Edit",
+  "connections.locations.title": "Devices by location",
+  "connections.locations.undefined": "Undefined",
+  "connections.locations.empty": "No devices yet.",
+  "connections.locations.count": "Devices"
 }

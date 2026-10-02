@@ -11,8 +11,8 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 
-from app.core.constants import IP_TYPE_EXTERNAL
 from app.core.deps import require_site, require_user
+from app.core.device_classify import classify_device
 from app.core.templating import render
 from app.crud import device as crud_device
 from app.database import get_db
@@ -20,37 +20,6 @@ from app.models.site import Site
 from app.models.user import User
 
 router = APIRouter(prefix="/topology", tags=["topology"])
-
-ICON_MODEM = "fa-tower-broadcast"
-ICON_HUB = "fa-circle-nodes"
-ICON_WIFI = "fa-wifi"
-ICON_ROUTER = "fa-router"
-ICON_CAMERA = "fa-video"
-ICON_VIDEO_SERVER = "fa-clapperboard"
-ICON_SERVER = "fa-server"
-ICON_OTHER = "fa-plug"
-
-
-def _classify(device, ports_count: int, has_external_ip: bool,
-              has_wifi: bool, has_rtsp: bool, has_other_service: bool) -> tuple[str, str]:
-    if has_external_ip:
-        return "modem", ICON_MODEM
-    if device.device_type and not device.device_type.is_active and ports_count > 1:
-        return "hub", ICON_HUB
-    if has_wifi and ports_count > 1:
-        return "wifi_router", ICON_WIFI
-    if has_wifi:
-        return "wifi_ap", ICON_WIFI
-    if ports_count > 1:
-        return "router", ICON_ROUTER
-    if has_rtsp and not has_other_service:
-        return "camera", ICON_CAMERA
-    if has_rtsp and has_other_service:
-        return "video_server", ICON_VIDEO_SERVER
-    if has_other_service:
-        return "server", ICON_SERVER
-    return "other", ICON_OTHER
-
 
 @router.get("", response_class=HTMLResponse)
 def topology_page(
@@ -80,11 +49,6 @@ def topology_data(
 
     for d in devices:
         ports_count = len(d.ports)
-        has_external_ip = any(
-            ip.address_type == IP_TYPE_EXTERNAL
-            for iface in d.interfaces
-            for ip in iface.ip_addresses
-        )
         has_wifi = len(d.wifi_networks) > 0
         is_wifi_client = any(
             iface.connected_wifi_network_id is not None
@@ -99,19 +63,7 @@ def topology_data(
                 if ssid not in wifi_client_ssids:
                     wifi_client_ssids.append(ssid)
 
-        has_rtsp = False
-        has_other_service = False
-        for svc in d.services:
-            proto = (svc.protocol or "").lower()
-            if proto == "rtsp":
-                has_rtsp = True
-            elif proto and proto != "ssh":
-                has_other_service = True
-
-        category, icon = _classify(
-            d, ports_count, has_external_ip, has_wifi,
-            has_rtsp, has_other_service,
-        )
+        category, icon = classify_device(d)
 
         # Prefer the IP flagged as primary; otherwise fall back to the
         # first non-empty address on any interface

@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import CONNECTION_TYPE_PHYSICAL
 from app.core.deps import require_admin, require_edit, require_site, require_user
+from app.core.device_classify import classify_device
 from app.core.exceptions import ValidationError
 from app.core.templating import render
 from app.core.utils import to_int
@@ -36,6 +37,28 @@ def list_connections(
     warning = request.session.pop("warning", None)
 
     wifi_nets = crud_wifi.list_by_site(db, site.id)
+    devices = crud_device.list_all(db, site.id)
+    location_groups_by_key: dict = {}
+    location_groups: list[dict] = []
+    for d in devices:
+        key = d.location.id if d.location else None
+        if key not in location_groups_by_key:
+            group = {"location": d.location, "devices": []}
+            location_groups_by_key[key] = group
+            location_groups.append(group)
+        _, icon = classify_device(d)
+        location_groups_by_key[key]["devices"].append({"device": d, "icon": icon})
+
+    for g in location_groups:
+        g["devices"].sort(key=lambda x: x["device"].hostname.lower())
+
+    location_groups.sort(
+        key=lambda g: (
+            (1, "") if g["location"] is None
+            else (0, g["location"].name.lower())
+        )
+    )
+
     wireless = []
     for w in wifi_nets:
         clients = []
@@ -64,6 +87,7 @@ def list_connections(
         current_site=site,
         connections=connections,
         wireless=wireless,
+        location_groups=location_groups,
         warning=warning,
     )
 
