@@ -30,15 +30,15 @@
 {% endmacro %}
 
 {% macro ip_badge(address, address_type) %}
-<span class="text-nowrap">
+<span class="ip-line">
 {%- if address_type == 'external' -%}
-<i class="fa-solid fa-globe text-primary me-1"></i>{% if address %}{{ address }}{% else %}DHCP{% endif %}
+{%- if address -%}<span class="ip-addr">{{ address }}</span><span class="ip-tag ip-tag-estat">ESTAT</span>{%- else -%}<span class="ip-addr"></span><span class="ip-tag ip-tag-edhcp">EDHCP</span>{%- endif -%}
 {%- elif address_type == 'reserved' -%}
-<i class="fa-solid fa-lock text-info me-1"></i>{{ address }}
+<span class="ip-addr">{{ address }}</span><span class="ip-tag ip-tag-lresv">LRESV</span>
 {%- elif address_type == 'dhcp' -%}
-<i class="fa-solid fa-bolt text-warning me-1"></i>{% if address %}{{ address }}{% else %}DHCP{% endif %}
+<span class="ip-addr"></span><span class="ip-tag ip-tag-ldhcp">LDHCP</span>
 {%- else -%}
-<i class="fa-solid fa-thumbtack text-secondary me-1"></i>{{ address }}
+<span class="ip-addr">{{ address }}</span><span class="ip-tag ip-tag-lstat">LSTAT</span>
 {%- endif -%}
 </span>
 {% endmacro %}

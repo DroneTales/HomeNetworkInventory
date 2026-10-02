@@ -568,10 +568,15 @@
     margin: 6px 0;
 }
 
+.dev-badges-row {
+    height: 18px;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+}
 .dev-badges {
     display: inline-flex;
     gap: 3px;
-    margin-left: 6px;
     vertical-align: middle;
 }
 .dev-badge {
@@ -712,4 +717,39 @@
 }
 .location-device .drag-handle:active {
     cursor: grabbing;
+}
+
+.dev-badges-inline {
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* IP type tags */
+.ip-tag {
+    display: inline-block;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    line-height: 14px;
+    vertical-align: middle;
+    border: 1px solid;
+}
+.ip-tag-lstat { background: #3f3f46; border-color: #71717a; color: #e4e4e7; }
+.ip-tag-ldhcp { background: #1e3a8a; border-color: #3b82f6; color: #bfdbfe; }
+.ip-tag-lresv { background: #4c1d95; border-color: #a78bfa; color: #ddd6fe; }
+.ip-tag-edhcp { background: #134e4a; border-color: #2dd4bf; color: #99f6e4; }
+.ip-tag-estat { background: #14532d; border-color: #22c55e; color: #bbf7d0; }
+
+/* IP line: address left, tag right */
+.ip-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+.ip-addr {
+    font-variant-numeric: tabular-nums;
 }
