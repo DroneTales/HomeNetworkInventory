@@ -10,7 +10,8 @@
 {% extends "base.html" %}
 {% from "_macros.html" import dash, delete_form with context %}
 
-{% block title %}{{ t('nav.connections') }}{% endblock %}
+{% block title %}{{ t('nav.connections') }}
+{% endblock %}
 
 {% block content %}
 {% if warning %}
@@ -204,7 +205,7 @@
 <div class="row g-3">
     {% for g in location_groups %}
     <div class="col-12 col-md-6 col-xl-4">
-        <div class="card info-card h-100">
+        <div class="card info-card h-100 location-group" data-location-id="{{ g.location.id if g.location else '' }}">
             <div class="card-header d-flex align-items-center">
                 {% if g.location %}
                 <i class="fa-solid fa-location-dot me-1"></i>
@@ -213,15 +214,19 @@
                 <i class="fa-solid fa-circle-question me-1"></i>
                 <span class="fw-bold">{{ t('connections.locations.undefined') }}</span>
                 {% endif %}
-                <span class="badge bg-secondary ms-2">{{ g.devices|length }}</span>
+                <span class="badge bg-secondary ms-2 location-count">{{ g.devices|length }}</span>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0 small">
                     {% for item in g.devices %}
                     {% set d = item.device %}
-                    <li class="py-1 d-flex justify-content-between align-items-center">
+                    <li class="py-1 d-flex justify-content-between align-items-center location-device" data-device-id="{{ d.id }}">
                         <a href="/devices/{{ d.id }}" class="text-decoration-none">
-                            <i class="fa-solid {{ item.icon }} text-muted me-1"></i>{{ d.hostname }}
+                            {% if current_user.role == 'admin' or current_user.can_edit %}
+                            <i class="fa-solid {{ item.icon }} text-muted me-1 drag-handle" draggable="true" title="{{ t('connections.locations.drag_hint') }}"></i>
+                            {% else %}
+                            <i class="fa-solid {{ item.icon }} text-muted me-1"></i>
+                            {% endif %}{{ d.hostname }}
                             {% if d.human_readable_name %}
                             <span class="text-muted">— {{ d.human_readable_name }}</span>
                             {% endif %}
@@ -239,5 +244,12 @@
 </div>
 {% endif %}
 
+<script>
+window.CONNECTIONS_LIST_CONFIG = {
+    successMsg: {{ t('connections.locations.move_success')|tojson }},
+    errorMsg: {{ t('connections.locations.move_error')|tojson }}
+};
+</script>
+<script src="/static/js/connections-list.js?v=1"></script>
 {% endblock %}
 

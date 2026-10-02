@@ -202,3 +202,19 @@ def delete(db: Session, device_id: int) -> None:
 
 def validate_full(db: Session, device: Device) -> None:
     _validate_consistency(db, device)
+
+def move_to_location(
+    db: Session,
+    device_id: int,
+    site_id: int,
+    location_id: int | None,
+) -> Device:
+    device = require_found(get_by_id(db, device_id, site_id=site_id), "Device")
+    if location_id is not None:
+        loc = require_found(db.get(Location, location_id), "Location", field="location_id")
+        if loc.site_id != site_id:
+            raise ValidationError("Location belongs to another site", field="location_id")
+    device.location_id = location_id
+    db.flush()
+    return device
+

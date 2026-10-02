@@ -309,5 +309,8 @@
   "connections.locations.title": "Устройства по локациям",
   "connections.locations.undefined": "Не определено",
   "connections.locations.empty": "Устройств пока нет.",
-  "connections.locations.count": "Устройства"
+  "connections.locations.count": "Устройства",
+  "connections.locations.move_success": "Устройство перемещено",
+  "connections.locations.move_error": "Не удалось переместить устройство",
+  "connections.locations.drag_hint": "Перетащите, чтобы сменить локацию"
 }

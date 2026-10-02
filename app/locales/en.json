@@ -309,5 +309,8 @@
   "connections.locations.title": "Devices by location",
   "connections.locations.undefined": "Undefined",
   "connections.locations.empty": "No devices yet.",
-  "connections.locations.count": "Devices"
+  "connections.locations.count": "Devices",
+  "connections.locations.move_success": "Device moved",
+  "connections.locations.move_error": "Failed to move device",
+  "connections.locations.drag_hint": "Drag to move to another location"
 }

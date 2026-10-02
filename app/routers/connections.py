@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.core.constants import CONNECTION_TYPE_PHYSICAL
@@ -263,6 +263,27 @@ def delete_connection(
     crud_connection.delete(db, connection_id)
     db.commit()
     return RedirectResponse("/connections", status_code=303)
+
+@router.post("/move-device")
+async def move_device(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_edit),
+    site: Site = Depends(require_site),
+):
+    payload = await request.json()
+    device_id = to_int(payload.get("device_id"))
+    raw_location_id = payload.get("location_id")
+    location_id = None if raw_location_id in (None, "", 0) else to_int(raw_location_id)
+
+    try:
+        crud_device.move_to_location(db, device_id=device_id, site_id=site.id, location_id=location_id)
+        db.commit()
+    except ValidationError as e:
+        db.rollback()
+        return JSONResponse({"ok": False, "error": e.message}, status_code=400)
+
+    return JSONResponse({"ok": True})
 
 def _devices_with_ports(db: Session, site_id: int) -> list[dict]:
     devices = crud_device.list_all(db, site_id)

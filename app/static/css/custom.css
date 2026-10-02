@@ -698,3 +698,18 @@
 .section-header i {
     color: var(--section-color, inherit);
 }
+
+/* Location drag-and-drop (Connections page) */
+.location-group.drop-target {
+    outline: 2px dashed var(--bs-primary);
+    outline-offset: -4px;
+}
+.location-device.dragging {
+    opacity: 0.5;
+}
+.location-device .drag-handle {
+    cursor: grab;
+}
+.location-device .drag-handle:active {
+    cursor: grabbing;
+}
