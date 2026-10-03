@@ -665,7 +665,7 @@ def _form_context(db: Session, site_id: int) -> dict:
         "vendors": crud_vendor.list_all(db),
         "locations": crud_location.list_all(db, site_id),
         "networks": crud_network.list_all(db, site_id),
-        "all_wifi_networks": crud_wifi.list_all(db),
+        "all_wifi_networks": crud_wifi.list_by_site(db, site_id),
         "credential_types": crud_cred_type.list_all(db),
         "all_devices": crud_device.list_all(db, site_id),
     }

@@ -69,6 +69,12 @@ def create(
     else:
         mac = None
 
+    if type == IFACE_TYPE_WIFI and connected_wifi_network_id is None:
+        raise ValidationError(
+            "Wi-Fi interface must be connected to a Wi-Fi network",
+            field="connected_wifi_network_id",
+        )
+
     if connected_wifi_network_id is not None:
         if type != IFACE_TYPE_WIFI:
             raise ValidationError(
@@ -117,6 +123,12 @@ def update(
         _check_mac_unique(db, mac, exclude_id=interface_id)
     else:
         mac = None
+
+    if type == IFACE_TYPE_WIFI and connected_wifi_network_id is None:
+        raise ValidationError(
+            "Wi-Fi interface must be connected to a Wi-Fi network",
+            field="connected_wifi_network_id",
+        )
 
     if connected_wifi_network_id is not None:
         if type != IFACE_TYPE_WIFI:
