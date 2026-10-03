@@ -62,6 +62,7 @@
     <ul>
         <li><strong>Devices</strong> — устройства текущего дома (главный раздел).</li>
         <li><strong>Connections</strong> — связи между устройствами текущего дома.</li>
+        <li><strong>Topology</strong> — визуальный граф текущего дома (открывается со страницы Connections).</li>
         <li><strong>Reference</strong> — справочники. Только для пользователей с правом редактирования.</li>
         <li><strong>Users</strong> — управление пользователями приложения. Только для admin.</li>
         <li><strong>Profile</strong> — свой профиль: язык, тема, смена пароля.</li>
@@ -75,8 +76,27 @@
     <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-desktop me-2 text-primary"></i>5. Устройства</h2>
 
     <h3 class="h6 mt-3">5.1. Список устройств</h3>
-    <p>Показывает все устройства <strong>текущего дома</strong> в виде таблицы (на десктопе) или карточек (на телефоне). Колонки: Hostname, Name, Type, Vendor, Model, Location, Local IP, Gateway, MAC, Actions.</p>
-    <p>Устройства отсортированы <strong>по IP-адресу</strong>. Устройства без IP — в конце. Неактивные показываются серым с бейджем <code>inactive</code>.</p>
+    <p>Показывает все устройства <strong>текущего дома</strong> в виде таблицы (на десктопе) или карточек (на телефоне). Колонки: Hostname, Name, Type, Vendor, Model, Location, IP Addresses, Gateway, MAC, Actions. Клик по заголовку колонки сортирует список; повторный — меняет порядок на обратный.</p>
+    <p>Неактивные устройства показываются серым с бейджем <code>inactive</code>.</p>
+
+    <p><strong>Бейджи состояния.</strong> Под hostname, на второй строке, показываются маленькие цветные бейджи — краткая сводка по устройству (при наведении — подсказка):</p>
+    <ul>
+        <li><i class="fa-solid fa-network-wired"></i> — устройство является DHCP-сервером.</li>
+        <li><i class="fa-solid fa-plug"></i> с числом — количество физических портов (показывается, если их больше одного).</li>
+        <li><i class="fa-solid fa-right-left"></i> — у устройства есть исходящие пробросы портов.</li>
+        <li><i class="fa-solid fa-right-to-bracket"></i> — у устройства есть входящие пробросы портов.</li>
+        <li><i class="fa-solid fa-server"></i> с числом — количество сервисов на устройстве.</li>
+    </ul>
+    <p>Если бейджей нет, под hostname остаётся пустая строка такой же высоты — чтобы строки таблицы оставались выровненными.</p>
+
+    <p><strong>IP-адреса.</strong> Все адреса устройства перечислены построчно. Справа от каждого адреса — короткая метка типа:</p>
+    <ul>
+        <li><code>LSTAT</code> — локальный статический адрес (серый).</li>
+        <li><code>LDHCP</code> — локальный DHCP-адрес, пока неизвестен (синий).</li>
+        <li><code>LRESV</code> — локальный адрес, закреплённый на DHCP-сервере за MAC (фиолетовый).</li>
+        <li><code>EDHCP</code> — внешний (от провайдера) адрес, выданный динамически, пока неизвестен (бирюзовый).</li>
+        <li><code>ESTAT</code> — внешний (от провайдера) статический адрес (зелёный).</li>
+    </ul>
 
     <h3 class="h6 mt-3">5.2. Создание устройства</h3>
     <p>Кнопка <strong>Add device</strong> в правом верхнем углу. Форма разбита на цветные блоки.</p>
@@ -182,15 +202,41 @@
     <p>Кнопка <strong>Add connection</strong>. Сначала выбери <strong>устройство</strong>, потом <strong>порт</strong> этого устройства — в Source и в Target. В выпадающих списках только устройства и порты текущего дома.</p>
     <p>Дополнительные поля: <strong>Type</strong> (<code>physical</code> или <code>logical</code>), <strong>Cable</strong> (цвет или тип), <strong>Description</strong>, <strong>Active</strong>.</p>
 
-    <h3 class="h6 mt-3">6.2. Ограничения</h3>
+    <h3 class="h6 mt-3">6.2. Редактирование связи</h3>
+    <p>Нажми иконку карандаша в колонке Actions (на десктопе) или кнопку <strong>Edit</strong> на мобильной карточке. Используется та же форма, что и при создании, но заполненная текущими значениями. Правила уникальности (см. ниже) действуют и при редактировании — редактируемая связь исключается из проверки.</p>
+
+    <h3 class="h6 mt-3">6.3. Ограничения</h3>
     <ul>
         <li>Source и Target не могут быть одним и тем же портом.</li>
         <li>Связь A→B и B→A — <strong>одна и та же физическая связь</strong>. Дубликаты запрещены.</li>
+        <li>Один физический порт может участвовать только в <strong>одной</strong> связи.</li>
         <li>Оба порта должны быть из устройств <strong>одного дома</strong>. Межсайтовые связи не допускаются.</li>
         <li>Двойной клик по Delete безопасен — второй запрос тихо проигнорируется.</li>
     </ul>
 
-    <h3 class="h6 mt-3">6.3. Связи в карточке устройства</h3>
+    <h3 class="h6 mt-3">6.4. Wi-Fi-сети</h3>
+    <p>Под основной таблицей — блок <strong>Wi-Fi networks</strong> со списком всех беспроводных сетей текущего дома и подключённых клиентов. Для каждой сети:</p>
+    <ul>
+        <li>В заголовке — SSID, диапазон (2.4/5/6 ГГц), бейдж <code>guest</code> при необходимости и число клиентов.</li>
+        <li>Справа в заголовке — ссылка на устройство-вещатель (роутер или точка доступа).</li>
+        <li>В теле карточки — список клиентских устройств, подключённых к сети.</li>
+    </ul>
+    <p>Сеть показывается только если у неё есть хотя бы один подключённый клиент.</p>
+
+    <h3 class="h6 mt-3">6.5. Устройства по локациям — drag &amp; drop</h3>
+    <p>Внизу страницы — блок <strong>Devices by location</strong>, группирующий все устройства текущего дома по справочнику <em>Location</em>. Устройства без локации попадают в группу <strong>Undefined</strong>, она показывается последней.</p>
+    <p>Пользователи с правом редактирования могут <strong>перетаскивать устройства между локациями</strong>:</p>
+    <ul>
+        <li>Наведи курсор на иконку типа устройства — курсор сменится на «ладонь».</li>
+        <li>Перетащи иконку на карточку другой локации.</li>
+        <li>Карточка-цель подсвечивается пунктирной рамкой, пока ты над ней.</li>
+        <li>Отпусти — устройство перемещается, а <code>location_id</code> обновляется в базе сразу, без перезагрузки страницы.</li>
+        <li>Отпустить на группу <strong>Undefined</strong> — очистить локацию устройства.</li>
+        <li>Всплывающее уведомление подтверждает успех или сообщает об ошибке.</li>
+    </ul>
+    <p>Перенос между домами невозможен — устройство можно перетащить только в локацию своего дома.</p>
+
+    <h3 class="h6 mt-3">6.6. Связи в карточке устройства</h3>
     <p>Блок <strong>Connections</strong> в карточке показывает:</p>
     <ul>
         <li><span class="text-success"><i class="fa-solid fa-arrow-right"></i> outgoing</span> — связи, где это устройство источник.</li>
@@ -198,8 +244,63 @@
     </ul>
 </section>
 
+<section id="topology" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-diagram-project me-2 text-primary"></i>7. Топология</h2>
+    <p>Страница <strong>Topology</strong> показывает визуальную карту текущего дома. Открывается кнопкой <strong>Map</strong> на странице Connections.</p>
+
+    <h3 class="h6 mt-3">7.1. Что отображается</h3>
+    <ul>
+        <li>Устройства сгруппированы в контейнеры: <strong>Home</strong> → <strong>Locations</strong> → <strong>Devices</strong>.</li>
+        <li>Устройства без локации обведены <strong>оранжевой рамкой</strong> и находятся вне блоков локаций.</li>
+        <li>Узел устройства показывает иконку категории и hostname. Цвет иконки зависит от категории (модем, хаб, Wi-Fi-роутер, Wi-Fi-точка доступа, роутер, камера, видеосервер, сервер, прочее).</li>
+        <li>Физические и логические связи между устройствами показаны рёбрами (на уровне устройств, без учёта конкретных портов).</li>
+        <li>Wi-Fi-связи: у вещателя — бейдж Wi-Fi, у клиента — бейдж с SSID.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">7.2. Управление</h3>
+    <ul>
+        <li><strong>Fit</strong> — вписать весь граф в окно.</li>
+        <li><strong>Back to Connections</strong> — вернуться к списку связей.</li>
+        <li><strong>Legend</strong> — переключить легенду в углу.</li>
+        <li><strong>Клик по устройству</strong> — открыть боковую панель с портами, интерфейсами и IP-адресами.</li>
+        <li><strong>Колесо мыши / жесты</strong> — масштаб; <strong>перетаскивание фона</strong> — панорама.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">7.3. Примечания</h3>
+    <ul>
+        <li>Граф только для чтения — позиции узлов не сохраняются (пересчитываются при каждой загрузке).</li>
+        <li>Показываются только устройства <strong>текущего дома</strong>.</li>
+    </ul>
+</section>
+
+<section id="port_forwards" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-right-left me-2 text-primary"></i>8. Проброс портов</h2>
+    <p>Правила проброса портов редактируются прямо в <strong>форме устройства</strong>, в блоке <strong>Port forwarding</strong>. Блок доступен только для устройств, тип которых поддерживает проброс (<em>Supports port forwarding</em> в справочнике Device Types).</p>
+
+    <h3 class="h6 mt-3">8.1. Поля</h3>
+    <ul>
+        <li><strong>External port start</strong>, <strong>External port end</strong> — диапазон портов снаружи.</li>
+        <li><strong>Protocol</strong> — <code>tcp</code>, <code>udp</code> или <code>both</code>.</li>
+        <li><strong>Target</strong> — либо <strong>устройство</strong> текущего дома, либо <strong>IP вручную</strong> (для устройства, которого ещё нет в инвентаре).</li>
+        <li><strong>Internal port start</strong>, <strong>Internal port end</strong> — диапазон портов на внутреннем хосте.</li>
+        <li><strong>Description</strong> — короткое описание.</li>
+        <li><strong>Active</strong> — отключить вместо удаления, удобно при отладке.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.2. Ограничения</h3>
+    <ul>
+        <li>Правило нацелено либо на устройство, либо на IP вручную — не на оба сразу.</li>
+        <li>Целевое устройство должно быть из <strong>того же дома</strong>, что и роутер.</li>
+        <li>В бейдже в списке устройств учитываются только <strong>активные</strong> правила.</li>
+        <li><code>both</code> означает, что правило покрывает TCP и UDP на одном диапазоне портов.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.3. Входящие пробросы в карточке устройства</h3>
+    <p>Если устройство является <em>целью</em> правил проброса другого устройства, эти правила показываются в отдельном блоке на его странице — так видно, какие порты и откуда открыты.</p>
+</section>
+
 <section id="reference" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-book me-2 text-primary"></i>7. Справочники</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-book me-2 text-primary"></i>9. Справочники</h2>
     <p>Раздел <strong>Reference</strong> — список справочников. Доступен пользователям с правом редактирования. Часть справочников привязана к дому, часть — глобальные.</p>
 
     <p><strong>Привязаны к дому</strong> (доступны всем с правом <em>Can edit</em>):</p>
@@ -224,7 +325,7 @@
 </section>
 
 <section id="users" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-users me-2 text-primary"></i>8. Пользователи</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-users me-2 text-primary"></i>10. Пользователи</h2>
     <p>Раздел <strong>Users</strong> доступен только администратору.</p>
 
     <h3 class="h6 mt-3">8.1. Роли</h3>
@@ -264,7 +365,7 @@
 </section>
 
 <section id="profile" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-user-gear me-2 text-primary"></i>9. Профиль</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-user-gear me-2 text-primary"></i>11. Профиль</h2>
     <p>Раздел <strong>Profile</strong> — твоя личная страница.</p>
     <ul>
         <li><strong>Account</strong> — имя, роль, права.</li>
@@ -274,7 +375,7 @@
 </section>
 
 <section id="permissions" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>10. Права и роли</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>12. Права и роли</h2>
     <p><strong>Admin</strong> видит всё и может всё.</p>
     <p><strong>User</strong> видит:</p>
     <ul>
@@ -288,12 +389,14 @@
 </section>
 
 <section id="tips" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-lightbulb me-2 text-primary"></i>11. Полезные советы</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-lightbulb me-2 text-primary"></i>13. Полезные советы</h2>
     <ul>
         <li><strong>Сначала дома.</strong> Перед созданием устройств заведи дом (если у тебя их несколько). Админ создаёт дома на странице выбора.</li>
         <li><strong>Потом справочники.</strong> Внутри дома заполни локации и сети. Глобальные справочники (типы, вендоры, модели, credential-типы) — один раз для всех домов.</li>
         <li><strong>Порты — при редактировании.</strong> Создай устройство с интерфейсами, сохрани, открой Edit, добавь порты.</li>
-        <li><strong>Тип IP-адреса:</strong> <code>static</code> — вручную, <code>dhcp</code> — автоматически, <code>reserved</code> — за MAC, <code>external</code> — от провайдера.</li>
+        <li><strong>Тип IP-адреса:</strong> <code>static</code> — вручную, <code>dhcp</code> — автоматически, <code>reserved</code> — за MAC, <code>external</code> — от провайдера. В списке устройств рядом с адресом показывается короткая метка: <code>LSTAT</code>, <code>LDHCP</code>, <code>LRESV</code>, <code>EDHCP</code>, <code>ESTAT</code>.</li>
+        <li><strong>Быстрый перенос устройств между локациями.</strong> На странице Connections в блоке <em>Devices by location</em> перетащи иконку типа устройства на карточку другой локации — устройство переедет мгновенно. Перетаскивание на <em>Undefined</em> очищает локацию.</li>
+        <li><strong>Топология как проверка.</strong> Открой граф, чтобы найти устройства без связей, локации без жильцов или Wi-Fi-клиентов, не привязанных ни к одной сети.</li>
         <li><strong>Внешний IP модема</strong> добавляется как отдельный интерфейс типа <code>wan</code> с типом адреса <code>external</code>. Маска, шлюз, MAC можно не указывать.</li>
         <li><strong>Wi-Fi: раздача vs подключение.</strong> Сети, которые устройство раздаёт — в блоке Wi-Fi networks. Подключение — в интерфейсе типа <code>wifi</code> через поле Connected Wi-Fi network.</li>
         <li><strong>Предупреждение про DHCP.</strong> Если <code>static</code> IP попал в диапазон пула — жёлтый баннер. Это не ошибка, но проверь на конфликт.</li>
@@ -302,7 +405,7 @@
 </section>
 
 <section id="problems" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-triangle-exclamation me-2 text-primary"></i>12. Возможные проблемы</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-triangle-exclamation me-2 text-primary"></i>14. Возможные проблемы</h2>
 
     <p><strong>«Safari не может найти страницу».</strong> Редко. Это особенность Safari с долгими паузами между открытием формы и сохранением. Нажми Back и сохрани заново — сработает.</p>
 
@@ -322,7 +425,7 @@
 </section>
 
 <section id="hotkeys" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-keyboard me-2 text-primary"></i>13. Горячие клавиши</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-keyboard me-2 text-primary"></i>15. Горячие клавиши</h2>
     <ul>
         <li><strong>Cmd+Shift+R</strong> (Mac) / <strong>Ctrl+Shift+R</strong> (Windows) — жёсткая перезагрузка страницы. Полезно после обновлений.</li>
         <li><strong>Cmd+Shift+N</strong> (Safari) — приватное окно. Помогает, если браузер кэширует старое.</li>

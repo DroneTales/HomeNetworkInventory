@@ -62,6 +62,7 @@
     <ul>
         <li><strong>Devices</strong> — devices in the current home (the main section).</li>
         <li><strong>Connections</strong> — links between devices in the current home.</li>
+        <li><strong>Topology</strong> — a visual graph of the current home (opened from the Connections page).</li>
         <li><strong>Reference</strong> — reference data. Only for users with edit rights.</li>
         <li><strong>Users</strong> — application user management. Admin only.</li>
         <li><strong>Profile</strong> — your profile: language, theme, password change.</li>
@@ -75,8 +76,27 @@
     <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-desktop me-2 text-primary"></i>5. Devices</h2>
 
     <h3 class="h6 mt-3">5.1. Device list</h3>
-    <p>Shows all devices of the <strong>current home</strong> as a table (desktop) or cards (mobile). Columns: Hostname, Name, Type, Vendor, Model, Location, Local IP, Gateway, MAC, Actions.</p>
-    <p>Devices are sorted <strong>by IP address</strong>. Devices without an IP appear at the end. Inactive devices are greyed out with an <code>inactive</code> badge.</p>
+    <p>Shows all devices of the <strong>current home</strong> as a table (desktop) or cards (mobile). Columns: Hostname, Name, Type, Vendor, Model, Location, IP Addresses, Gateway, MAC, Actions. Click any column header to sort; click again to reverse.</p>
+    <p>Inactive devices are greyed out with an <code>inactive</code> badge.</p>
+
+    <p><strong>Status badges.</strong> Under the hostname, on a second line, small coloured badges summarise the device at a glance (hover for a tooltip):</p>
+    <ul>
+        <li><i class="fa-solid fa-network-wired"></i> — the device is a DHCP server.</li>
+        <li><i class="fa-solid fa-plug"></i> with a number — number of physical ports (shown when more than one).</li>
+        <li><i class="fa-solid fa-right-left"></i> — the device has outgoing port forwards.</li>
+        <li><i class="fa-solid fa-right-to-bracket"></i> — the device has incoming port forwards.</li>
+        <li><i class="fa-solid fa-server"></i> with a number — number of services running on the device.</li>
+    </ul>
+    <p>If a device has no badges, an empty line of the same height is reserved so that rows stay aligned.</p>
+
+    <p><strong>IP addresses.</strong> All addresses of the device are listed, one per line. Each address carries a short type tag on the right:</p>
+    <ul>
+        <li><code>LSTAT</code> — local static address (grey).</li>
+        <li><code>LDHCP</code> — local DHCP address, not yet known (blue).</li>
+        <li><code>LRESV</code> — local address reserved on the DHCP server by MAC (purple).</li>
+        <li><code>EDHCP</code> — external (ISP) address, assigned dynamically, not yet known (teal).</li>
+        <li><code>ESTAT</code> — external (ISP) static address (green).</li>
+    </ul>
 
     <h3 class="h6 mt-3">5.2. Creating a device</h3>
     <p>Use the <strong>Add device</strong> button in the top-right corner. The form is split into colour-coded blocks.</p>
@@ -182,15 +202,41 @@
     <p>Click <strong>Add connection</strong>. First choose a <strong>device</strong>, then a <strong>port</strong> of that device — for both Source and Target. Dropdowns show only devices and ports of the current home.</p>
     <p>Additional fields: <strong>Type</strong> (<code>physical</code> or <code>logical</code>), <strong>Cable</strong> (colour or type), <strong>Description</strong>, <strong>Active</strong>.</p>
 
-    <h3 class="h6 mt-3">6.2. Rules</h3>
+    <h3 class="h6 mt-3">6.2. Editing a connection</h3>
+    <p>Click the pencil icon in the Actions column (desktop) or the <strong>Edit</strong> button on the mobile card. The same form is reused, pre-filled with the current values. The uniqueness rules below apply on edit as well — the connection being edited is excluded from the check.</p>
+
+    <h3 class="h6 mt-3">6.3. Rules</h3>
     <ul>
         <li>Source and Target cannot be the same port.</li>
         <li>A→B and B→A are the <strong>same physical connection</strong>. Duplicates are not allowed.</li>
+        <li>One physical port can participate in only <strong>one</strong> connection.</li>
         <li>Both ports must belong to devices of the <strong>same home</strong>. Cross-home links are not permitted.</li>
         <li>Double-clicking Delete is safe — the second request is silently ignored.</li>
     </ul>
 
-    <h3 class="h6 mt-3">6.3. Connections on the device page</h3>
+    <h3 class="h6 mt-3">6.4. Wi-Fi networks</h3>
+    <p>Below the main table, a <strong>Wi-Fi networks</strong> block lists all wireless networks of the current home with their connected clients. For each network:</p>
+    <ul>
+        <li>The header shows the SSID, the band (2.4/5/6 GHz), a <code>guest</code> badge if applicable, and the number of clients.</li>
+        <li>On the right of the header — a link to the broadcasting device (router or access point).</li>
+        <li>The card body lists the client devices currently connected to the network.</li>
+    </ul>
+    <p>A network is only shown if it has at least one connected client.</p>
+
+    <h3 class="h6 mt-3">6.5. Devices by location — drag &amp; drop</h3>
+    <p>At the bottom of the page, a <strong>Devices by location</strong> block groups all devices of the current home by their <em>Location</em> reference. Devices without a location go into the <strong>Undefined</strong> group, shown last.</p>
+    <p>Users with edit rights can <strong>drag a device to another location</strong>:</p>
+    <ul>
+        <li>Hover over the device type icon — the cursor changes to a grab hand.</li>
+        <li>Drag the icon onto another location card.</li>
+        <li>The target card is highlighted with a dashed outline while you hover over it.</li>
+        <li>Drop — the device is moved and the <code>location_id</code> is updated in the database immediately, without reloading the page.</li>
+        <li>Dropping into the <strong>Undefined</strong> group clears the device location.</li>
+        <li>A toast confirms success or reports an error.</li>
+    </ul>
+    <p>Cross-home moves are not possible — a device can only be moved to a location of its own home.</p>
+
+    <h3 class="h6 mt-3">6.6. Connections on the device page</h3>
     <p>The <strong>Connections</strong> block on the device page shows:</p>
     <ul>
         <li><span class="text-success"><i class="fa-solid fa-arrow-right"></i> outgoing</span> — connections where this device is the source.</li>
@@ -198,8 +244,63 @@
     </ul>
 </section>
 
+<section id="topology" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-diagram-project me-2 text-primary"></i>7. Topology</h2>
+    <p>The <strong>Topology</strong> page shows a visual map of the current home. Open it from the <strong>Map</strong> button on the Connections page.</p>
+
+    <h3 class="h6 mt-3">7.1. What is shown</h3>
+    <ul>
+        <li>Devices are grouped into compound containers: <strong>Home</strong> → <strong>Locations</strong> → <strong>Devices</strong>.</li>
+        <li>Devices without a location are outlined in <strong>orange</strong> and placed outside the location frames.</li>
+        <li>Each device node shows a category icon and the hostname. The icon colour depends on the device category (modem, hub, Wi-Fi router, Wi-Fi access point, router, camera, video server, server, other).</li>
+        <li>Physical and logical connections between devices are drawn as edges (device-level, ignoring individual ports).</li>
+        <li>Wi-Fi relationships: broadcasters get a Wi-Fi badge; clients connected to a Wi-Fi network get a client badge with the SSID.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">7.2. Controls</h3>
+    <ul>
+        <li><strong>Fit</strong> — fit the whole graph into the viewport.</li>
+        <li><strong>Back to Connections</strong> — return to the Connections list.</li>
+        <li><strong>Legend</strong> — toggle the colour legend in the corner.</li>
+        <li><strong>Click a device</strong> — opens the side panel with the device's ports, interfaces, and IP addresses.</li>
+        <li><strong>Mouse wheel / pinch</strong> — zoom; <strong>drag the background</strong> — pan.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">7.3. Notes</h3>
+    <ul>
+        <li>The graph is read-only — nodes cannot be moved permanently (their positions are recalculated on every load).</li>
+        <li>Only devices of the <strong>current home</strong> are shown.</li>
+    </ul>
+</section>
+
+<section id="port_forwards" class="mb-4">
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-right-left me-2 text-primary"></i>8. Port forwarding</h2>
+    <p>Port forwarding rules are edited directly inside the <strong>device form</strong> — in the <strong>Port forwarding</strong> block. This is only available for devices whose type supports port forwarding (<em>Supports port forwarding</em> in the device type reference).</p>
+
+    <h3 class="h6 mt-3">8.1. Fields</h3>
+    <ul>
+        <li><strong>External port start</strong>, <strong>External port end</strong> — the port range on the outside.</li>
+        <li><strong>Protocol</strong> — <code>tcp</code>, <code>udp</code>, or <code>both</code>.</li>
+        <li><strong>Target</strong> — either a <strong>device</strong> of the current home, or a <strong>manual IP</strong> (for a device not yet in the inventory).</li>
+        <li><strong>Internal port start</strong>, <strong>Internal port end</strong> — the port range on the internal host.</li>
+        <li><strong>Description</strong> — a short note.</li>
+        <li><strong>Active</strong> — disable instead of delete when troubleshooting.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.2. Rules</h3>
+    <ul>
+        <li>A rule can target either a device or a manual IP, not both.</li>
+        <li>The target device must belong to the <strong>same home</strong> as the router.</li>
+        <li>Only <strong>active</strong> rules are counted in the badge on the device list.</li>
+        <li><code>both</code> means the rule covers TCP and UDP on the same port range.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">8.3. Incoming forwards on the device page</h3>
+    <p>If a device is the <em>target</em> of another device's forwarding rules, the incoming rules are shown on the target device page in a separate block — so you can see at a glance which ports are exposed and from where.</p>
+</section>
+
 <section id="reference" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-book me-2 text-primary"></i>7. Reference</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-book me-2 text-primary"></i>9. Reference</h2>
     <p>The <strong>Reference</strong> section lists all reference data. Accessible to users with edit rights. Some lists are per home, some are global.</p>
 
     <p><strong>Per home</strong> (available to anyone with <em>Can edit</em>):</p>
@@ -224,7 +325,7 @@
 </section>
 
 <section id="users" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-users me-2 text-primary"></i>8. Users</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-users me-2 text-primary"></i>10. Users</h2>
     <p>The <strong>Users</strong> section is available to the administrator only.</p>
 
     <h3 class="h6 mt-3">8.1. Roles</h3>
@@ -264,7 +365,7 @@
 </section>
 
 <section id="profile" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-user-gear me-2 text-primary"></i>9. Profile</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-user-gear me-2 text-primary"></i>11. Profile</h2>
     <p>The <strong>Profile</strong> section is your personal page.</p>
     <ul>
         <li><strong>Account</strong> — name, role, permissions.</li>
@@ -274,7 +375,7 @@
 </section>
 
 <section id="permissions" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>10. Permissions and roles</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-shield-halved me-2 text-primary"></i>12. Permissions and roles</h2>
     <p><strong>Admin</strong> sees everything and can do everything.</p>
     <p><strong>User</strong> can see:</p>
     <ul>
@@ -288,12 +389,14 @@
 </section>
 
 <section id="tips" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-lightbulb me-2 text-primary"></i>11. Tips</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-lightbulb me-2 text-primary"></i>13. Tips</h2>
     <ul>
         <li><strong>Homes first.</strong> Before creating devices, add a home (if you have more than one). Admins create homes on the home selection page.</li>
         <li><strong>Then reference data.</strong> Inside a home, fill in locations and networks. Global reference lists (device types, vendors, models, credential types) are shared across all homes.</li>
         <li><strong>Ports are added on edit.</strong> Create the device with interfaces, save, open Edit, then add ports.</li>
-        <li><strong>IP address type:</strong> <code>static</code> — manual, <code>dhcp</code> — automatic, <code>reserved</code> — bound to MAC, <code>external</code> — from the ISP.</li>
+        <li><strong>IP address type:</strong> <code>static</code> — manual, <code>dhcp</code> — automatic, <code>reserved</code> — bound to MAC, <code>external</code> — from the ISP. In the device list each address shows a short tag: <code>LSTAT</code>, <code>LDHCP</code>, <code>LRESV</code>, <code>EDHCP</code>, <code>ESTAT</code>.</li>
+        <li><strong>Move devices between locations quickly.</strong> On the Connections page, drag the device type icon in the <em>Devices by location</em> block onto another location card — the device moves instantly. Drop onto <em>Undefined</em> to clear its location.</li>
+        <li><strong>Topology as a sanity check.</strong> Open the graph to spot devices with no connections, unassigned locations, or Wi-Fi clients not attached to any network.</li>
         <li><strong>External IP of a modem</strong> is added as a separate interface of type <code>wan</code> with address type <code>external</code>. Mask, gateway, and MAC can be left blank.</li>
         <li><strong>Wi-Fi: broadcasting vs connecting.</strong> Networks the device broadcasts go into the Wi-Fi networks block. Connections to an existing network go into a <code>wifi</code> interface via the Connected Wi-Fi network field.</li>
         <li><strong>DHCP warning.</strong> If a <code>static</code> IP falls into a pool range, a yellow banner appears. This is a warning, not an error, but check for conflicts.</li>
@@ -302,7 +405,7 @@
 </section>
 
 <section id="problems" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-triangle-exclamation me-2 text-primary"></i>12. Troubleshooting</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-triangle-exclamation me-2 text-primary"></i>14. Troubleshooting</h2>
 
     <p><strong>"Safari cannot open the page".</strong> Rare. This is a Safari quirk with long pauses between opening a form and submitting. Press Back and save again — it should work.</p>
 
@@ -322,7 +425,7 @@
 </section>
 
 <section id="hotkeys" class="mb-4">
-    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-keyboard me-2 text-primary"></i>13. Hotkeys</h2>
+    <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-keyboard me-2 text-primary"></i>15. Hotkeys</h2>
     <ul>
         <li><strong>Cmd+Shift+R</strong> (Mac) / <strong>Ctrl+Shift+R</strong> (Windows) — hard reload. Useful after updates.</li>
         <li><strong>Cmd+Shift+N</strong> (Safari) — private window. Helps when the browser caches stale content.</li>
