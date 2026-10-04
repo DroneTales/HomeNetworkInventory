@@ -2,8 +2,8 @@
 
 A self-hosted web application for tracking devices on a home network. It stores
 information about devices, their network interfaces, IP addresses, Wi-Fi
-networks, physical ports, credentials, services, port forwarding rules, and
-connections between devices.
+networks, physical ports, credentials, services, and connections between
+devices.
 
 Supports **multiple homes** — an apartment, a country house, an office — each
 with its own isolated inventory.
@@ -25,39 +25,26 @@ inventory clean and searchable.
   - Per-user assignment
   - Delete a home only when it is empty
 - **Devices** — full inventory with a colour-coded device page:
-  - basic info (hostname, type, vendor, model, location, network)
+  - basic info (hostname, type, vendor, model, location)
   - network interfaces (Ethernet, Wi-Fi, WAN, virtual, physical ports)
-  - IP addresses with four address types: `static`, `dhcp`, `reserved`, `external`.
-    External addresses may be static (with an explicit IP) or dynamic (address
-    assigned by the ISP, IP unknown)
+  - IP addresses with four address types: `static`, `dhcp`, `reserved`, `external`
   - physical ports (WAN, LAN1, LAN2, …) mapped to interfaces
   - Wi-Fi networks the device broadcasts (SSID, band, encryption, password)
-  - Wi-Fi clients (devices connected to this device as a Wi-Fi client)
   - DHCP pools the device serves
   - credentials (admin, ssh, wifi, camera, matter, other)
   - services (web UI, RTSP streams, HomeBridge, etc.)
   - free-form remarks
-  - all sections render only when they contain data — the card stays compact
+- **Networks per interface** — a device can belong to several logical
+  networks at once, because network membership is a property of each
+  interface, not of the device. A router with LAN, WAN, and guest Wi-Fi has
+  interfaces in three networks; a passive hub has none. In the device form,
+  interfaces are grouped by network, and each group has its own
+  **Add interface** button. Networks are logical: two networks may share the
+  same CIDR but have different gateways (for example, `Home` on
+  `192.168.1.1/24` and `Work` on `192.168.1.2/24`).
 - **Connections** — physical and logical links between device ports, with
   cable colour/type and description. Bidirectional: a connection shows up on
-  both device pages. Cross-home links are not permitted. A physical port can
-  participate in only one connection. Connections can be created, edited,
-  and deleted.
-- **Port forwarding** — rules per device with external port range, protocol
-  (`tcp` / `udp` / `both`), and internal target (device + port, or manual IP).
-  Overlap detection rejects conflicting rules on the same device. Incoming
-  rules (rules from other devices that target this device) are shown on the
-  device page.
-- **Network topology** — an interactive graph of the whole home, rendered with
-  Cytoscape.js:
-  - compound nodes: home → locations → devices
-  - devices that are not assigned to a location appear in an "Unassigned"
-    group with an orange outline
-  - HTML device icons and category colours
-  - Wi-Fi badges, port counts, primary IP on hover
-  - side panel with device details and its ports when a node is selected
-  - click a port in the side panel to highlight the target device
-  - fit / back controls, category legend
+  both device pages. Cross-home links are not permitted.
 - **Reference** — locations and networks per home, editable by any user with
   `Can edit`. Global lists (device types, vendors, models, credential types)
   are shared across all homes and can only be changed by admins. Full CRUD
@@ -67,10 +54,8 @@ inventory clean and searchable.
   - `Can edit` — create, edit, delete devices and connections
   - `Can view passwords` — see device passwords
   - `Can change passwords` — change existing device passwords
-  - `Can change own password` — allow the user to change their own account
-    password from the profile page
 - **Profile** — per-user language (English / Russian) and theme
-  (Auto / Light / Dark), plus optional change of own password.
+  (Auto / Light / Dark).
 - **Help** — built-in guide with a table of contents, in English and Russian.
 
 ## Screenshots
@@ -82,10 +67,6 @@ inventory clean and searchable.
 ### Device page
 
 ![Device page](docs/screenshots/03-device-view.png)
-
-### Topology
-
-![Topology](docs/screenshots/07-topology.png)
 
 ### Connections
 
@@ -99,7 +80,6 @@ More screenshots are in [`docs/screenshots/`](docs/screenshots/).
 - **Database**: SQLite
 - **Templating**: Jinja2
 - **Frontend**: Bootstrap 5 (CDN), Font Awesome 6 (CDN), vanilla JS
-- **Graph**: Cytoscape.js + fcose + node-html-label (CDN)
 - **Server**: Uvicorn
 - **Sessions**: signed cookie via `itsdangerous` and Starlette's `SessionMiddleware`
 - **Auth**: bcrypt password hashing for application users; device passwords are
@@ -175,7 +155,10 @@ python -c "import secrets; print(secrets.token_urlsafe(48))"
 6. Inside the home, populate **Reference** — locations and networks. Add
    global reference data once (device types, vendors, models, credential
    types) — it is shared across all homes.
-7. Start adding devices.
+7. Start adding devices. In the device form, interfaces are grouped by
+   network, so assign each interface to a network by adding it under the
+   corresponding group. Interfaces that do not belong to any network go
+   into the **No network** group.
 
 ## Project structure
 
@@ -187,22 +170,19 @@ HomeNetworkInventory/
 │   ├── database.py         # SQLAlchemy engine, session, Base
 │   ├── core/               # Cross-cutting utilities
 │   │   ├── bootstrap.py    # Creates the default Admin user on first run
-│   │   ├── constants.py    # Shared constants (roles, types, protocols)
 │   │   ├── deps.py         # FastAPI dependencies (current_user, require_site, …)
 │   │   ├── exceptions.py   # ValidationError
 │   │   ├── i18n.py         # Language detection and translation
 │   │   ├── middleware.py   # CurrentSiteMiddleware
 │   │   ├── security.py     # bcrypt hashing
 │   │   ├── templating.py   # Jinja2 render helper
-│   │   ├── utils.py        # Small shared utilities (to_int, parse_ipv4, …)
 │   │   └── validation.py   # IP, MAC, hostname validators
 │   ├── models/             # SQLAlchemy models (one file per entity)
 │   ├── schemas/            # Pydantic schemas (reserved for future use)
 │   ├── crud/               # Database operations with validation
-│   ├── routers/            # HTTP endpoints (auth, sites, devices, topology, …)
+│   ├── routers/            # HTTP endpoints (auth, sites, devices, …)
 │   ├── templates/          # Jinja2 templates
-│   │   └── _macros.html    # Shared macros (dash, check, delete forms, ip_badge)
-│   ├── static/             # CSS, JS, images, favicon
+│   ├── static/             # CSS and JS
 │   └── locales/            # Translation files (en.json, ru.json)
 ├── docs/                   # Deployment guide, example configs, screenshots
 ├── requirements.txt
@@ -219,11 +199,9 @@ HomeNetworkInventory/
 - Device passwords (Wi-Fi, credentials, RTSP URLs) are stored **in plain text**
   and displayed in the UI. This is intentional: the tool is meant to be a
   living inventory, and hiding passwords behind yet another password would
-  defeat the purpose. A warning banner is shown on the devices list and in
-  the profile until the user explicitly dismisses it.
-- Do not expose this application to the public internet without strong
-  authentication in front.
-- Access control is enforced by per-user permission flags
+  defeat the purpose. Do not expose this application to the public internet
+  without strong authentication in front.
+- Access control is enforced by three permission flags per non-admin user
   (see above) and by per-home assignment: a user only sees the homes they
   have been assigned to.
 - Passwords of devices are never sent to the browser for users who lack the
@@ -240,3 +218,4 @@ Licensed under the **GNU Affero General Public License v3.0**. See
 [LICENSE](LICENSE) for the full text.
 
 Copyright (C) 2026 Mike Petrichenko
+
