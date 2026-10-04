@@ -78,12 +78,12 @@
             <td>{{ dash(c.description) }}</td>
             <td class="text-end">
                 {% if current_user.role == 'admin' or current_user.can_edit %}
-                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa-solid fa-pen"></i>
+                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary" title="{{ t('common.edit') }}">
+                    <i class="fa-solid fa-pen fa-fw"></i>
                 </a>
                 {% endif %}
                 {% if current_user.role == 'admin' %}
-                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete')) }}
+                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete'), icon_only=True) }}
                 {% endif %}
             </td>
         </tr>
@@ -134,12 +134,12 @@
 
             <div class="mt-2 d-flex gap-1">
                 {% if current_user.role == 'admin' or current_user.can_edit %}
-                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary flex-fill">
-                    <i class="fa-solid fa-pen"></i>
+                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary flex-fill" title="{{ t('common.edit') }}">
+                    <i class="fa-solid fa-pen"></i> {{ t('common.edit') }}
                 </a>
                 {% endif %}
                 {% if current_user.role == 'admin' %}
-                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete')) }}
+                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete'), fill=True) }}
                 {% endif %}
             </div>
         </div>

@@ -12,10 +12,13 @@
 {% macro check(value) %}{% if value %}✓{% else %}—{% endif %}{% endmacro %}
 
 {# confirm is passed through |tojson so quotes/backslashes are safe in the attribute #}
-{% macro delete_form(action, confirm) %}
-<form method="post" action="{{ action }}" class="d-inline"
+{% macro delete_form(action, confirm, icon_only=False, tooltip=None, fill=False) %}
+<form method="post" action="{{ action }}" class="{% if fill %}flex-fill{% else %}d-inline{% endif %}"
       onsubmit='return confirm({{ confirm|tojson }});'>
-    <button type="submit" class="btn btn-sm btn-outline-danger">{{ t('common.delete') }}</button>
+    <button type="submit" class="btn btn-sm btn-outline-danger{% if fill %} w-100{% endif %}"
+            title="{{ tooltip or t('common.delete') }}">
+        <i class="fa-solid fa-trash fa-fw"></i>{% if not icon_only %} {{ t('common.delete') }}{% endif %}
+    </button>
 </form>
 {% endmacro %}
 

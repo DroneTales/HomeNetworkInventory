@@ -140,12 +140,12 @@
                 {{ macs | join(', ') if macs else '—' }}
             </td>
             <td class="text-end">
-                <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa-solid fa-eye"></i>
+                <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary" title="{{ t('common.view') }}">
+                    <i class="fa-solid fa-eye fa-fw"></i>
                 </a>
                 {% if current_user.role == 'admin' or current_user.can_edit %}
-                <a href="/devices/{{ d.id }}/edit" class="btn btn-sm btn-outline-secondary">
-                    <i class="fa-solid fa-pen"></i>
+                <a href="/devices/{{ d.id }}/edit" class="btn btn-sm btn-outline-secondary" title="{{ t('common.edit') }}">
+                    <i class="fa-solid fa-pen fa-fw"></i>
                 </a>
                 {% endif %}
             </td>
@@ -193,11 +193,11 @@
             </div>
 
             <div class="mt-2">
-                <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary">
+                <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary" title="{{ t('common.view') }}">
                     <i class="fa-solid fa-eye"></i> {{ t('common.view') }}
                 </a>
                 {% if current_user.role == 'admin' or current_user.can_edit %}
-                <a href="/devices/{{ d.id }}/edit" class="btn btn-sm btn-outline-secondary">
+                <a href="/devices/{{ d.id }}/edit" class="btn btn-sm btn-outline-secondary" title="{{ t('common.edit') }}">
                     <i class="fa-solid fa-pen"></i> {{ t('common.edit') }}
                 </a>
                 {% endif %}
