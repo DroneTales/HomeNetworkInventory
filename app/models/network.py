@@ -23,7 +23,6 @@ class Network(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     network_address: Mapped[str] = mapped_column(String(45), nullable=False)
     mask: Mapped[str] = mapped_column(String(45), nullable=False)
-    gateway: Mapped[str | None] = mapped_column(String(45))
     vlan: Mapped[int | None] = mapped_column()
     description: Mapped[str | None] = mapped_column(String(255))
 

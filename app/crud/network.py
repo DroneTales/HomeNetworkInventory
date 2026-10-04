@@ -11,7 +11,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
-from app.core.validation import require_found, validate_ipv4, validate_mask, validate_same_subnet
+from app.core.validation import require_found, validate_ipv4, validate_mask
 from app.models.network import Network
 
 
@@ -44,7 +44,6 @@ def create(
     name: str,
     network_address: str,
     mask: str,
-    gateway: str | None = None,
     vlan: int | None = None,
     description: str | None = None,
 ) -> Network:
@@ -61,18 +60,11 @@ def create(
     network_address = validate_ipv4(network_address, field="network_address")
     mask = validate_mask(mask, field="mask")
 
-    if gateway is not None and gateway.strip():
-        gateway = validate_ipv4(gateway, field="gateway")
-        validate_same_subnet(network_address, mask, gateway, field="gateway")
-    else:
-        gateway = None
-
     network = Network(
         site_id=site_id,
         name=name,
         network_address=network_address,
         mask=mask,
-        gateway=gateway,
         vlan=vlan,
         description=description or None,
     )
@@ -86,7 +78,6 @@ def update(
     name: str,
     network_address: str,
     mask: str,
-    gateway: str | None = None,
     vlan: int | None = None,
     description: str | None = None,
 ) -> Network:
@@ -106,16 +97,9 @@ def update(
     network_address = validate_ipv4(network_address, field="network_address")
     mask = validate_mask(mask, field="mask")
 
-    if gateway is not None and gateway.strip():
-        gateway = validate_ipv4(gateway, field="gateway")
-        validate_same_subnet(network_address, mask, gateway, field="gateway")
-    else:
-        gateway = None
-
     network.name = name
     network.network_address = network_address
     network.mask = mask
-    network.gateway = gateway
     network.vlan = vlan
     network.description = description or None
     db.flush()

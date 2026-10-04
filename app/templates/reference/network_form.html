@@ -45,11 +45,6 @@
                            value="{{ fd.mask or '255.255.255.0' }}" required>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="gateway" class="form-label">{{ t('devices.list.gateway') }}</label>
-                    <input type="text" class="form-control" id="gateway" name="gateway"
-                           value="{{ fd.gateway or '' }}" placeholder="192.168.1.1">
-                </div>
-                <div class="col-12 col-md-6">
                     <label for="vlan" class="form-label">{{ t('reference.field.vlan') }}</label>
                     <input type="number" class="form-control" id="vlan" name="vlan"
                            value="{{ fd.vlan or '' }}">

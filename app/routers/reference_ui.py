@@ -637,7 +637,6 @@ def networks_list(
             "cells": [
                 x.name,
                 f"{x.network_address}/{x.mask}",
-                x.gateway or "—",
                 x.vlan if x.vlan is not None else "—",
             ],
         }
@@ -652,7 +651,7 @@ def networks_list(
         add_url="/reference/networks/new",
         edit_url_prefix="/reference/networks/",
         delete_url_prefix="/reference/networks/",
-        column_keys=["devices.list.name", "reference.col.address", "devices.list.gateway", "reference.field.vlan"],
+        column_keys=["devices.list.name", "reference.col.address", "reference.field.vlan"],
         rows=rows,
     )
 
@@ -721,7 +720,6 @@ def networks_edit_form(
             "name": item.name,
             "network_address": item.network_address,
             "mask": item.mask,
-            "gateway": item.gateway or "",
             "vlan": item.vlan if item.vlan is not None else "",
             "description": item.description or "",
         },
@@ -915,7 +913,6 @@ def _network_form_data(form) -> dict:
         "name": (form.get("name") or "").strip(),
         "network_address": (form.get("network_address") or "").strip(),
         "mask": (form.get("mask") or "").strip(),
-        "gateway": (form.get("gateway") or "").strip() or None,
         "vlan": to_int(form.get("vlan")),
         "description": (form.get("description") or "").strip() or None,
     }
