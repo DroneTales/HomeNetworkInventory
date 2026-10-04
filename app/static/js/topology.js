@@ -101,6 +101,8 @@
                     is_wifi_client: d.is_wifi_client ? 1 : 0,
                     wifi_ssids: (d.wifi_ssids || []).join(", "),
                     wifi_client_ssids: (d.wifi_client_ssids || []).join(", "),
+                    wifi_clients: (d.wifi_clients || []).join(","),
+                    wifi_broadcasters: (d.wifi_broadcasters || []).join(","),
                     parent: parent,
                 },
                 classes: "leaf",
@@ -230,6 +232,14 @@
                     selector: "node.topo-highlighted",
                     style: {
                         "border-color": "#fbbf24",
+                        "border-width": 3,
+                        "border-style": "solid",
+                    }
+                },
+                {
+                    selector: "node.topo-related",
+                    style: {
+                        "border-color": "#22c55e",
                         "border-width": 3,
                         "border-style": "solid",
                     }
@@ -428,6 +438,7 @@
 
         function clearHighlight() {
             cy.elements("node.topo-highlighted").removeClass("topo-highlighted");
+            cy.elements("node.topo-related").removeClass("topo-related");
         }
 
         function setHighlight(nodeId) {
@@ -435,7 +446,21 @@
             const n = cy.getElementById(nodeId);
             if (n && !n.empty()) {
                 n.addClass("topo-highlighted");
+                setRelated(n.data());
             }
+        }
+
+        function setRelated(d) {
+            function mark(ids) {
+                String(ids || "").split(",").forEach(function (raw) {
+                    const id = raw.trim();
+                    if (!id) return;
+                    const el = cy.getElementById("device-" + id);
+                    if (el && !el.empty()) el.addClass("topo-related");
+                });
+            }
+            mark(d.wifi_clients);
+            mark(d.wifi_broadcasters);
         }
 
         function closePanel() {
@@ -456,10 +481,9 @@
             const devicesPayload = devicesById[deviceId];
             if (!devicesPayload) return;
 
-            clearHighlight();
+            setHighlight(deviceNodeId);
 
             if (focus) {
-                setHighlight(deviceNodeId);
                 cy.animate({
                     center: { eles: node },
                     zoom: Math.max(cy.zoom(), 1.2),

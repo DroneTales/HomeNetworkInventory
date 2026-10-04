@@ -45,6 +45,28 @@ def topology_data(
 ):
     devices = crud_device.list_all(db, site.id)
 
+    wifi_broadcaster: dict[int, int] = {}
+    wifi_clients: dict[int, set[int]] = {}
+    for d in devices:
+        for w in d.wifi_networks:
+            wifi_broadcaster[w.id] = d.id
+            wifi_clients.setdefault(w.id, set())
+
+    for d in devices:
+        for iface in d.interfaces:
+            wid = iface.connected_wifi_network_id
+            if wid and wid in wifi_broadcaster:
+                wifi_clients[wid].add(d.id)
+
+    device_clients: dict[int, set[int]] = {}
+    device_broadcasters: dict[int, set[int]] = {}
+    for wid, broadcaster_id in wifi_broadcaster.items():
+        for client_id in wifi_clients.get(wid, ()):
+            if client_id == broadcaster_id:
+                continue
+            device_clients.setdefault(broadcaster_id, set()).add(client_id)
+            device_broadcasters.setdefault(client_id, set()).add(broadcaster_id)
+
     nodes = []
     port_nodes = []
 
@@ -102,6 +124,8 @@ def topology_data(
             "is_wifi_client": is_wifi_client,
             "wifi_ssids": wifi_ssids,
             "wifi_client_ssids": wifi_client_ssids,
+            "wifi_clients": sorted(device_clients.get(d.id, ())),
+            "wifi_broadcasters": sorted(device_broadcasters.get(d.id, ())),
             "has_services": len(d.services) > 0,
             "is_active": d.is_active,
         })
