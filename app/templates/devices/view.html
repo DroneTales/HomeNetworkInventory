@@ -139,7 +139,7 @@
                         <tr>
                             {% if loop.first %}
                             <td rowspan="{{ ips|length }}"><code>{{ iface.name }}</code></td>
-                            <td rowspan="{{ ips|length }}">{{ iface.type }}</td>
+                            <td rowspan="{{ ips|length }}">{{ iface.type }}{% if iface.band %} <span class="badge bg-secondary">{{ iface.band }}</span>{% endif %}</td>
                             <td rowspan="{{ ips|length }}">{{ dash(iface.mac) }}</td>
                             {% endif %}
                             <td>
@@ -163,7 +163,7 @@
                     {% else %}
                     <tr>
                         <td><code>{{ iface.name }}</code></td>
-                        <td>{{ iface.type }}</td>
+                        <td>{{ iface.type }}{% if iface.band %} <span class="badge bg-secondary">{{ iface.band }}</span>{% endif %}</td>
                         <td>{{ dash(iface.mac) }}</td>
                         <td>—</td>
                         <td>—</td>
@@ -433,7 +433,7 @@
                 <thead>
                 <tr>
                     <th>{{ t('devices.form.field.ssid') }}</th>
-                    <th>{{ t('devices.form.field.band') }}</th>
+                    <th>{{ t('devices.form.field.broadcast_by') }}</th>
                     <th>{{ t('devices.form.field.encryption') }}</th>
                     <th>{{ t('devices.form.field.password') }}</th>
                     <th>{{ t('devices.form.field.guest') }}</th>
@@ -443,7 +443,10 @@
                 {% for w in wifi_networks %}
                 <tr>
                     <td>{{ w.ssid }}</td>
-                    <td>{{ dash(w.band) }}</td>
+                    <td>
+                        {% if w.interface %}<code>{{ w.interface.name }}</code>{% if w.interface.band %} <span class="badge bg-secondary">{{ w.interface.band }}</span>{% endif %}
+                        {% else %}—{% endif %}
+                    </td>
                     <td>{{ dash(w.encryption) }}</td>
                     <td>
                         {% if w.password %}

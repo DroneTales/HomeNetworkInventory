@@ -18,14 +18,12 @@
                    name="wifi_ssid" value="{{ wifi.ssid if wifi else '' }}"
                    placeholder="homekit2" required>
         </div>
-        <div class="col-6 col-md-1">
-            <label class="form-label small mb-0">{{ t('devices.form.field.band') }}</label>
-            <select class="form-select form-select-sm wifi-band px-1" name="wifi_band">
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">{{ t('devices.form.field.broadcast_by') }}</label>
+            {% set cur_iface_id = wifi.interface_id if wifi and wifi.interface_id else '' %}
+            <select class="form-select form-select-sm wifi-broadcast-by px-1" name="wifi_interface_id"
+                    data-current="{{ cur_iface_id }}">
                 <option value="">—</option>
-                {% set cur_band = wifi.band if wifi else '' %}
-                <option value="2.4" {% if cur_band == '2.4' %}selected{% endif %}>2.4</option>
-                <option value="5" {% if cur_band == '5' %}selected{% endif %}>5</option>
-                <option value="6" {% if cur_band == '6' %}selected{% endif %}>6</option>
             </select>
         </div>
         <div class="col-6 col-md-2">
@@ -68,7 +66,7 @@
                 <label class="form-check-label small">{{ t('devices.form.field.guest') }}</label>
             </div>
         </div>
-        <div class="col-6 col-md-2 text-end">
+        <div class="col-6 col-md-auto text-end">
             <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-btn px-1">{{ t('devices.form.btn.remove') }}</button>
         </div>
     </div>

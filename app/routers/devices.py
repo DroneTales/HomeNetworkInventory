@@ -16,6 +16,7 @@ from app.core.constants import (
     IFACE_TYPE_ETHERNET,
     IFACE_TYPE_PORT,
     IFACE_TYPE_WIFI,
+    IFACE_TYPE_WIFI_AP,
     IP_TYPE_STATIC,
     PF_PROTOCOL_TCP,
     ROLE_ADMIN,
@@ -45,6 +46,7 @@ from app.models.dhcp_pool import DhcpPool
 from app.models.interface import Interface
 from app.models.site import Site
 from app.models.user import User
+from app.models.wifi_network import WiFiNetwork
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
@@ -342,8 +344,14 @@ def _process_device_form(
                 is_active=is_active,
             )
 
-        wifi_map = _sync_wifi_networks(db, device, wifi_networks)
-        created_ips = _sync_interfaces(db, device, interfaces, wifi_map, network_id)
+        created_ips, iface_id_map, deferred_links, ifaces_to_delete = _sync_interfaces(
+            db, device, interfaces, network_id
+        )
+        wifi_map = _sync_wifi_networks(db, device, wifi_networks, iface_id_map)
+        _apply_client_wifi_links(db, deferred_links, wifi_map)
+        _check_deletable_interfaces(db, ifaces_to_delete)
+        for iface_id in ifaces_to_delete:
+            crud_interface.delete(db, iface_id)
         _sync_ports(db, device, ports)
         _sync_dhcp_pools(db, device, dhcp_pools)
         _sync_credentials(db, device, credentials)
@@ -386,13 +394,20 @@ def _process_device_form(
 # _sync_* helpers reconcile submitted form rows with existing children:
 # rows with an "id" are updated, rows without are created, rows missing
 # from the submission are deleted. The pattern is shared by all _sync_* below.
-def _sync_wifi_networks(db: Session, device: Device, items: list[dict]) -> dict[int, int]:
+def _sync_wifi_networks(
+    db: Session,
+    device: Device,
+    items: list[dict],
+    iface_id_map: dict[int, int] | None = None,
+) -> dict[int, int]:
     wifi_map: dict[int, int] = {}
     existing = {w.id: w for w in device.wifi_networks}
     seen_ids = set()
+    iface_id_map = iface_id_map or {}
 
     for idx, data in enumerate(items):
         item_id = data.get("id")
+        interface_id = _resolve_iface_id(data.get("interface_id"), iface_id_map)
         if item_id and item_id in existing:
             wifi = existing[item_id]
             password = data.get("password")
@@ -402,7 +417,7 @@ def _sync_wifi_networks(db: Session, device: Device, items: list[dict]) -> dict[
                 db,
                 wifi_id=item_id,
                 ssid=data["ssid"],
-                band=data["band"],
+                interface_id=interface_id,
                 encryption=data["encryption"],
                 password=password,
                 is_guest=data["is_guest"],
@@ -414,7 +429,7 @@ def _sync_wifi_networks(db: Session, device: Device, items: list[dict]) -> dict[
                 db,
                 device_id=device.id,
                 ssid=data["ssid"],
-                band=data["band"],
+                interface_id=interface_id,
                 encryption=data["encryption"],
                 password=data["password"],
                 is_guest=data["is_guest"],
@@ -432,18 +447,17 @@ def _sync_interfaces(
     db: Session,
     device: Device,
     items: list[dict],
-    wifi_map: dict[int, int],
     network_id: int | None,
-) -> list[tuple[str, str]]:
+) -> tuple[list[tuple[str, str]], dict[int, int], list[tuple[int, str]], list[int]]:
     existing = {i.id: i for i in device.interfaces}
     seen_ids = set()
     all_ips: list[tuple[str, str]] = []
+    iface_id_map: dict[int, int] = {}
+    deferred_links: list[tuple[int, str]] = []
 
-    for data in items:
+    for idx, data in enumerate(items):
         item_id = data.get("id")
-        connected_id = None
-        if data["type"] == IFACE_TYPE_WIFI:
-            connected_id = _resolve_wifi_id(data.get("connected_wifi_network_id"), wifi_map)
+        is_wifi_client = data["type"] == IFACE_TYPE_WIFI
 
         if item_id and item_id in existing:
             iface = existing[item_id]
@@ -453,7 +467,9 @@ def _sync_interfaces(
                 name=data["name"],
                 type=data["type"],
                 mac=data["mac"],
-                connected_wifi_network_id=connected_id,
+                band=data.get("band"),
+                connected_wifi_network_id=iface.connected_wifi_network_id if is_wifi_client else None,
+                defer_wifi_validation=is_wifi_client,
             )
             seen_ids.add(item_id)
         else:
@@ -463,8 +479,17 @@ def _sync_interfaces(
                 name=data["name"],
                 type=data["type"],
                 mac=data["mac"],
-                connected_wifi_network_id=connected_id,
+                band=data.get("band"),
+                connected_wifi_network_id=None,
+                defer_wifi_validation=is_wifi_client,
             )
+
+        iface_id_map[idx] = iface.id
+
+        if is_wifi_client:
+            raw = data.get("connected_wifi_network_id")
+            if raw:
+                deferred_links.append((iface.id, str(raw).strip()))
 
         existing_ips = {ip.id: ip for ip in iface.ip_addresses}
         # Always attempt to create/update the IP record (except for port);
@@ -504,12 +529,39 @@ def _sync_interfaces(
             for ip in existing_ips.values():
                 db.delete(ip)
 
-    for iface_id, iface in existing.items():
-        if iface_id not in seen_ids:
-            db.delete(iface)
+    to_delete = [iface.id for iface_id, iface in existing.items() if iface_id not in seen_ids]
+
+    return all_ips, iface_id_map, deferred_links, to_delete
+
+def _check_deletable_interfaces(db: Session, iface_ids: list[int]) -> None:
+    for iface_id in iface_ids:
+        iface = db.get(Interface, iface_id)
+        if iface is None or iface.type != IFACE_TYPE_WIFI_AP:
+            continue
+        linked = (
+            db.query(WiFiNetwork)
+            .filter(WiFiNetwork.interface_id == iface_id)
+            .count()
+        )
+        if linked:
+            raise ValidationError(
+                f"Cannot delete Wi-Fi AP interface '{iface.name}' while Wi-Fi networks are broadcast through it",
+                field="interface_id",
+            )
+
+
+def _apply_client_wifi_links(
+    db: Session,
+    deferred_links: list[tuple[int, str]],
+    wifi_map: dict[int, int],
+) -> None:
+    for iface_id, raw in deferred_links:
+        wifi_id = _resolve_wifi_id(raw, wifi_map)
+        iface = db.get(Interface, iface_id)
+        if iface is not None:
+            iface.connected_wifi_network_id = wifi_id
     db.flush()
 
-    return all_ips
 
 def _sync_ports(db: Session, device: Device, items: list[dict]) -> None:
     valid_interface_ids = {
@@ -679,6 +731,7 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
             "name": iface.name,
             "type": iface.type,
             "mac": iface.mac or "",
+            "band": iface.band or "",
             "address": ip.address if ip else "",
             "mask": ip.mask if ip else "255.255.255.0",
             "address_type": ip.address_type if ip else IP_TYPE_STATIC,
@@ -701,7 +754,7 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
         wifi_networks.append({
             "id": w.id,
             "ssid": w.ssid,
-            "band": w.band or "",
+            "interface_id": w.interface_id or "",
             "encryption": w.encryption or "",
             "password": (w.password or "") if show_passwords else "",
             "is_guest": w.is_guest,
@@ -796,6 +849,23 @@ def _form_dict(form) -> dict:
         "port_forwards": _collect_port_forwards(form),
     }
 
+def _resolve_iface_id(value, iface_id_map: dict[int, int]) -> int | None:
+    if value is None:
+        return None
+    value = str(value).strip()
+    if not value:
+        return None
+    if value.startswith("new:"):
+        try:
+            idx = int(value[4:])
+        except ValueError:
+            return None
+        return iface_id_map.get(idx)
+    try:
+        return int(value)
+    except ValueError:
+        return None
+
 def _resolve_wifi_id(value, wifi_map: dict[int, int]) -> int | None:
     if value is None:
         return None
@@ -818,6 +888,7 @@ def _collect_interfaces(form) -> list[dict]:
     names = form.getlist("interface_name")
     types = form.getlist("interface_type")
     macs = form.getlist("interface_mac")
+    bands = form.getlist("interface_band")
     addresses = form.getlist("interface_address")
     masks = form.getlist("interface_mask")
     address_types = form.getlist("interface_address_type")
@@ -834,6 +905,7 @@ def _collect_interfaces(form) -> list[dict]:
         item_id = to_int(ids[i] if i < len(ids) else None)
         iface_type = (types[i] if i < len(types) else IFACE_TYPE_ETHERNET).strip().lower()
         mac = (macs[i] if i < len(macs) else "").strip() or None
+        band = (bands[i] if i < len(bands) else "").strip() or None
 
         address = (addresses[i] if i < len(addresses) else "").strip() or None
         mask = (masks[i] if i < len(masks) else "").strip() or None
@@ -847,6 +919,7 @@ def _collect_interfaces(form) -> list[dict]:
             "name": name,
             "type": iface_type,
             "mac": mac,
+            "band": band,
             "address": address,
             "mask": mask,
             "address_type": address_type,
@@ -885,7 +958,7 @@ def _collect_ports(form) -> list[dict]:
 def _collect_wifi_networks(form) -> list[dict]:
     ids = form.getlist("wifi_id")
     ssids = form.getlist("wifi_ssid")
-    bands = form.getlist("wifi_band")
+    iface_ids = form.getlist("wifi_interface_id")
     encryptions = form.getlist("wifi_encryption")
     passwords = form.getlist("wifi_password")
     guests = form.getlist("wifi_is_guest")
@@ -897,7 +970,7 @@ def _collect_wifi_networks(form) -> list[dict]:
             continue
 
         item_id = to_int(ids[i] if i < len(ids) else None)
-        band = (bands[i] if i < len(bands) else "").strip() or None
+        interface_id = (iface_ids[i] if i < len(iface_ids) else "").strip() or None
         encryption = (encryptions[i] if i < len(encryptions) else "").strip() or None
         password = (passwords[i] if i < len(passwords) else "").strip() or None
         guest = (guests[i] if i < len(guests) else "") == "on"
@@ -905,7 +978,7 @@ def _collect_wifi_networks(form) -> list[dict]:
         result.append({
             "id": item_id,
             "ssid": ssid,
-            "band": band,
+            "interface_id": interface_id,
             "encryption": encryption,
             "password": password,
             "is_guest": guest,

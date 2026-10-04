@@ -20,13 +20,21 @@ class WiFiNetwork(Base):
     device_id: Mapped[int] = mapped_column(
         ForeignKey("devices.id", ondelete="CASCADE"), nullable=False
     )
+    interface_id: Mapped[int] = mapped_column(
+        ForeignKey("interfaces.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
     ssid: Mapped[str] = mapped_column(String(100), nullable=False)
-    band: Mapped[str | None] = mapped_column(String(10))
     encryption: Mapped[str | None] = mapped_column(String(50))
     password: Mapped[str | None] = mapped_column(String(255))
     is_guest: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     device: Mapped["Device"] = relationship(back_populates="wifi_networks")
+    interface: Mapped["Interface | None"] = relationship(
+        back_populates="broadcast_wifi_networks",
+        foreign_keys=[interface_id],
+    )
     connected_interfaces: Mapped[list["Interface"]] = relationship(
-        back_populates="connected_wifi_network"
+        back_populates="connected_wifi_network",
+        foreign_keys="Interface.connected_wifi_network_id",
     )

@@ -314,5 +314,8 @@
   "connections.locations.move_error": "Не удалось переместить устройство",
   "connections.locations.drag_hint": "Перетащите, чтобы сменить локацию",
   "help.toc.topology": "7. Топология",
-  "help.toc.port_forwards": "8. Проброс портов"
+  "help.toc.port_forwards": "8. Проброс портов",
+  "devices.form.field.radio_mac": "MAC радио",
+  "devices.form.field.broadcast_by": "Вещает через",
+  "devices.form.hint.cannot_delete_wifi_ap": "Нельзя удалить Wi-Fi AP интерфейс: через него вещают {ssids}. Сначала переназначьте эти сети."
 }

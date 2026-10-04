@@ -355,6 +355,11 @@
     {% endwith %}
 </template>
 
-<script src="/static/js/devices.js"></script>
+<script>
+window.DEVICES_FORM_CONFIG = {
+    cannotDeleteWifiAp: {{ t('devices.form.hint.cannot_delete_wifi_ap')|tojson }}
+};
+</script>
+<script src="/static/js/devices.js?v=5"></script>
 {% endblock %}
 

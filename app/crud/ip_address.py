@@ -48,16 +48,21 @@ def _check_ip_unique(
     db: Session,
     address: str,
     site_id: int,
+    device_id: int | None = None,
     exclude_id: int | None = None,
 ) -> None:
     # Uniqueness is enforced per site, not globally: different homes
-    # may use the same private subnet without conflict
+    # may use the same private subnet without conflict.
+    # Within the same device the address may repeat (e.g. eth0 and wlan0
+    # of the same router share one management IP).
     query = (
         db.query(IPAddress)
         .join(Interface, IPAddress.interface_id == Interface.id)
         .join(Device, Interface.device_id == Device.id)
         .filter(IPAddress.address == address, Device.site_id == site_id)
     )
+    if device_id is not None:
+        query = query.filter(Device.id != device_id)
     if exclude_id is not None:
         query = query.filter(IPAddress.id != exclude_id)
 
@@ -140,7 +145,7 @@ def validate(
     device = require_found(db.get(Device, iface.device_id), "Device", field="interface_id")
 
     if address is not None:
-        _check_ip_unique(db, address, site_id=device.site_id, exclude_id=exclude_id)
+        _check_ip_unique(db, address, site_id=device.site_id, device_id=device.id, exclude_id=exclude_id)
 
     return address, mask, gateway, dns
 

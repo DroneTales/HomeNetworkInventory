@@ -23,6 +23,7 @@ class Interface(Base):
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     type: Mapped[str] = mapped_column(String(20), nullable=False)
     mac: Mapped[str | None] = mapped_column(String(17), index=True)
+    band: Mapped[str | None] = mapped_column(String(10))
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     connected_wifi_network_id: Mapped[int | None] = mapped_column(
@@ -31,7 +32,12 @@ class Interface(Base):
 
     device: Mapped["Device"] = relationship(back_populates="interfaces")
     connected_wifi_network: Mapped["WiFiNetwork | None"] = relationship(
-        back_populates="connected_interfaces"
+        back_populates="connected_interfaces",
+        foreign_keys=[connected_wifi_network_id],
+    )
+    broadcast_wifi_networks: Mapped[list["WiFiNetwork"]] = relationship(
+        back_populates="interface",
+        foreign_keys="WiFiNetwork.interface_id",
     )
     ip_addresses: Mapped[list["IPAddress"]] = relationship(
         back_populates="interface", cascade="all, delete-orphan"

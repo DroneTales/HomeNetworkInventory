@@ -314,5 +314,8 @@
   "connections.locations.move_error": "Failed to move device",
   "connections.locations.drag_hint": "Drag to move to another location",
   "help.toc.topology": "7. Topology",
-  "help.toc.port_forwards": "8. Port forwarding"
+  "help.toc.port_forwards": "8. Port forwarding",
+  "devices.form.field.radio_mac": "Radio MAC",
+  "devices.form.field.broadcast_by": "Broadcast by",
+  "devices.form.hint.cannot_delete_wifi_ap": "Cannot delete Wi-Fi AP interface: it broadcasts {ssids}. Reassign those networks first."
 }

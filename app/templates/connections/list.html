@@ -166,7 +166,7 @@
             <div class="card-header d-flex flex-wrap align-items-center">
                 <i class="fa-solid fa-wifi me-1"></i>
                 <span class="fw-bold">{{ w.wifi.ssid }}</span>
-                {% if w.wifi.band %}<span class="badge bg-secondary ms-1">{{ w.wifi.band }} GHz</span>{% endif %}
+                {% if w.wifi.interface and w.wifi.interface.band %}<span class="badge bg-secondary ms-1">{{ w.wifi.interface.band }} GHz</span>{% endif %}
                 {% if w.wifi.is_guest %}<span class="badge bg-info text-dark ms-1">{{ t('devices.form.field.guest') }}</span>{% endif %}
                 <span class="badge bg-secondary ms-2">{{ w.clients|length }}</span>
                 {% if w.device %}

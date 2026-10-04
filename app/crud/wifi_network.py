@@ -9,12 +9,12 @@
 
 from sqlalchemy.orm import Session
 
+from app.core.constants import IFACE_TYPE_WIFI_AP
 from app.core.exceptions import ValidationError
 from app.core.validation import require_found, validate_choice
 from app.models.device import Device
+from app.models.interface import Interface
 from app.models.wifi_network import WiFiNetwork
-
-VALID_BANDS = {"2.4", "5", "6"}
 
 VALID_ENCRYPTIONS = {
     "WPA2-PSK/AES",
@@ -62,19 +62,13 @@ def get_by_device_and_ssid(
 
 def _validate(
     ssid: str,
-    band: str | None,
     encryption: str | None,
-) -> tuple[str, str | None, str | None]:
+) -> tuple[str, str | None]:
     ssid = (ssid or "").strip()
     if not ssid:
         raise ValidationError("SSID is required", field="ssid")
     if len(ssid) > 100:
         raise ValidationError("SSID must be at most 100 characters", field="ssid")
-
-    if band is not None and band.strip():
-        band = validate_choice(band.strip(), VALID_BANDS, "band", "band")
-    else:
-        band = None
 
     if encryption is not None and encryption.strip():
         encryption = validate_choice(
@@ -83,20 +77,49 @@ def _validate(
     else:
         encryption = None
 
-    return ssid, band, encryption
+    return ssid, encryption
+
+
+def _validate_interface(
+    db: Session,
+    device_id: int,
+    interface_id: int | None,
+) -> int:
+    if interface_id is None:
+        raise ValidationError(
+            "Broadcast interface is required",
+            field="interface_id",
+        )
+    iface = require_found(
+        db.get(Interface, interface_id),
+        "Interface",
+        field="interface_id",
+    )
+    if iface.device_id != device_id:
+        raise ValidationError(
+            "Interface belongs to another device",
+            field="interface_id",
+        )
+    if iface.type != IFACE_TYPE_WIFI_AP:
+        raise ValidationError(
+            "Only Wi-Fi AP interfaces can broadcast a Wi-Fi network",
+            field="interface_id",
+        )
+    return interface_id
 
 def create(
     db: Session,
     device_id: int,
     ssid: str,
-    band: str | None = None,
+    interface_id: int | None = None,
     encryption: str | None = None,
     password: str | None = None,
     is_guest: bool = False,
 ) -> WiFiNetwork:
     require_found(db.get(Device, device_id), "Device", field="device_id")
 
-    ssid, band, encryption = _validate(ssid, band, encryption)
+    ssid, encryption = _validate(ssid, encryption)
+    interface_id = _validate_interface(db, device_id, interface_id)
 
     if get_by_device_and_ssid(db, device_id, ssid) is not None:
         raise ValidationError(
@@ -106,8 +129,8 @@ def create(
 
     wifi = WiFiNetwork(
         device_id=device_id,
+        interface_id=interface_id,
         ssid=ssid,
-        band=band,
         encryption=encryption,
         password=password or None,
         is_guest=is_guest,
@@ -120,14 +143,15 @@ def update(
     db: Session,
     wifi_id: int,
     ssid: str,
-    band: str | None = None,
+    interface_id: int | None = None,
     encryption: str | None = None,
     password: str | None = None,
     is_guest: bool = False,
 ) -> WiFiNetwork:
     wifi = require_found(get_by_id(db, wifi_id), "Wi-Fi network")
 
-    ssid, band, encryption = _validate(ssid, band, encryption)
+    ssid, encryption = _validate(ssid, encryption)
+    interface_id = _validate_interface(db, wifi.device_id, interface_id)
 
     existing = get_by_device_and_ssid(db, wifi.device_id, ssid)
     if existing is not None and existing.id != wifi_id:
@@ -137,7 +161,7 @@ def update(
         )
 
     wifi.ssid = ssid
-    wifi.band = band
+    wifi.interface_id = interface_id
     wifi.encryption = encryption
     wifi.password = password or None
     wifi.is_guest = is_guest

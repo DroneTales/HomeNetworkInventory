@@ -28,9 +28,11 @@
             const removeBtn = row.querySelector("." + options.removeBtnClass);
             if (removeBtn) {
                 removeBtn.addEventListener("click", function () {
+                    if (options.beforeRemove && options.beforeRemove(row) === false) return;
                     row.remove();
                     updateEmptyHint();
                     if (options.afterBind) options.afterBind(row);
+                    if (options.afterMutation) options.afterMutation();
                 });
             }
             if (options.afterBind) options.afterBind(row);
@@ -41,12 +43,14 @@
             container.appendChild(clone);
             bindRemove(clone);
             updateEmptyHint();
+            if (options.afterMutation) options.afterMutation();
             const firstInput = clone.querySelector("input, select");
             if (firstInput) firstInput.focus();
         });
 
         container.querySelectorAll("." + options.rowClass).forEach(bindRemove);
         updateEmptyHint();
+        if (options.afterMutation) options.afterMutation();
     }
 
     setupList({
@@ -57,6 +61,8 @@
         rowClass: "interface-row",
         removeBtnClass: "remove-iface-btn",
         afterBind: bindInterfaceRow,
+        afterMutation: rebuildBroadcastSelects,
+        beforeRemove: checkInterfaceBeforeRemove,
     });
 
     function bindInterfaceRow(row) {
@@ -94,6 +100,15 @@
                 note.classList.toggle("d-none", !(!isPort && isDhcp));
             }
 
+            const isWifiAp = tval === "wifi_ap";
+            const bandField = row.querySelector(".iface-field-band");
+            if (bandField) bandField.classList.toggle("d-none", !isWifiAp);
+
+            const macDefault = row.querySelector(".iface-mac-label-default");
+            const macAp = row.querySelector(".iface-mac-label-ap");
+            if (macDefault) macDefault.classList.toggle("d-none", isWifiAp);
+            if (macAp) macAp.classList.toggle("d-none", !isWifiAp);
+
             if (isDhcp && !isPort) {
                 const addr = row.querySelector(".iface-address");
                 const mask = row.querySelector(".iface-mask");
@@ -106,9 +121,101 @@
             }
         }
 
-        if (typeSelect) typeSelect.addEventListener("change", refresh);
+        if (typeSelect) typeSelect.addEventListener("change", function () { refresh(); rebuildBroadcastSelects(); });
         if (addressTypeSelect) addressTypeSelect.addEventListener("change", refresh);
+
+        const nameInput = row.querySelector(".iface-name");
+        if (nameInput) nameInput.addEventListener("input", rebuildBroadcastSelects);
+
+        const bandSelect = row.querySelector(".iface-band");
+        if (bandSelect) bandSelect.addEventListener("change", rebuildBroadcastSelects);
+
         refresh();
+    }
+
+    document.addEventListener("change", function (e) {
+        if (e.target && e.target.classList.contains("wifi-broadcast-by")) {
+            e.target.dataset.current = e.target.value;
+        }
+    });
+
+    function checkInterfaceBeforeRemove(row) {
+        const typeSelect = row.querySelector(".iface-type");
+        if (!typeSelect || typeSelect.value !== "wifi_ap") return true;
+
+        const container = document.getElementById("interfaces-container");
+        if (!container) return true;
+
+        const rows = container.querySelectorAll(".interface-row");
+        let idx = -1;
+        rows.forEach(function (r, i) { if (r === row) idx = i; });
+        if (idx < 0) return true;
+
+        const idInput = row.querySelector(".iface-id");
+        const realId = idInput ? idInput.value.trim() : "";
+        const targetValue = realId ? realId : ("new:" + idx);
+
+        const ssids = [];
+        document.querySelectorAll(".wifi-row").forEach(function (wrow) {
+            const sel = wrow.querySelector(".wifi-broadcast-by");
+            if (!sel) return;
+            const current = sel.dataset.current || sel.value || "";
+            if (current === targetValue) {
+                const ssidInput = wrow.querySelector(".wifi-ssid");
+                if (ssidInput && ssidInput.value.trim()) ssids.push(ssidInput.value.trim());
+            }
+        });
+
+        if (ssids.length === 0) return true;
+
+        const tpl = (window.DEVICES_FORM_CONFIG && window.DEVICES_FORM_CONFIG.cannotDeleteWifiAp) || "Cannot delete Wi-Fi AP interface: it broadcasts {ssids}.";
+        alert(tpl.replace("{ssids}", ssids.join(", ")));
+        return false;
+    }
+
+    function rebuildBroadcastSelects() {
+        const ifaceContainer = document.getElementById("interfaces-container");
+        if (!ifaceContainer) return;
+
+        const rows = ifaceContainer.querySelectorAll(".interface-row");
+        const options = [{value: "", label: "—"}];
+        rows.forEach(function (r, idx) {
+            const type = r.querySelector(".iface-type");
+            if (!type || type.value !== "wifi_ap") return;
+            const idInput = r.querySelector(".iface-id");
+            const nameInput = r.querySelector(".iface-name");
+            const bandSelect = r.querySelector(".iface-band");
+            const realId = idInput ? idInput.value.trim() : "";
+            const name = nameInput ? nameInput.value.trim() : "";
+            const band = bandSelect ? bandSelect.value : "";
+            let label = name || "wifi_ap";
+            if (band) label += " (" + band + ")";
+            options.push({
+                value: realId ? realId : ("new:" + idx),
+                label: label,
+            });
+        });
+
+        document.querySelectorAll(".wifi-broadcast-by").forEach(function (sel) {
+            const current = sel.dataset.current || sel.value || "";
+            while (sel.options.length > 0) sel.remove(0);
+            options.forEach(function (o) {
+                const opt = document.createElement("option");
+                opt.value = o.value;
+                opt.textContent = o.label;
+                sel.appendChild(opt);
+            });
+            let matched = false;
+            for (let i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === current) {
+                    sel.selectedIndex = i;
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) sel.value = "";
+            sel.dataset.current = sel.value;
+        });
     }
 
     setupList({
