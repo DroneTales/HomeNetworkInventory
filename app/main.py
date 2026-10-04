@@ -54,7 +54,7 @@ app.add_middleware(
     secret_key=settings.session_secret,
     session_cookie="hni_session",
     same_site="lax",
-    https_only=True,
+    https_only=getattr(settings, "cookie_secure", True),
 )
 
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")

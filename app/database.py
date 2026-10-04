@@ -47,10 +47,7 @@ def check_database_path() -> None:
     parent = db_path.parent
 
     if not parent.exists():
-        raise RuntimeError(
-            f"Database directory does not exist: {parent}\n"
-            f"Create the directory or mount the storage device before starting."
-        )
+        parent.mkdir(parents=True, exist_ok=True)
 
     if not os.access(parent, os.W_OK):
         raise RuntimeError(
