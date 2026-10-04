@@ -108,12 +108,12 @@
         <li><strong>Device type</strong> — a type from the reference data. Types can be <em>active</em> (must have an IP) or <em>passive</em> (hub, unmanaged switch).</li>
         <li><strong>Vendor</strong> and <strong>Model</strong> — manufacturer and model. After choosing a vendor, the model list is refreshed automatically.</li>
         <li><strong>Location</strong> — where the device physically is <em>in this home</em>.</li>
-        <li><strong>Network</strong> — which subnet of the home it belongs to.</li>
         <li><strong>Active</strong> — tick if the device is operational.</li>
     </ul>
 
     <p><strong>Interfaces (blue):</strong></p>
-    <p>Network interfaces of the device. The <strong>+ Add interface</strong> button adds a row. Row fields:</p>
+    <p>Network interfaces of the device, grouped by the <em>logical network</em> they belong to. Every network of the current home has its own group, plus a <strong>No network</strong> group for interfaces that are not bound to any network. Use the <strong>+ Add interface</strong> button inside a group to add an interface directly to that network. Network membership is a property of the <em>interface</em>, not of the device: a router with LAN, WAN, and guest Wi-Fi will have interfaces in several networks at once. A passive device (hub, unmanaged switch) has no interfaces with a network at all. The group header is a link to the network's reference page.</p>
+    <p>Row fields:</p>
     <ul>
         <li><strong>Name</strong> — <code>eth0</code>, <code>wan0</code>, <code>wlan0</code>. Required.</li>
         <li><strong>Type</strong> — one of:
@@ -142,7 +142,8 @@
         <li><strong>DNS</strong> — name server. Usually the same as the gateway.</li>
         <li><strong>Connected Wi-Fi network</strong> — only for interfaces of type <code>wifi</code>. Required. Choose the network this device is connected to.</li>
     </ul>
-    <p>A device can have <strong>several</strong> interfaces — for example, LAN and WAN on a router, or two Wi-Fi AP radios (2.4 GHz and 5 GHz) on an access point.</p>
+    <p>A device can have <strong>several</strong> interfaces — for example, LAN and WAN on a router, or two Wi-Fi AP radios (2.4 GHz and 5 GHz) on an access point. Because the network is a property of the interface, a device belongs to as many networks as it has interfaces bound to networks.</p>
+    <p>Interfaces of type <code>port</code> cannot belong to a network — the network selector is effectively absent for them, and they always land in the <strong>No network</strong> group.</p>
     <p><strong>IP uniqueness.</strong> An address is unique <em>within a home</em>, but may repeat across interfaces of the <em>same</em> device. This matches real routers where the management IP is shared by <code>eth0</code>, <code>wlan0</code>, and so on.</p>
 
     <p><strong>Ports (cyan):</strong></p>
@@ -196,6 +197,15 @@
     </ul>
 
     <p><strong>Remarks (yellow):</strong> free-form text for anything that did not fit elsewhere.</p>
+
+    <h3 class="h6 mt-3">5.2.1. Example: a Wi-Fi repeater</h3>
+    <p>A Wi-Fi repeater is a single device that is <em>both</em> a Wi-Fi client and a Wi-Fi access point at the same time. It connects to your main router over Wi-Fi and rebroadcasts the network under the same or a different SSID. In the inventory this is modelled as <strong>one device with two Wi-Fi interfaces</strong>:</p>
+    <ul>
+        <li><code>wlan_client</code>, type <code>wifi</code>, bound to the Wi-Fi network it connects to (the main router's SSID). This is its uplink. Its network is the network it is associated with — typically the main LAN.</li>
+        <li><code>wlan_ap</code>, type <code>wifi_ap</code>, with a band (for example <code>2.4</code>). This is the radio that <em>broadcasts</em> the repeated network. Its network is the subnet it hands out to clients — usually the same as the uplink, but it can be a different one (for example, a dedicated repeater subnet).</li>
+    </ul>
+    <p>Both interfaces live on the <em>same physical box</em>, so the device is a member of two logical networks at once — this is exactly the case the per-interface network model is designed for. Add the repeated network under <strong>Wi-Fi networks (purple)</strong> with <strong>Broadcast by</strong> pointing at <code>wlan_ap</code>, and the clients that associate with it will show up as Wi-Fi clients on the device's page.</p>
+    <p>If your repeater does not rebroadcast over Wi-Fi at all (a so-called wired extender), drop the <code>wlan_ap</code> interface and add an <code>ethernet</code> interface instead — the network is a property of the interface, so the same device can play either role depending on which interfaces you add.</p>
 
     <h3 class="h6 mt-3">5.3. Device page</h3>
     <p>Click a hostname in the list to open the device page. All data is shown in colour-coded blocks. Buttons at the top: <strong>Back</strong>, <strong>Edit</strong>, <strong>Delete</strong> (admin only).</p>
@@ -273,15 +283,25 @@
     <h3 class="h6 mt-3">7.2. Controls</h3>
     <ul>
         <li><strong>Fit</strong> — fit the whole graph into the viewport.</li>
+        <li><strong>Save layout</strong> — persist the current node positions for this home. Available to administrators and users with edit rights. Positions are stored per home and per device.</li>
+        <li><strong>Reset layout</strong> — discard the saved positions and re-run the automatic layout on the next load. Asks for confirmation.</li>
         <li><strong>Back to Connections</strong> — return to the Connections list.</li>
         <li><strong>Legend</strong> — toggle the colour legend in the corner.</li>
         <li><strong>Click a device</strong> — opens the side panel with the device's ports, interfaces, and IP addresses.</li>
         <li><strong>Mouse wheel / pinch</strong> — zoom; <strong>drag the background</strong> — pan.</li>
     </ul>
 
-    <h3 class="h6 mt-3">7.3. Notes</h3>
+    <h3 class="h6 mt-3">7.3. Saving the layout</h3>
     <ul>
-        <li>The graph is read-only — nodes cannot be moved permanently (their positions are recalculated on every load).</li>
+        <li>Drag any node to arrange the graph the way you like, then press <strong>Save layout</strong>. Positions are stored per home and per device; switching homes or reloading the page restores them.</li>
+        <li>If a node has no saved position (a new device, or after <strong>Reset layout</strong>), the auto-layout places it; saved positions are applied on top of the auto-layout result.</li>
+        <li><strong>Reset layout</strong> removes the saved positions for the current home. The next load runs the auto-layout from scratch.</li>
+        <li>Positions of a device are removed automatically when the device is deleted from the home.</li>
+    </ul>
+
+    <h3 class="h6 mt-3">7.4. Notes</h3>
+    <ul>
+        <li>The graph itself is derived from data — edges are connections, containers are locations, badges are Wi-Fi roles. Only node positions are user-defined and persistable.</li>
         <li>Only devices of the <strong>current home</strong> are shown.</li>
     </ul>
 </section>
