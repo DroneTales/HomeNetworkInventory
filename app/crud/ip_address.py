@@ -158,7 +158,6 @@ def create(
     address_type: str,
     gateway: str | None = None,
     dns: str | None = None,
-    network_id: int | None = None,
     is_primary: bool = True,
 ) -> IPAddress:
     address, mask, gateway, dns = validate(
@@ -168,7 +167,6 @@ def create(
 
     ip = IPAddress(
         interface_id=interface_id,
-        network_id=network_id,
         address=address,
         mask=mask,
         gateway=gateway,
@@ -190,7 +188,6 @@ def update(
     address_type: str,
     gateway: str | None = None,
     dns: str | None = None,
-    network_id: int | None = None,
     is_primary: bool = True,
 ) -> IPAddress:
     ip = require_found(get_by_id(db, ip_id), "IP address")
@@ -201,7 +198,6 @@ def update(
     )
 
     ip.interface_id = interface_id
-    ip.network_id = network_id
     ip.address = address
     ip.mask = mask
     ip.gateway = gateway

@@ -110,28 +110,16 @@ def delete(db: Session, network_id: int) -> None:
     if network is None:
         return
 
-    from app.models.device import Device
-    from app.models.ip_address import IPAddress
+    from app.models.interface import Interface
 
-    devices_in_use = (
-        db.query(Device)
-        .filter(Device.network_id == network_id)
+    interfaces_in_use = (
+        db.query(Interface)
+        .filter(Interface.network_id == network_id)
         .count()
     )
-    if devices_in_use > 0:
+    if interfaces_in_use > 0:
         raise ValidationError(
-            f"Cannot delete: {devices_in_use} device(s) belong to this network",
-            field="id",
-        )
-
-    ips_in_use = (
-        db.query(IPAddress)
-        .filter(IPAddress.network_id == network_id)
-        .count()
-    )
-    if ips_in_use > 0:
-        raise ValidationError(
-            f"Cannot delete: {ips_in_use} IP address(es) belong to this network",
+            f"Cannot delete: {interfaces_in_use} interface(s) belong to this network",
             field="id",
         )
 

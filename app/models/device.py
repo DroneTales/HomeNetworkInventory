@@ -30,7 +30,6 @@ class Device(Base):
     vendor_id: Mapped[int | None] = mapped_column(ForeignKey("vendors.id"))
     model_id: Mapped[int | None] = mapped_column(ForeignKey("models.id"))
     location_id: Mapped[int | None] = mapped_column(ForeignKey("locations.id"))
-    network_id: Mapped[int | None] = mapped_column(ForeignKey("networks.id"))
 
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(
@@ -45,7 +44,6 @@ class Device(Base):
     vendor: Mapped["Vendor | None"] = relationship(back_populates="devices")
     model: Mapped["Model | None"] = relationship(back_populates="devices")
     location: Mapped["Location | None"] = relationship(back_populates="devices")
-    network: Mapped["Network | None"] = relationship(back_populates="devices")
 
     interfaces: Mapped[list["Interface"]] = relationship(
         back_populates="device", cascade="all, delete-orphan"

@@ -44,6 +44,7 @@ __all__ = [
     "PortForward",
     "Service",
     "Site",
+    "TopologyPosition",
     "User",
     "UserSite",
     "Vendor",

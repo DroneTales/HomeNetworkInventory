@@ -10,6 +10,8 @@
 <div class="interface-row border rounded p-2 mb-2">
     <input type="hidden" name="interface_id" class="iface-id"
            value="{{ iface.id if iface and iface.id else '' }}">
+    <input type="hidden" name="interface_network_id" class="iface-network-id"
+           value="{{ iface.network_id if iface and iface.network_id else '' }}">
 
     {% set cur_type = iface.type if iface else 'ethernet' %}
     {% set cur_at = iface.address_type if iface else 'static' %}

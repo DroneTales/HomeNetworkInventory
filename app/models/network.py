@@ -27,5 +27,4 @@ class Network(Base):
     description: Mapped[str | None] = mapped_column(String(255))
 
     site: Mapped["Site"] = relationship(back_populates="networks")
-    devices: Mapped[list["Device"]] = relationship(back_populates="network")
-    ip_addresses: Mapped[list["IPAddress"]] = relationship(back_populates="network")
+    interfaces: Mapped[list["Interface"]] = relationship(back_populates="network")

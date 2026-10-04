@@ -17,7 +17,6 @@ from app.models.interface import Interface
 from app.models.ip_address import IPAddress
 from app.models.location import Location
 from app.models.model import Model
-from app.models.network import Network
 from app.models.vendor import Vendor
 
 
@@ -64,7 +63,6 @@ def _check_references(
     vendor_id: int | None,
     model_id: int | None,
     location_id: int | None,
-    network_id: int | None,
 ) -> None:
     if device_type_id is not None:
         require_found(db.get(DeviceType, device_type_id), "Device type", field="device_type_id")
@@ -82,13 +80,6 @@ def _check_references(
                 field="location_id",
             )
 
-    if network_id is not None:
-        net = require_found(db.get(Network, network_id), "Network", field="network_id")
-        if net.site_id != site_id:
-            raise ValidationError(
-                "Network belongs to a different home",
-                field="network_id",
-            )
 
 def _validate_consistency(db: Session, device: Device) -> None:
     # Active device types require at least one IP; passive ones must have none
@@ -127,13 +118,12 @@ def create(
     vendor_id: int | None = None,
     model_id: int | None = None,
     location_id: int | None = None,
-    network_id: int | None = None,
     is_active: bool = True,
 ) -> Device:
     hostname = validate_hostname(hostname, field="hostname")
 
     _check_references(
-        db, site_id, device_type_id, vendor_id, model_id, location_id, network_id
+        db, site_id, device_type_id, vendor_id, model_id, location_id
     )
     _check_hostname_unique(db, hostname, site_id)
 
@@ -146,7 +136,6 @@ def create(
         vendor_id=vendor_id,
         model_id=model_id,
         location_id=location_id,
-        network_id=network_id,
         is_active=is_active,
     )
     db.add(device)
@@ -163,7 +152,6 @@ def update(
     vendor_id: int | None = None,
     model_id: int | None = None,
     location_id: int | None = None,
-    network_id: int | None = None,
     is_active: bool = True,
 ) -> Device:
     device = require_found(get_by_id(db, device_id), "Device")
@@ -177,7 +165,6 @@ def update(
         vendor_id,
         model_id,
         location_id,
-        network_id,
     )
     _check_hostname_unique(db, hostname, device.site_id, exclude_id=device_id)
 
@@ -188,7 +175,6 @@ def update(
     device.vendor_id = vendor_id
     device.model_id = model_id
     device.location_id = location_id
-    device.network_id = network_id
     device.is_active = is_active
     db.flush()
     return device

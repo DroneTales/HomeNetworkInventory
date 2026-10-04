@@ -171,6 +171,24 @@ def view_device(
             if ip.address:
                 device_ips.append(ip.address)
 
+    iface_groups_map: dict[int | None, dict] = {}
+    for iface in interfaces:
+        key = iface.network_id
+        if key not in iface_groups_map:
+            iface_groups_map[key] = {
+                "network": iface.network if key else None,
+                "interfaces": [],
+            }
+        iface_groups_map[key]["interfaces"].append(iface)
+
+    interface_groups = sorted(
+        [g for g in iface_groups_map.values() if g["network"] is not None],
+        key=lambda g: g["network"].name,
+    )
+    no_network = iface_groups_map.get(None)
+    if no_network:
+        interface_groups.append(no_network)
+
     wifi_clients = []
     for w in wifi_networks:
         clients = []
@@ -205,6 +223,7 @@ def view_device(
         current_site=site,
         device=device,
         interfaces=interfaces,
+        interface_groups=interface_groups,
         ports=ports,
         wifi_networks=wifi_networks,
         dhcp_pools=dhcp_pools,
@@ -295,7 +314,6 @@ def _process_device_form(
     vendor_id = to_int(form.get("vendor_id"))
     model_id = to_int(form.get("model_id"))
     location_id = to_int(form.get("location_id"))
-    network_id = to_int(form.get("network_id"))
     is_active = form.get("is_active") == "on"
 
     interfaces = _collect_interfaces(form)
@@ -327,7 +345,6 @@ def _process_device_form(
                 vendor_id=vendor_id,
                 model_id=model_id,
                 location_id=location_id,
-                network_id=network_id,
                 is_active=is_active,
             )
         else:
@@ -341,12 +358,11 @@ def _process_device_form(
                 vendor_id=vendor_id,
                 model_id=model_id,
                 location_id=location_id,
-                network_id=network_id,
                 is_active=is_active,
             )
 
         created_ips, iface_id_map, deferred_links, ifaces_to_delete = _sync_interfaces(
-            db, device, interfaces, network_id
+            db, device, interfaces
         )
         wifi_map = _sync_wifi_networks(db, device, wifi_networks, iface_id_map)
         _apply_client_wifi_links(db, deferred_links, wifi_map)
@@ -448,7 +464,6 @@ def _sync_interfaces(
     db: Session,
     device: Device,
     items: list[dict],
-    network_id: int | None,
 ) -> tuple[list[tuple[str, str]], dict[int, int], list[tuple[int, str]], list[int]]:
     existing = {i.id: i for i in device.interfaces}
     seen_ids = set()
@@ -459,6 +474,7 @@ def _sync_interfaces(
     for idx, data in enumerate(items):
         item_id = data.get("id")
         is_wifi_client = data["type"] == IFACE_TYPE_WIFI
+        iface_network_id = data.get("network_id")
 
         if item_id and item_id in existing:
             iface = existing[item_id]
@@ -470,6 +486,7 @@ def _sync_interfaces(
                 mac=data["mac"],
                 band=data.get("band"),
                 connected_wifi_network_id=iface.connected_wifi_network_id if is_wifi_client else None,
+                network_id=iface_network_id,
                 defer_wifi_validation=is_wifi_client,
             )
             seen_ids.add(item_id)
@@ -482,6 +499,7 @@ def _sync_interfaces(
                 mac=data["mac"],
                 band=data.get("band"),
                 connected_wifi_network_id=None,
+                network_id=iface_network_id,
                 defer_wifi_validation=is_wifi_client,
             )
 
@@ -509,7 +527,6 @@ def _sync_interfaces(
                     address_type=data["address_type"],
                     gateway=data.get("gateway"),
                     dns=data.get("dns"),
-                    network_id=network_id,
                 )
                 for extra_id in list(existing_ips.keys())[1:]:
                     db.delete(existing_ips[extra_id])
@@ -522,7 +539,6 @@ def _sync_interfaces(
                     address_type=data["address_type"],
                     gateway=data.get("gateway"),
                     dns=data.get("dns"),
-                    network_id=network_id,
                 )
             if data.get("address"):
                 all_ips.append((data["address"], data["address_type"]))
@@ -739,6 +755,7 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
             "gateway": (ip.gateway if ip and ip.gateway else "") or "",
             "dns": (ip.dns if ip and ip.dns else "") or "",
             "connected_wifi_network_id": iface.connected_wifi_network_id or "",
+            "network_id": iface.network_id or "",
         })
 
     ports = []
@@ -819,7 +836,6 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
         "vendor_id": device.vendor_id or "",
         "model_id": device.model_id or "",
         "location_id": device.location_id or "",
-        "network_id": device.network_id or "",
         "is_active": device.is_active,
         "interfaces": interfaces,
         "ports": ports,
@@ -839,7 +855,6 @@ def _form_dict(form) -> dict:
         "vendor_id": form.get("vendor_id") or "",
         "model_id": form.get("model_id") or "",
         "location_id": form.get("location_id") or "",
-        "network_id": form.get("network_id") or "",
         "is_active": form.get("is_active") == "on",
         "interfaces": _collect_interfaces(form),
         "ports": _collect_ports(form),
@@ -896,6 +911,7 @@ def _collect_interfaces(form) -> list[dict]:
     gateways = form.getlist("interface_gateway")
     dns_list = form.getlist("interface_dns")
     wifi_links = form.getlist("interface_connected_wifi")
+    network_ids = form.getlist("interface_network_id")
 
     result = []
     for i, name in enumerate(names):
@@ -914,6 +930,7 @@ def _collect_interfaces(form) -> list[dict]:
         gateway = (gateways[i] if i < len(gateways) else "").strip() or None
         dns = (dns_list[i] if i < len(dns_list) else "").strip() or None
         connected_wifi = (wifi_links[i] if i < len(wifi_links) else "").strip() or None
+        network_id = to_int(network_ids[i] if i < len(network_ids) else None)
 
         result.append({
             "id": item_id,
@@ -927,6 +944,7 @@ def _collect_interfaces(form) -> list[dict]:
             "gateway": gateway,
             "dns": dns,
             "connected_wifi_network_id": connected_wifi,
+            "network_id": network_id,
         })
 
     return result

@@ -321,5 +321,6 @@
   "topology.btn.reset": "Сбросить раскладку",
   "topology.reset.confirm": "Сбросить все сохранённые позиции узлов?",
   "topology.btn.save": "Сохранить раскладку",
-  "devices.badge.wifi_ap": "Раздаёт Wi-Fi"
+  "devices.badge.wifi_ap": "Раздаёт Wi-Fi",
+  "devices.form.no_network": "Без сети"
 }

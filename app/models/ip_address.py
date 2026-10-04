@@ -20,8 +20,6 @@ class IPAddress(Base):
     interface_id: Mapped[int] = mapped_column(
         ForeignKey("interfaces.id", ondelete="CASCADE"), nullable=False
     )
-    network_id: Mapped[int | None] = mapped_column(ForeignKey("networks.id"))
-
     address: Mapped[str | None] = mapped_column(String(45), index=True)
     mask: Mapped[str | None] = mapped_column(String(45))
     gateway: Mapped[str | None] = mapped_column(String(45))
@@ -30,4 +28,3 @@ class IPAddress(Base):
     is_primary: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     interface: Mapped["Interface"] = relationship(back_populates="ip_addresses")
-    network: Mapped["Network | None"] = relationship(back_populates="ip_addresses")

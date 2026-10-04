@@ -53,17 +53,56 @@
         if (options.afterMutation) options.afterMutation();
     }
 
-    setupList({
-        containerId: "interfaces-container",
-        emptyHintId: "interfaces-empty",
-        addBtnId: "add-interface-btn",
-        templateId: "interface-row-template",
-        rowClass: "interface-row",
-        removeBtnClass: "remove-iface-btn",
-        afterBind: bindInterfaceRow,
-        afterMutation: rebuildBroadcastSelects,
-        beforeRemove: checkInterfaceBeforeRemove,
-    });
+    function allInterfaceRows() {
+        return document.querySelectorAll(".iface-group-container .interface-row");
+    }
+
+    function setupInterfaceGroup(group) {
+        const container = group.querySelector(".iface-group-container");
+        const addBtn = group.querySelector(".add-iface-btn");
+        const emptyHint = group.querySelector(".iface-group-empty");
+        const template = document.getElementById("interface-row-template");
+        const networkId = group.dataset.networkId || "";
+
+        if (!container || !addBtn || !template) return;
+
+        function updateEmpty() {
+            if (!emptyHint) return;
+            const rows = container.querySelectorAll(".interface-row");
+            emptyHint.classList.toggle("d-none", rows.length > 0);
+        }
+
+        function bindRemove(row) {
+            const removeBtn = row.querySelector(".remove-iface-btn");
+            if (removeBtn) {
+                removeBtn.addEventListener("click", function () {
+                    if (checkInterfaceBeforeRemove(row) === false) return;
+                    row.remove();
+                    updateEmpty();
+                    rebuildBroadcastSelects();
+                });
+            }
+            bindInterfaceRow(row);
+        }
+
+        addBtn.addEventListener("click", function () {
+            const clone = template.content.firstElementChild.cloneNode(true);
+            const netInput = clone.querySelector(".iface-network-id");
+            if (netInput) netInput.value = networkId;
+            container.appendChild(clone);
+            bindRemove(clone);
+            updateEmpty();
+            rebuildBroadcastSelects();
+            const firstInput = clone.querySelector("input, select");
+            if (firstInput) firstInput.focus();
+        });
+
+        container.querySelectorAll(".interface-row").forEach(bindRemove);
+        updateEmpty();
+    }
+
+    document.querySelectorAll(".iface-group").forEach(setupInterfaceGroup);
+    rebuildBroadcastSelects();
 
     function bindInterfaceRow(row) {
         const typeSelect = row.querySelector(".iface-type");
@@ -143,10 +182,7 @@
         const typeSelect = row.querySelector(".iface-type");
         if (!typeSelect || typeSelect.value !== "wifi_ap") return true;
 
-        const container = document.getElementById("interfaces-container");
-        if (!container) return true;
-
-        const rows = container.querySelectorAll(".interface-row");
+        const rows = allInterfaceRows();
         let idx = -1;
         rows.forEach(function (r, i) { if (r === row) idx = i; });
         if (idx < 0) return true;
@@ -174,10 +210,7 @@
     }
 
     function rebuildBroadcastSelects() {
-        const ifaceContainer = document.getElementById("interfaces-container");
-        if (!ifaceContainer) return;
-
-        const rows = ifaceContainer.querySelectorAll(".interface-row");
+        const rows = allInterfaceRows();
         const options = [{value: "", label: "—"}];
         rows.forEach(function (r, idx) {
             const type = r.querySelector(".iface-type");

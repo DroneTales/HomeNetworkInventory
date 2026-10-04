@@ -79,16 +79,6 @@
 
                     <dt class="col-sm-4">{{ t('devices.list.location') }}</dt>
                     <dd class="col-sm-8">{{ device.location.name if device.location else '—' }}</dd>
-
-                    <dt class="col-sm-4">{{ t('devices.form.field.network') }}</dt>
-                    <dd class="col-sm-8">
-                        {% if device.network %}
-                            {{ device.network.name }}
-                            ({{ device.network.network_address }}/{{ device.network.mask }})
-                        {% else %}
-                            —
-                        {% endif %}
-                    </dd>
                 </dl>
             </div>
             <div class="col-md-6">
@@ -113,75 +103,86 @@
         <span class="section-count">({{ interfaces|length }})</span>
     </div>
     <div class="card-body">
-        {% if not interfaces %}
-        <div class="text-muted small">{{ t('devices.view.empty.interfaces') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.list.name') }}</th>
-                    <th>{{ t('devices.list.type') }}</th>
-                    <th>{{ t('devices.list.mac') }}</th>
-                    <th>{{ t('devices.list.local_ip') }}</th>
-                    <th>{{ t('devices.form.field.mask') }}</th>
-                    <th>{{ t('devices.form.field.address_type') }}</th>
-                    <th>{{ t('devices.list.gateway') }}</th>
-                    <th>{{ t('devices.form.field.dns') }}</th>
-                    <th>{{ t('devices.view.field.connected_wifi') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for iface in interfaces %}
-                    {% set ips = iface.ip_addresses %}
-                    {% if ips %}
-                        {% for ip in ips %}
+        {% for group in interface_groups %}
+        <div class="{% if not loop.first %}mt-3{% endif %}">
+            <div class="fw-semibold mb-2">
+                {% if group.network %}
+                    <a href="/reference/networks/{{ group.network.id }}/edit" class="text-decoration-none">
+                        <i class="fa-solid fa-network-wired me-1"></i>{{ group.network.name }}
+                    </a>
+                {% else %}
+                    <span class="text-muted">
+                        <i class="fa-solid fa-circle-question me-1"></i>{{ t('devices.form.no_network') }}
+                    </span>
+                {% endif %}
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>{{ t('devices.list.name') }}</th>
+                        <th>{{ t('devices.list.type') }}</th>
+                        <th>{{ t('devices.list.mac') }}</th>
+                        <th>{{ t('devices.list.local_ip') }}</th>
+                        <th>{{ t('devices.form.field.mask') }}</th>
+                        <th>{{ t('devices.form.field.address_type') }}</th>
+                        <th>{{ t('devices.list.gateway') }}</th>
+                        <th>{{ t('devices.form.field.dns') }}</th>
+                        <th>{{ t('devices.view.field.connected_wifi') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for iface in group.interfaces %}
+                        {% set ips = iface.ip_addresses %}
+                        {% if ips %}
+                            {% for ip in ips %}
+                            <tr>
+                                {% if loop.first %}
+                                <td rowspan="{{ ips|length }}"><code>{{ iface.name }}</code></td>
+                                <td rowspan="{{ ips|length }}">{{ iface.type }}{% if iface.band %} <span class="badge bg-secondary">{{ iface.band }}</span>{% endif %}</td>
+                                <td rowspan="{{ ips|length }}">{{ dash(iface.mac) }}</td>
+                                {% endif %}
+                                <td>
+                                    {% if ip.address %}{{ ip.address }}
+                                    {% elif ip.address_type == 'dhcp' %}<span class="text-muted fst-italic">{{ t('devices.view.dhcp_unknown') }}</span>
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td>{{ dash(ip.mask) }}</td>
+                                <td>{{ ip.address_type }}</td>
+                                <td>{{ dash(ip.gateway) }}</td>
+                                <td>{{ dash(ip.dns) }}</td>
+                                {% if loop.first %}
+                                <td rowspan="{{ ips|length }}">
+                                    {% if iface.connected_wifi_network %}
+                                        {{ iface.connected_wifi_network.ssid }}
+                                    {% else %}—{% endif %}
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        {% else %}
                         <tr>
-                            {% if loop.first %}
-                            <td rowspan="{{ ips|length }}"><code>{{ iface.name }}</code></td>
-                            <td rowspan="{{ ips|length }}">{{ iface.type }}{% if iface.band %} <span class="badge bg-secondary">{{ iface.band }}</span>{% endif %}</td>
-                            <td rowspan="{{ ips|length }}">{{ dash(iface.mac) }}</td>
-                            {% endif %}
+                            <td><code>{{ iface.name }}</code></td>
+                            <td>{{ iface.type }}{% if iface.band %} <span class="badge bg-secondary">{{ iface.band }}</span>{% endif %}</td>
+                            <td>{{ dash(iface.mac) }}</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
                             <td>
-                                {% if ip.address %}{{ ip.address }}
-                                {% elif ip.address_type == 'dhcp' %}<span class="text-muted fst-italic">{{ t('devices.view.dhcp_unknown') }}</span>
-                                {% else %}—{% endif %}
-                            </td>
-                            <td>{{ dash(ip.mask) }}</td>
-                            <td>{{ ip.address_type }}</td>
-                            <td>{{ dash(ip.gateway) }}</td>
-                            <td>{{ dash(ip.dns) }}</td>
-                            {% if loop.first %}
-                            <td rowspan="{{ ips|length }}">
                                 {% if iface.connected_wifi_network %}
                                     {{ iface.connected_wifi_network.ssid }}
                                 {% else %}—{% endif %}
                             </td>
-                            {% endif %}
                         </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td><code>{{ iface.name }}</code></td>
-                        <td>{{ iface.type }}{% if iface.band %} <span class="badge bg-secondary">{{ iface.band }}</span>{% endif %}</td>
-                        <td>{{ dash(iface.mac) }}</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td>
-                            {% if iface.connected_wifi_network %}
-                                {{ iface.connected_wifi_network.ssid }}
-                            {% else %}—{% endif %}
-                        </td>
-                    </tr>
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        {% endif %}
+        {% endfor %}
     </div>
 </div>
 {% endif %}

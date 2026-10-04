@@ -10,6 +10,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.constants import (
+    IFACE_TYPE_PORT,
     IFACE_TYPE_WIFI,
     IFACE_TYPE_WIFI_AP,
     VALID_BANDS,
@@ -19,6 +20,7 @@ from app.core.exceptions import ValidationError
 from app.core.validation import require_found, validate_choice, validate_mac
 from app.models.device import Device
 from app.models.interface import Interface
+from app.models.network import Network
 from app.models.wifi_network import WiFiNetwork
 
 
@@ -46,7 +48,6 @@ def _validate_wifi_links(
     band: str | None,
     connected_wifi_network_id: int | None,
     db: Session,
-    exclude_interface_id: int | None = None,
     defer_wifi_validation: bool = False,
 ) -> None:
     if not defer_wifi_validation and type == IFACE_TYPE_WIFI and connected_wifi_network_id is None:
@@ -75,6 +76,31 @@ def _validate_wifi_links(
             field="connected_wifi_network_id",
         )
 
+
+def _validate_network(
+    db: Session,
+    type: str,
+    network_id: int | None,
+    site_id: int,
+) -> int | None:
+    if type == IFACE_TYPE_PORT:
+        if network_id is not None:
+            raise ValidationError(
+                "Port interface cannot belong to a network",
+                field="network_id",
+            )
+        return None
+
+    if network_id is None:
+        return None
+
+    network = require_found(db.get(Network, network_id), "Network", field="network_id")
+    if network.site_id != site_id:
+        raise ValidationError(
+            "Network belongs to another home",
+            field="network_id",
+        )
+    return network_id
 
 def list_by_device(db: Session, device_id: int) -> list[Interface]:
     return (
@@ -112,9 +138,10 @@ def create(
     band: str | None = None,
     is_active: bool = True,
     connected_wifi_network_id: int | None = None,
+    network_id: int | None = None,
     defer_wifi_validation: bool = False,
 ) -> Interface:
-    require_found(db.get(Device, device_id), "Device", field="device_id")
+    device = require_found(db.get(Device, device_id), "Device", field="device_id")
 
     name = (name or "").strip()
     if not name:
@@ -132,6 +159,7 @@ def create(
 
     band = _validate_band(type, band)
     _validate_wifi_links(type, band, connected_wifi_network_id, db, defer_wifi_validation=defer_wifi_validation)
+    network_id = _validate_network(db, type, network_id, device.site_id)
 
     iface = Interface(
         device_id=device_id,
@@ -141,6 +169,7 @@ def create(
         band=band,
         is_active=is_active,
         connected_wifi_network_id=connected_wifi_network_id,
+        network_id=network_id,
     )
     db.add(iface)
     db.flush()
@@ -155,6 +184,7 @@ def update(
     band: str | None = None,
     is_active: bool = True,
     connected_wifi_network_id: int | None = None,
+    network_id: int | None = None,
     defer_wifi_validation: bool = False,
 ) -> Interface:
     iface = require_found(get_by_id(db, interface_id), "Interface")
@@ -174,7 +204,9 @@ def update(
         mac = None
 
     band = _validate_band(type, band)
-    _validate_wifi_links(type, band, connected_wifi_network_id, db, exclude_interface_id=interface_id, defer_wifi_validation=defer_wifi_validation)
+    _validate_wifi_links(type, band, connected_wifi_network_id, db, defer_wifi_validation=defer_wifi_validation)
+    device = require_found(db.get(Device, iface.device_id), "Device")
+    network_id = _validate_network(db, type, network_id, device.site_id)
 
     iface.name = name
     iface.type = type
@@ -182,6 +214,7 @@ def update(
     iface.band = band
     iface.is_active = is_active
     iface.connected_wifi_network_id = connected_wifi_network_id
+    iface.network_id = network_id
     db.flush()
     return iface
 

@@ -29,8 +29,12 @@ class Interface(Base):
     connected_wifi_network_id: Mapped[int | None] = mapped_column(
         ForeignKey("wifi_networks.id", ondelete="SET NULL")
     )
+    network_id: Mapped[int | None] = mapped_column(
+        ForeignKey("networks.id", ondelete="SET NULL")
+    )
 
     device: Mapped["Device"] = relationship(back_populates="interfaces")
+    network: Mapped["Network | None"] = relationship(back_populates="interfaces")
     connected_wifi_network: Mapped["WiFiNetwork | None"] = relationship(
         back_populates="connected_interfaces",
         foreign_keys=[connected_wifi_network_id],

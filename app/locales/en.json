@@ -321,5 +321,6 @@
   "topology.btn.reset": "Reset layout",
   "topology.reset.confirm": "Reset all saved node positions?",
   "topology.btn.save": "Save layout",
-  "devices.badge.wifi_ap": "Broadcasts Wi-Fi"
+  "devices.badge.wifi_ap": "Broadcasts Wi-Fi",
+  "devices.form.no_network": "No network"
 }
