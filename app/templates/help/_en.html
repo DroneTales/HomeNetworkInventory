@@ -116,8 +116,18 @@
     <p>Network interfaces of the device. The <strong>+ Add interface</strong> button adds a row. Row fields:</p>
     <ul>
         <li><strong>Name</strong> — <code>eth0</code>, <code>wan0</code>, <code>wlan0</code>. Required.</li>
-        <li><strong>Type</strong> — <code>ethernet</code>, <code>wifi</code>, <code>wan</code>, <code>virtual</code>, <code>port</code>. Type <code>port</code> is a "dumb" port with no IP (for passive devices).</li>
-        <li><strong>MAC</strong> — MAC address. Can be empty for <code>static</code>, but is <strong>required</strong> for <code>dhcp</code> and <code>reserved</code>.</li>
+        <li><strong>Type</strong> — one of:
+            <ul>
+                <li><code>ethernet</code> — wired interface.</li>
+                <li><code>wifi</code> — Wi-Fi client interface (the device connects to an existing Wi-Fi network).</li>
+                <li><code>wifi_ap</code> — Wi-Fi Access Point radio (the device <em>broadcasts</em> Wi-Fi networks).</li>
+                <li><code>wan</code> — uplink interface.</li>
+                <li><code>virtual</code> — virtual interface (VLAN, tunnel, bridge).</li>
+                <li><code>port</code> — "dumb" socket with no IP (for passive devices).</li>
+            </ul>
+        </li>
+        <li><strong>MAC</strong> (or <strong>Radio MAC</strong> for <code>wifi_ap</code>) — MAC address. Can be empty for <code>static</code>, but is <strong>required</strong> for <code>dhcp</code> and <code>reserved</code>. For a Wi-Fi AP it is the BSSID of the radio, shared by all SSIDs on that radio.</li>
+        <li><strong>Band</strong> — only for <code>wifi_ap</code>. Required. One of <code>2.4</code>, <code>5</code>, <code>6</code>. Wi-Fi networks broadcast through this interface inherit the band.</li>
         <li><strong>IP address</strong> — the address. Leave empty for type <code>port</code>.</li>
         <li><strong>Mask</strong> — subnet mask. Can be empty for <code>external</code>.</li>
         <li><strong>Type</strong> (address type):
@@ -130,9 +140,10 @@
         </li>
         <li><strong>Gateway</strong> — if filled in, must be in the same subnet as the IP (except for <code>external</code>).</li>
         <li><strong>DNS</strong> — name server. Usually the same as the gateway.</li>
-        <li><strong>Connected Wi-Fi network</strong> — only for interfaces of type <code>wifi</code>. Choose the network this device is connected to.</li>
+        <li><strong>Connected Wi-Fi network</strong> — only for interfaces of type <code>wifi</code>. Required. Choose the network this device is connected to.</li>
     </ul>
-    <p>A device can have <strong>several</strong> interfaces — for example, LAN and WAN on a router.</p>
+    <p>A device can have <strong>several</strong> interfaces — for example, LAN and WAN on a router, or two Wi-Fi AP radios (2.4 GHz and 5 GHz) on an access point.</p>
+    <p><strong>IP uniqueness.</strong> An address is unique <em>within a home</em>, but may repeat across interfaces of the <em>same</em> device. This matches real routers where the management IP is shared by <code>eth0</code>, <code>wlan0</code>, and so on.</p>
 
     <p><strong>Ports (cyan):</strong></p>
     <p><strong>Available only when editing an existing device.</strong> Physical ports (sockets) on the device chassis. Used to define connections.</p>
@@ -147,12 +158,14 @@
     <p>Networks this device <strong>broadcasts</strong> (router, access point).</p>
     <ul>
         <li><strong>SSID</strong> — network name. Required.</li>
-        <li><strong>Band</strong> — <code>2.4</code>, <code>5</code>, <code>6</code>.</li>
+        <li><strong>Broadcast by</strong> — which <code>wifi_ap</code> interface broadcasts this SSID. Required. The band is taken from the interface, so a 5 GHz SSID can only be broadcast through a 5 GHz radio.</li>
         <li><strong>Encryption</strong> — encryption type.</li>
         <li><strong>Password</strong> — stored in plain text.</li>
         <li><strong>Guest</strong> — this is a guest network.</li>
     </ul>
-    <p>An access point can broadcast <strong>multiple</strong> networks.</p>
+    <p>An access point can broadcast <strong>multiple</strong> networks — either through one radio (multi-SSID) or through several radios (dual-band AP).</p>
+    <p><strong>Band comes from the radio, not the SSID.</strong> To add a second band, add a second <code>wifi_ap</code> interface with the desired band, then create the SSID again and set <em>Broadcast by</em> to that interface.</p>
+    <p><strong>A <code>wifi_ap</code> interface cannot be deleted while any Wi-Fi network is still broadcast through it.</strong> Reassign those networks to another interface first — or remove them. The device form warns you before the interface is removed.</p>
 
     <p><strong>DHCP pools (orange):</strong></p>
     <p>Address pools this device <strong>serves</strong> (modem, router).</p>

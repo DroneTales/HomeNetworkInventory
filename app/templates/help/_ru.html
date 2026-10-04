@@ -116,8 +116,18 @@
     <p>Сетевые интерфейсы устройства. Кнопка <strong>+ Add interface</strong> добавляет строку. Поля строки:</p>
     <ul>
         <li><strong>Name</strong> — <code>eth0</code>, <code>wan0</code>, <code>wlan0</code>. Обязательно.</li>
-        <li><strong>Type</strong> — <code>ethernet</code>, <code>wifi</code>, <code>wan</code>, <code>virtual</code>, <code>port</code>. Тип <code>port</code> — «тупой» порт без IP (для пассивных устройств).</li>
-        <li><strong>MAC</strong> — MAC-адрес. Может быть пустым для <code>static</code>, <strong>обязателен</strong> для <code>dhcp</code> и <code>reserved</code>.</li>
+        <li><strong>Type</strong> — один из:
+            <ul>
+                <li><code>ethernet</code> — проводной интерфейс.</li>
+                <li><code>wifi</code> — клиентский Wi-Fi интерфейс (устройство подключается к существующей сети).</li>
+                <li><code>wifi_ap</code> — радио точки доступа (устройство <em>раздаёт</em> Wi-Fi сети).</li>
+                <li><code>wan</code> — аплинк-интерфейс.</li>
+                <li><code>virtual</code> — виртуальный интерфейс (VLAN, туннель, мост).</li>
+                <li><code>port</code> — «тупой» разъём без IP (для пассивных устройств).</li>
+            </ul>
+        </li>
+        <li><strong>MAC</strong> (для <code>wifi_ap</code> — <strong>MAC радио</strong>) — MAC-адрес. Может быть пустым для <code>static</code>, <strong>обязателен</strong> для <code>dhcp</code> и <code>reserved</code>. Для Wi-Fi AP это BSSID радио, общий для всех SSID на этом радио.</li>
+        <li><strong>Band</strong> — только для <code>wifi_ap</code>. Обязателен. Один из <code>2.4</code>, <code>5</code>, <code>6</code>. Wi-Fi сети, вещаемые через этот интерфейс, наследуют band.</li>
         <li><strong>IP address</strong> — адрес. Для типа <code>port</code> не заполняется.</li>
         <li><strong>Mask</strong> — маска подсети. Для <code>external</code> можно оставить пустой.</li>
         <li><strong>Type</strong> (тип адреса):
@@ -130,9 +140,10 @@
         </li>
         <li><strong>Gateway</strong> — шлюз. Если заполнен, должен быть в той же подсети, что и IP (кроме <code>external</code>).</li>
         <li><strong>DNS</strong> — сервер имён. Обычно совпадает со шлюзом.</li>
-        <li><strong>Connected Wi-Fi network</strong> — только для интерфейса типа <code>wifi</code>. Выбор сети, к которой подключено устройство.</li>
+        <li><strong>Connected Wi-Fi network</strong> — только для интерфейса типа <code>wifi</code>. Обязательно. Выбор сети, к которой подключено устройство.</li>
     </ul>
-    <p>Интерфейсов может быть <strong>несколько</strong> — например, LAN и WAN у роутера.</p>
+    <p>Интерфейсов может быть <strong>несколько</strong> — например, LAN и WAN у роутера, или два Wi-Fi радио (2.4 и 5 ГГц) у точки доступа.</p>
+    <p><strong>Уникальность IP.</strong> Адрес уникален <em>в пределах дома</em>, но может повторяться на разных интерфейсах <em>одного</em> устройства. Это соответствует реальным роутерам, у которых один управляющий IP используется на <code>eth0</code>, <code>wlan0</code> и так далее.</p>
 
     <p><strong>Ports (голубой):</strong></p>
     <p><strong>Доступно только при редактировании существующего устройства.</strong> Физические порты (разъёмы) на корпусе. Используются для связей.</p>
@@ -147,12 +158,14 @@
     <p>Сети, которые <strong>раздаёт</strong> это устройство (роутер, точка доступа).</p>
     <ul>
         <li><strong>SSID</strong> — имя сети. Обязательно.</li>
-        <li><strong>Band</strong> — диапазон: <code>2.4</code>, <code>5</code>, <code>6</code>.</li>
+        <li><strong>Broadcast by</strong> (вещает через) — какой <code>wifi_ap</code> интерфейс раздаёт этот SSID. Обязательно. Band берётся из интерфейса, поэтому 5 ГГц SSID можно вещать только через 5 ГГц радио.</li>
         <li><strong>Encryption</strong> — тип шифрования.</li>
         <li><strong>Password</strong> — пароль. Хранится в открытом виде.</li>
         <li><strong>Guest</strong> — это гостевая сеть.</li>
     </ul>
-    <p>Одна точка доступа может раздавать <strong>несколько</strong> сетей.</p>
+    <p>Одна точка доступа может раздавать <strong>несколько</strong> сетей — как через одно радио (multi-SSID), так и через несколько радио (двухдиапазонная точка).</p>
+    <p><strong>Band берётся из радио, а не из SSID.</strong> Чтобы добавить второй диапазон, добавь второй интерфейс <code>wifi_ap</code> с нужным band, затем создай SSID заново и укажи в <em>Broadcast by</em> этот интерфейс.</p>
+    <p><strong>Интерфейс <code>wifi_ap</code> нельзя удалить, пока через него вещают Wi-Fi сети.</strong> Сначала переназначь эти сети на другой интерфейс — или удали их. Форма устройства предупредит об этом до удаления.</p>
 
     <p><strong>DHCP pools (оранжевый):</strong></p>
     <p>Пулы адресов, которые <strong>выдаёт</strong> это устройство (модем, роутер).</p>
