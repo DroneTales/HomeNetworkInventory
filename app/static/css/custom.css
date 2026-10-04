@@ -753,3 +753,12 @@
 .ip-addr {
     font-variant-numeric: tabular-nums;
 }
+
+/* Interface row responsive layout */
+@media (min-width: 768px) {
+    .iface-col-name { max-width: 80px; }
+    .iface-col-type { max-width: 95px; }
+    .iface-col-mac { max-width: 150px; }
+    .iface-col-band { max-width: 90px; }
+    .iface-col-atype { max-width: 140px; }
+}

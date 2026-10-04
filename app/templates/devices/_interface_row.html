@@ -16,14 +16,14 @@
     {% set hide_ip_fields = (cur_type == 'port') or (cur_at == 'dhcp') %}
     {% set cur_band = iface.band if iface else '' %}
 
-    <div class="row g-1 align-items-end flex-nowrap">
-        <div class="col" style="max-width:80px">
+    <div class="row g-1 align-items-end iface-row-cols">
+        <div class="col-6 col-md iface-col-name">
             <label class="form-label small mb-0">{{ t('devices.form.field.name') }}</label>
             <input type="text" class="form-control form-control-sm iface-name px-1"
                    name="interface_name" value="{{ iface.name if iface else '' }}"
                    placeholder="eth0" required>
         </div>
-        <div class="col" style="max-width:95px">
+        <div class="col-6 col-md iface-col-type">
             <label class="form-label small mb-0">{{ t('devices.form.field.type') }}</label>
             <select class="form-select form-select-sm iface-type px-1" name="interface_type">
                 <option value="ethernet" {% if cur_type == 'ethernet' %}selected{% endif %}>ethernet</option>
@@ -34,7 +34,7 @@
                 <option value="port" {% if cur_type == 'port' %}selected{% endif %}>port</option>
             </select>
         </div>
-        <div class="col" style="max-width:150px">
+        <div class="col-6 col-md iface-col-mac">
             <label class="form-label small mb-0">
                 <span class="iface-mac-label-default">{{ t('devices.form.field.mac') }}</span>
                 <span class="iface-mac-label-ap d-none">{{ t('devices.form.field.radio_mac') }}</span>
@@ -43,7 +43,7 @@
                    name="interface_mac" value="{{ iface.mac if iface and iface.mac else '' }}"
                    placeholder="AA:BB:CC:DD:EE:FF">
         </div>
-        <div class="col iface-field-band {% if cur_type != 'wifi_ap' %}d-none{% endif %}" style="max-width:90px">
+        <div class="col-6 col-md iface-col-band iface-field-band {% if cur_type != 'wifi_ap' %}d-none{% endif %}">
             <label class="form-label small mb-0">{{ t('devices.form.field.band') }}</label>
             <select class="form-select form-select-sm iface-band px-1" name="interface_band">
                 <option value="">—</option>
@@ -52,8 +52,7 @@
                 <option value="6" {% if cur_band == '6' %}selected{% endif %}>6</option>
             </select>
         </div>
-        <div class="col iface-field-address-type {% if cur_type == 'port' %}d-none{% endif %}"
-             style="max-width:140px">
+        <div class="col-6 col-md iface-col-atype iface-field-address-type {% if cur_type == 'port' %}d-none{% endif %}">
             <label class="form-label small mb-0">{{ t('devices.form.field.address_type') }}</label>
             <select class="form-select form-select-sm iface-address-type px-1" name="interface_address_type">
                 <option value="static" {% if cur_at == 'static' %}selected{% endif %}>static</option>
@@ -62,34 +61,34 @@
                 <option value="reserved" {% if cur_at == 'reserved' %}selected{% endif %}>reserved</option>
             </select>
         </div>
-        <div class="col iface-field-address {% if hide_ip_fields %}d-none{% endif %}">
+        <div class="col-12 col-md iface-field-address {% if hide_ip_fields %}d-none{% endif %}">
             <label class="form-label small mb-0">{{ t('devices.form.field.ip_address') }}</label>
             <input type="text" class="form-control form-control-sm iface-address px-1"
                    name="interface_address"
                    value="{{ iface.address if iface and iface.address else '' }}"
                    placeholder="192.168.1.10">
         </div>
-        <div class="col iface-field-mask {% if hide_ip_fields %}d-none{% endif %}">
+        <div class="col-6 col-md iface-field-mask {% if hide_ip_fields %}d-none{% endif %}">
             <label class="form-label small mb-0">{{ t('devices.form.field.mask') }}</label>
             <input type="text" class="form-control form-control-sm iface-mask px-1"
                    name="interface_mask"
                    value="{{ iface.mask if iface and iface.mask else '255.255.255.0' }}">
         </div>
-        <div class="col iface-field-gateway {% if hide_ip_fields %}d-none{% endif %}">
+        <div class="col-6 col-md iface-field-gateway {% if hide_ip_fields %}d-none{% endif %}">
             <label class="form-label small mb-0">{{ t('devices.form.field.gateway') }}</label>
             <input type="text" class="form-control form-control-sm iface-gateway px-1"
                    name="interface_gateway"
                    value="{{ iface.gateway if iface and iface.gateway else '' }}"
                    placeholder="192.168.1.1">
         </div>
-        <div class="col iface-field-dns {% if hide_ip_fields %}d-none{% endif %}">
+        <div class="col-12 col-md iface-field-dns {% if hide_ip_fields %}d-none{% endif %}">
             <label class="form-label small mb-0">{{ t('devices.form.field.dns') }}</label>
             <input type="text" class="form-control form-control-sm iface-dns px-1"
                    name="interface_dns"
                    value="{{ iface.dns if iface and iface.dns else '' }}"
                    placeholder="192.168.1.1">
         </div>
-        <div class="col-auto text-end">
+        <div class="col-12 col-md-auto text-end">
             <button type="button" class="btn btn-sm btn-outline-danger remove-iface-btn px-1">{{ t('devices.form.btn.remove') }}</button>
         </div>
     </div>
