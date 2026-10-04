@@ -98,6 +98,7 @@ def list_devices(
                 "pf_out": len(d.port_forwards) > 0,
                 "pf_in": len(d.port_forwards_targeted) > 0,
                 "services": len(d.services),
+                "wifi_ap": any(i.type == IFACE_TYPE_WIFI_AP for i in d.interfaces),
             },
         })
 

@@ -762,3 +762,9 @@
     .iface-col-band { max-width: 90px; }
     .iface-col-atype { max-width: 140px; }
 }
+
+.dev-badge-wifi-ap {
+    background: #7c2d12;
+    border-color: #fb923c;
+    color: #fed7aa;
+}

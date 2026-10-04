@@ -320,5 +320,6 @@
   "devices.form.hint.cannot_delete_wifi_ap": "Нельзя удалить Wi-Fi AP интерфейс: через него вещают {ssids}. Сначала переназначьте эти сети.",
   "topology.btn.reset": "Сбросить раскладку",
   "topology.reset.confirm": "Сбросить все сохранённые позиции узлов?",
-  "topology.btn.save": "Сохранить раскладку"
+  "topology.btn.save": "Сохранить раскладку",
+  "devices.badge.wifi_ap": "Раздаёт Wi-Fi"
 }

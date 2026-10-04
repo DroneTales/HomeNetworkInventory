@@ -31,6 +31,9 @@
         {% if flags.services > 0 %}
         <span class="dev-badge dev-badge-svc" title="{{ t('devices.badge.services') }}"><i class="fa-solid fa-server"></i><span class="dev-badge-count">{{ flags.services }}</span></span>
         {% endif %}
+        {% if flags.wifi_ap %}
+        <span class="dev-badge dev-badge-wifi-ap" title="{{ t('devices.badge.wifi_ap') }}"><i class="fa-solid fa-wifi"></i></span>
+        {% endif %}
     </span>
 {% if not inline %}</div>{% endif %}
 {% endmacro %}
