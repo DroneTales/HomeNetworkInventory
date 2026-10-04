@@ -317,5 +317,8 @@
   "help.toc.port_forwards": "8. Port forwarding",
   "devices.form.field.radio_mac": "Radio MAC",
   "devices.form.field.broadcast_by": "Broadcast by",
-  "devices.form.hint.cannot_delete_wifi_ap": "Cannot delete Wi-Fi AP interface: it broadcasts {ssids}. Reassign those networks first."
+  "devices.form.hint.cannot_delete_wifi_ap": "Cannot delete Wi-Fi AP interface: it broadcasts {ssids}. Reassign those networks first.",
+  "topology.btn.reset": "Reset layout",
+  "topology.reset.confirm": "Reset all saved node positions?",
+  "topology.btn.save": "Save layout"
 }

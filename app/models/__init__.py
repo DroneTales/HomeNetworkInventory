@@ -22,6 +22,7 @@ from app.models.port import Port
 from app.models.port_forward import PortForward
 from app.models.service import Service
 from app.models.site import Site
+from app.models.topology_position import TopologyPosition
 from app.models.user import User
 from app.models.user_site import UserSite
 from app.models.vendor import Vendor

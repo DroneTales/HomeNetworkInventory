@@ -11,10 +11,11 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 
-from app.core.deps import require_site, require_user
+from app.core.deps import require_edit, require_site, require_user
 from app.core.device_classify import classify_device
 from app.core.templating import render
 from app.crud import device as crud_device
+from app.crud import topology_position as crud_pos
 from app.database import get_db
 from app.models.site import Site
 from app.models.user import User
@@ -138,10 +139,40 @@ def topology_data(
         if d.location:
             locations[d.location.id] = {"id": d.location.id, "name": d.location.name}
 
+    positions = [
+        {"device_id": row.device_id, "x": row.x, "y": row.y}
+        for row in crud_pos.list_by_site(db, site.id)
+    ]
+
     return JSONResponse({
         "site": {"id": site.id, "name": site.name},
         "locations": list(locations.values()),
         "devices": nodes,
         "ports": port_nodes,
         "edges": edges,
+        "positions": positions,
     })
+
+@router.post("/positions")
+async def save_positions(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_edit),
+    site: Site = Depends(require_site),
+):
+    payload = await request.json()
+    positions = payload.get("positions") or []
+    updated = crud_pos.upsert_many(db, site.id, positions)
+    db.commit()
+    return JSONResponse({"ok": True, "updated": updated})
+
+
+@router.delete("/positions")
+def reset_positions(
+    db: Session = Depends(get_db),
+    user: User = Depends(require_edit),
+    site: Site = Depends(require_site),
+):
+    deleted = crud_pos.clear_site(db, site.id)
+    db.commit()
+    return JSONResponse({"ok": True, "deleted": deleted})

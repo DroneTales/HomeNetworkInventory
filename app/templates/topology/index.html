@@ -20,6 +20,14 @@
         <button type="button" class="btn btn-outline-secondary btn-sm" id="topology-fit-btn">
             <i class="fa-solid fa-expand me-1"></i>{{ t('topology.btn.fit') }}
         </button>
+        {% if current_user.role == 'admin' or current_user.can_edit %}
+        <button type="button" class="btn btn-primary btn-sm" id="topology-save-btn">
+            <i class="fa-solid fa-floppy-disk me-1"></i>{{ t('topology.btn.save') }}
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm" id="topology-reset-btn">
+            <i class="fa-solid fa-rotate-left me-1"></i>{{ t('topology.btn.reset') }}
+        </button>
+        {% endif %}
         <a href="/connections" class="btn btn-outline-secondary">
             <i class="fa-solid fa-arrow-left me-1"></i>{{ t('topology.btn.back') }}
         </a>
@@ -32,7 +40,8 @@
             <div id="topology-container"
                  style="height: 78vh; min-height: 500px;"
                  data-site-id="{{ current_site.id }}"
-                 data-data-url="/topology/data">
+                 data-data-url="/topology/data"
+                 data-can-edit="{% if current_user.role == 'admin' or current_user.can_edit %}1{% else %}0{% endif %}">
                 <div class="text-muted small d-flex align-items-center justify-content-center h-100">
                     {{ t('topology.loading') }}
                 </div>
@@ -119,8 +128,9 @@ window.TOPO_I18N = {
     "topology.open_device": "{{ t('topology.open_device') }}",
     "topology.section.ports": "{{ t('topology.section.ports') }}",
     "topology.port.none": "{{ t('topology.port.none') }}",
-    "topology.ports.empty": "{{ t('topology.ports.empty') }}"
+    "topology.ports.empty": "{{ t('topology.ports.empty') }}",
+    "topology.reset.confirm": "{{ t('topology.reset.confirm') }}"
 };
 </script>
-<script src="/static/js/topology.js"></script>
+<script src="/static/js/topology.js?v=3"></script>
 {% endblock %}

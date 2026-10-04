@@ -22,6 +22,8 @@
     }
 
     const dataUrl = container.dataset.dataUrl || "/topology/data";
+    const canEdit = container.dataset.canEdit === "1";
+    const positionsUrl = "/topology/positions";
 
     fetch(dataUrl, { credentials: "same-origin" })
         .then(function (r) { return r.json(); })
@@ -260,6 +262,90 @@
                 }
             },
         ]);
+
+        const hasPositions = (data.positions || []).length > 0;
+        const savedPositions = {};
+        (data.positions || []).forEach(function (p) {
+            savedPositions["device-" + p.device_id] = { x: p.x, y: p.y };
+        });
+
+        cy.ready(function () {
+            cy.on("layoutstop", function () {
+                if (!hasPositions) return;
+                cy.nodes("node.leaf").forEach(function (n) {
+                    const pos = savedPositions[n.id()];
+                    if (pos) {
+                        n.position({ x: pos.x, y: pos.y });
+                    }
+                });
+                cy.fit(null, 30);
+            });
+        });
+
+        function runFcose() {
+            cy.layout({
+                name: "fcose",
+                animate: true,
+                animationDuration: 500,
+                nodeRepulsion: 8000,
+                idealEdgeLength: 120,
+            }).run();
+        }
+
+        function collectAllPositions() {
+            const list = [];
+            cy.nodes("node.leaf").forEach(function (n) {
+                const p = n.position();
+                list.push({
+                    device_id: parseInt(n.id().replace("device-", ""), 10),
+                    x: p.x,
+                    y: p.y,
+                });
+            });
+            return list;
+        }
+
+        const saveBtn = document.getElementById("topology-save-btn");
+        if (saveBtn && canEdit) {
+            saveBtn.addEventListener("click", function () {
+                const list = collectAllPositions();
+                if (list.length === 0) return;
+                saveBtn.disabled = true;
+                fetch(positionsUrl, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ positions: list }),
+                }).then(function (r) {
+                    return r.json();
+                }).then(function (data) {
+                    if (data && data.ok) {
+                        saveBtn.classList.remove("btn-primary");
+                        saveBtn.classList.add("btn-success");
+                        setTimeout(function () {
+                            saveBtn.classList.remove("btn-success");
+                            saveBtn.classList.add("btn-primary");
+                        }, 1200);
+                    }
+                }).catch(function () { /* silent */ })
+                  .finally(function () { saveBtn.disabled = false; });
+            });
+        }
+
+        const resetBtn = document.getElementById("topology-reset-btn");
+        if (resetBtn && canEdit) {
+            resetBtn.addEventListener("click", function () {
+                const msg = t("topology.reset.confirm");
+                if (!window.confirm(msg)) return;
+                resetBtn.disabled = true;
+                fetch(positionsUrl, {
+                    method: "DELETE",
+                    credentials: "same-origin",
+                }).then(function () {
+                    runFcose();
+                }).finally(function () { resetBtn.disabled = false; });
+            });
+        }
 
         const tooltip = document.createElement("div");
         tooltip.className = "topo-tooltip";

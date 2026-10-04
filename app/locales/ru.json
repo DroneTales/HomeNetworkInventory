@@ -317,5 +317,8 @@
   "help.toc.port_forwards": "8. Проброс портов",
   "devices.form.field.radio_mac": "MAC радио",
   "devices.form.field.broadcast_by": "Вещает через",
-  "devices.form.hint.cannot_delete_wifi_ap": "Нельзя удалить Wi-Fi AP интерфейс: через него вещают {ssids}. Сначала переназначьте эти сети."
+  "devices.form.hint.cannot_delete_wifi_ap": "Нельзя удалить Wi-Fi AP интерфейс: через него вещают {ssids}. Сначала переназначьте эти сети.",
+  "topology.btn.reset": "Сбросить раскладку",
+  "topology.reset.confirm": "Сбросить все сохранённые позиции узлов?",
+  "topology.btn.save": "Сохранить раскладку"
 }
