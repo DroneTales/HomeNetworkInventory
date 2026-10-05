@@ -260,7 +260,6 @@
   "users.list.change_own_password": "Own password",
   "connections.wireless.title": "Wi-Fi connections",
   "connections.wireless.empty": "No Wi-Fi connections.",
-  "devices.view.section.wifi_clients": "Wi-Fi clients",
   "sites.list.title": "Choose a home",
   "sites.list.heading": "Choose a home",
   "sites.list.subtitle": "Pick a home to work with its inventory.",
@@ -314,5 +313,6 @@
   "devices.form.drag_handle": "Drag to move between networks",
   "devices.view.dhcp.assigned": "Assigned IP addresses",
   "devices.view.dhcp.dynamic_clients": "DHCP clients",
-  "devices.view.field.connected_to": "Connected to"
+  "devices.view.field.connected_to": "Connected to",
+  "devices.view.wifi.clients": "Connected clients"
 }

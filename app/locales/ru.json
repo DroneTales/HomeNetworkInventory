@@ -260,7 +260,6 @@
   "users.list.change_own_password": "Свой пароль",
   "connections.wireless.title": "Wi-Fi подключения",
   "connections.wireless.empty": "Wi-Fi подключений нет.",
-  "devices.view.section.wifi_clients": "Wi-Fi клиенты",
   "sites.list.title": "Выбор дома",
   "sites.list.heading": "Выберите дом",
   "sites.list.subtitle": "Выберите дом, чтобы перейти к его инвентарю.",
@@ -314,5 +313,6 @@
   "devices.form.drag_handle": "Перетащите, чтобы сменить сеть",
   "devices.view.dhcp.assigned": "Закреплённые адреса",
   "devices.view.dhcp.dynamic_clients": "DHCP-клиенты",
-  "devices.view.field.connected_to": "Подключено к"
+  "devices.view.field.connected_to": "Подключено к",
+  "devices.view.wifi.clients": "Подключённые клиенты"
 }

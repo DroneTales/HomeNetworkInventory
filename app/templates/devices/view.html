@@ -187,131 +187,6 @@
 </div>
 {% endif %}
 
-{# ---------- Port forwarding ---------- #}
-{% if port_forwards %}
-<div class="card info-card section-port-forwarding mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-right-left"></i>
-        <span>{{ t('devices.view.section.pf') }}</span>
-        <span class="section-count">({{ port_forwards|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not port_forwards %}
-        <div class="text-muted small">{{ t('devices.view.empty.pf') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.form.field.description') }}</th>
-                    <th>{{ t('devices.view.field.external') }}</th>
-                    <th>{{ t('devices.form.field.protocol') }}</th>
-                    <th>{{ t('devices.form.field.target') }}</th>
-                    <th>{{ t('devices.view.field.internal') }}</th>
-                    <th>{{ t('devices.form.field.active') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for pf in port_forwards %}
-                <tr>
-                    <td>{{ dash(pf.description) }}</td>
-                    <td>
-                        {% if pf.external_port_start == pf.external_port_end %}
-                            {{ pf.external_port_start }}
-                        {% else %}
-                            {{ pf.external_port_start }}–{{ pf.external_port_end }}
-                        {% endif %}
-                    </td>
-                    <td>{{ pf.protocol }}</td>
-                    <td>
-                        {% if pf.internal_device %}
-                            <a href="/devices/{{ pf.internal_device.id }}">{{ pf.internal_device.hostname }}</a>
-                        {% elif pf.internal_ip_manual %}
-                            {{ pf.internal_ip_manual }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if pf.internal_port_start == pf.internal_port_end %}
-                            {{ pf.internal_port_start }}
-                        {% else %}
-                            {{ pf.internal_port_start }}–{{ pf.internal_port_end }}
-                        {% endif %}
-                    </td>
-                    <td>{{ check(pf.is_active) }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
-
-{# ---------- Incoming port forwarding ---------- #}
-{% if incoming_port_forwards %}
-<div class="card info-card section-port-forwarding mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-right-to-bracket"></i>
-        <span>{{ t('devices.view.section.pf_incoming') }}</span>
-        <span class="section-count">({{ incoming_port_forwards|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not incoming_port_forwards %}
-        <div class="text-muted small">{{ t('devices.view.empty.pf_incoming') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.view.field.pf_source') }}</th>
-                    <th>{{ t('devices.view.field.external') }}</th>
-                    <th>{{ t('devices.form.field.protocol') }}</th>
-                    <th>{{ t('devices.view.field.internal') }}</th>
-                    <th>{{ t('devices.form.field.active') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in incoming_port_forwards %}
-                <tr>
-                    <td>
-                        {% if item.source_device %}
-                            <a href="/devices/{{ item.source_device.id }}">{{ item.source_device.hostname }}</a>
-                        {% else %}
-                            —
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if item.pf.external_port_start == item.pf.external_port_end %}
-                            {{ item.pf.external_port_start }}
-                        {% else %}
-                            {{ item.pf.external_port_start }}–{{ item.pf.external_port_end }}
-                        {% endif %}
-                    </td>
-                    <td>{{ item.pf.protocol }}</td>
-                    <td>
-                        {% if item.pf.internal_port_start == item.pf.internal_port_end %}
-                            {{ item.pf.internal_port_start }}
-                        {% else %}
-                            {{ item.pf.internal_port_start }}–{{ item.pf.internal_port_end }}
-                        {% endif %}
-                        {% if item.matched_ip %}
-                            <span class="text-muted small">({{ item.matched_ip }})</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ check(item.pf.is_active) }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
-
 {# ---------- Ports ---------- #}
 {% if ports %}
 <div class="card info-card section-ports mb-3">
@@ -385,9 +260,6 @@
         <span class="section-count">({{ wifi_networks|length }})</span>
     </div>
     <div class="card-body">
-        {% if not wifi_networks %}
-        <div class="text-muted small">{{ t('devices.view.empty.wifi') }}</div>
-        {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
@@ -400,7 +272,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for w in wifi_networks %}
+                {% for row in wifi_rows %}
+                {% set w = row.wifi %}
                 <tr>
                     <td>{{ w.ssid }}</td>
                     <td>
@@ -424,44 +297,41 @@
                     </td>
                     <td>{{ check(w.is_guest) }}</td>
                 </tr>
+                {% if row.clients %}
+                <tr>
+                    <td colspan="5" class="bg-body-tertiary">
+                        <div class="small fw-semibold mb-2 ms-4">
+                            <i class="fa-solid fa-plug-circle-check me-1"></i>{{ t('devices.view.wifi.clients') }}
+                        </div>
+                        <div class="ms-4">
+                            <table class="table table-sm table-borderless align-middle mb-0 small">
+                                <thead>
+                                <tr class="text-muted">
+                                    <th>{{ t('devices.list.hostname') }}</th>
+                                    <th>{{ t('devices.list.name') }}</th>
+                                    <th>{{ t('devices.form.field.interface') }}</th>
+                                    <th>{{ t('devices.list.local_ip') }}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for c in row.clients %}
+                                <tr>
+                                    <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a></td>
+                                    <td>{{ dash(c.device.human_readable_name) }}</td>
+                                    <td><code>{{ c.interface.name }}</code></td>
+                                    <td>{{ dash(c.ip.address) if c.ip else '—' }}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
                 {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
-
-{# ---------- Wi-Fi clients ---------- #}
-{% if wifi_clients %}
-<div class="card info-card section-wifi mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-wifi"></i>
-        <span>{{ t('devices.view.section.wifi_clients') }}</span>
-    </div>
-    <div class="card-body">
-        {% for wc in wifi_clients %}
-        <div class="mb-3{% if not loop.last %} pb-3 border-bottom{% endif %}">
-            <div class="mb-2">
-                <span class="fw-bold">{{ wc.wifi.ssid }}</span>
-                {% if wc.wifi.band %}<span class="badge bg-secondary ms-1">{{ wc.wifi.band }} GHz</span>{% endif %}
-                {% if wc.wifi.is_guest %}<span class="badge bg-info text-dark ms-1">{{ t('devices.form.field.guest') }}</span>{% endif %}
-                <span class="text-muted small ms-2">({{ wc.clients|length }})</span>
-            </div>
-            <ul class="list-unstyled mb-0 small">
-                {% for c in wc.clients %}
-                <li class="py-1">
-                    <i class="fa-solid fa-plug text-muted me-1"></i>
-                    <a href="/devices/{{ c.id }}" class="text-decoration-none">{{ c.hostname }}</a>
-                    {% if c.human_readable_name %}
-                    <span class="text-muted">— {{ c.human_readable_name }}</span>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endfor %}
     </div>
 </div>
 {% endif %}
@@ -674,6 +544,131 @@
                         {% endif %}
                     </td>
                     <td>{{ dash(c.description) }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{# ---------- Port forwarding ---------- #}
+{% if port_forwards %}
+<div class="card info-card section-port-forwarding mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-right-left"></i>
+        <span>{{ t('devices.view.section.pf') }}</span>
+        <span class="section-count">({{ port_forwards|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not port_forwards %}
+        <div class="text-muted small">{{ t('devices.view.empty.pf') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.form.field.description') }}</th>
+                    <th>{{ t('devices.view.field.external') }}</th>
+                    <th>{{ t('devices.form.field.protocol') }}</th>
+                    <th>{{ t('devices.form.field.target') }}</th>
+                    <th>{{ t('devices.view.field.internal') }}</th>
+                    <th>{{ t('devices.form.field.active') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for pf in port_forwards %}
+                <tr>
+                    <td>{{ dash(pf.description) }}</td>
+                    <td>
+                        {% if pf.external_port_start == pf.external_port_end %}
+                            {{ pf.external_port_start }}
+                        {% else %}
+                            {{ pf.external_port_start }}–{{ pf.external_port_end }}
+                        {% endif %}
+                    </td>
+                    <td>{{ pf.protocol }}</td>
+                    <td>
+                        {% if pf.internal_device %}
+                            <a href="/devices/{{ pf.internal_device.id }}">{{ pf.internal_device.hostname }}</a>
+                        {% elif pf.internal_ip_manual %}
+                            {{ pf.internal_ip_manual }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if pf.internal_port_start == pf.internal_port_end %}
+                            {{ pf.internal_port_start }}
+                        {% else %}
+                            {{ pf.internal_port_start }}–{{ pf.internal_port_end }}
+                        {% endif %}
+                    </td>
+                    <td>{{ check(pf.is_active) }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{# ---------- Incoming port forwarding ---------- #}
+{% if incoming_port_forwards %}
+<div class="card info-card section-port-forwarding mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>{{ t('devices.view.section.pf_incoming') }}</span>
+        <span class="section-count">({{ incoming_port_forwards|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not incoming_port_forwards %}
+        <div class="text-muted small">{{ t('devices.view.empty.pf_incoming') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.view.field.pf_source') }}</th>
+                    <th>{{ t('devices.view.field.external') }}</th>
+                    <th>{{ t('devices.form.field.protocol') }}</th>
+                    <th>{{ t('devices.view.field.internal') }}</th>
+                    <th>{{ t('devices.form.field.active') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in incoming_port_forwards %}
+                <tr>
+                    <td>
+                        {% if item.source_device %}
+                            <a href="/devices/{{ item.source_device.id }}">{{ item.source_device.hostname }}</a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.pf.external_port_start == item.pf.external_port_end %}
+                            {{ item.pf.external_port_start }}
+                        {% else %}
+                            {{ item.pf.external_port_start }}–{{ item.pf.external_port_end }}
+                        {% endif %}
+                    </td>
+                    <td>{{ item.pf.protocol }}</td>
+                    <td>
+                        {% if item.pf.internal_port_start == item.pf.internal_port_end %}
+                            {{ item.pf.internal_port_start }}
+                        {% else %}
+                            {{ item.pf.internal_port_start }}–{{ item.pf.internal_port_end }}
+                        {% endif %}
+                        {% if item.matched_ip %}
+                            <span class="text-muted small">({{ item.matched_ip }})</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ check(item.pf.is_active) }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
