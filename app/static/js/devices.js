@@ -80,6 +80,7 @@
                     row.remove();
                     updateEmpty();
                     rebuildBroadcastSelects();
+                    rebuildPortInterfaceSelects();
                 });
             }
             bindInterfaceRow(row);
@@ -93,6 +94,7 @@
             bindRemove(clone);
             updateEmpty();
             rebuildBroadcastSelects();
+            rebuildPortInterfaceSelects();
             const firstInput = clone.querySelector("input, select");
             if (firstInput) firstInput.focus();
         });
@@ -103,6 +105,7 @@
 
     document.querySelectorAll(".iface-group").forEach(setupInterfaceGroup);
     rebuildBroadcastSelects();
+    rebuildPortInterfaceSelects();
 
     function bindInterfaceRow(row) {
         const typeSelect = row.querySelector(".iface-type");
@@ -160,17 +163,81 @@
             }
         }
 
-        if (typeSelect) typeSelect.addEventListener("change", function () { refresh(); rebuildBroadcastSelects(); });
+        if (typeSelect) typeSelect.addEventListener("change", function () { refresh(); rebuildBroadcastSelects(); rebuildPortInterfaceSelects(); });
         if (addressTypeSelect) addressTypeSelect.addEventListener("change", refresh);
 
         const nameInput = row.querySelector(".iface-name");
-        if (nameInput) nameInput.addEventListener("input", rebuildBroadcastSelects);
+        if (nameInput) nameInput.addEventListener("input", function () { rebuildBroadcastSelects(); rebuildPortInterfaceSelects(); });
 
         const bandSelect = row.querySelector(".iface-band");
         if (bandSelect) bandSelect.addEventListener("change", rebuildBroadcastSelects);
 
         refresh();
     }
+
+    function ifaceRowRawId(row) {
+        const idInput = row.querySelector(".iface-id");
+        return idInput ? idInput.value.trim() : "";
+    }
+
+    function buildInterfaceOptions() {
+        const options = [];
+        let idx = 0;
+        allInterfaceRows().forEach(function (row) {
+            const nameInput = row.querySelector(".iface-name");
+            const name = nameInput ? nameInput.value.trim() : "";
+            if (!name) return;
+            const typeSelect = row.querySelector(".iface-type");
+            const type = typeSelect ? typeSelect.value.trim() : "ethernet";
+            if (type !== "wifi" && type !== "wifi_ap") {
+                const raw = ifaceRowRawId(row);
+                const value = raw || ("new:" + idx);
+                options.push({ value: value, label: name + " (" + type + ")" });
+            }
+            idx++;
+        });
+        return options;
+    }
+
+    function rebuildPortInterfaceSelects() {
+        const options = buildInterfaceOptions();
+        const hint = document.getElementById("ports-need-interface");
+        if (hint) hint.classList.toggle("d-none", options.length > 0);
+
+        document.querySelectorAll(".port-interface").forEach(function (sel) {
+            const current = sel.dataset.selected || sel.value || "";
+            while (sel.options.length > 0) sel.remove(0);
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "—";
+            sel.appendChild(placeholder);
+
+            options.forEach(function (o) {
+                const opt = document.createElement("option");
+                opt.value = o.value;
+                opt.textContent = o.label;
+                sel.appendChild(opt);
+            });
+
+            let matched = false;
+            for (let i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === current) {
+                    sel.selectedIndex = i;
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) sel.value = "";
+            sel.dataset.selected = sel.value;
+        });
+    }
+
+    document.addEventListener("change", function (e) {
+        if (e.target && e.target.classList && e.target.classList.contains("port-interface")) {
+            e.target.dataset.selected = e.target.value;
+        }
+    });
 
     document.addEventListener("change", function (e) {
         if (e.target && e.target.classList.contains("wifi-broadcast-by")) {
@@ -258,6 +325,7 @@
         templateId: "port-row-template",
         rowClass: "port-row",
         removeBtnClass: "remove-port-btn",
+        afterMutation: rebuildPortInterfaceSelects,
     });
 
     setupList({

@@ -160,14 +160,12 @@
         </div>
     </div>
 
-    {# ---------- Ports (edit mode only) ---------- #}
-    {% if is_edit %}
+    {# ---------- Ports ---------- #}
     <div class="card info-card section-ports mb-3">
         <div class="card-header">
             <i class="fa-solid fa-plug"></i>
             <span>{{ t('devices.form.section.ports') }}</span>
-            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-port-btn"
-                    {% if not interfaces %}disabled title="{{ t('devices.form.hint.add_interface_first') }}"{% endif %}>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-port-btn">
                 <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_port') }}
             </button>
         </div>
@@ -182,14 +180,11 @@
             <div id="ports-empty" class="text-muted small {% if fd.ports %}d-none{% endif %}">
                 {{ t('devices.form.empty.ports') }}
             </div>
-            {% if not interfaces %}
-            <div class="text-muted small mt-2">
+            <div id="ports-need-interface" class="text-muted small mt-2 {% if interfaces %}d-none{% endif %}">
                 {{ t('devices.form.hint.ports_need_interface') }}
             </div>
-            {% endif %}
         </div>
     </div>
-    {% endif %}
 
     {# ---------- Wi-Fi networks ---------- #}
     <div class="card info-card section-wifi mb-3">
@@ -333,13 +328,11 @@
     {% endwith %}
 </template>
 
-{% if is_edit %}
 <template id="port-row-template">
     {% with port = None %}
         {% include "devices/_port_row.html" with context %}
     {% endwith %}
 </template>
-{% endif %}
 
 <template id="wifi-row-template">
     {% with wifi = None %}
@@ -376,6 +369,6 @@ window.DEVICES_FORM_CONFIG = {
     cannotDeleteWifiAp: {{ t('devices.form.hint.cannot_delete_wifi_ap')|tojson }}
 };
 </script>
-<script src="/static/js/devices.js?v=6"></script>
+<script src="/static/js/devices.js?v=7"></script>
 {% endblock %}
 

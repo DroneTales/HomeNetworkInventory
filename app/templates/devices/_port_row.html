@@ -21,17 +21,9 @@
         </div>
         <div class="col-6 col-md-3">
             <label class="form-label small mb-0">{{ t('devices.form.field.interface') }}</label>
-            <select class="form-select form-select-sm port-interface px-1" name="port_interface_id" required>
+            <select class="form-select form-select-sm port-interface px-1" name="port_interface_id"
+                    data-selected="{{ port.interface_id if port and port.interface_id else '' }}" required>
                 <option value="">—</option>
-                {% set cur_iface = port.interface_id if port and port.interface_id else '' %}
-                {% for iface in interfaces %}
-                {% if iface.type not in ('wifi', 'wifi_ap') %}
-                <option value="{{ iface.id }}"
-                        {% if cur_iface and cur_iface|string == iface.id|string %}selected{% endif %}>
-                    {{ iface.name }} ({{ iface.type }})
-                </option>
-                {% endif %}
-                {% endfor %}
             </select>
         </div>
         <div class="col-12 col-md-5">

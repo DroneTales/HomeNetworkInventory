@@ -369,7 +369,7 @@ def _process_device_form(
         _check_deletable_interfaces(db, ifaces_to_delete)
         for iface_id in ifaces_to_delete:
             crud_interface.delete(db, iface_id)
-        _sync_ports(db, device, ports)
+        _sync_ports(db, device, ports, iface_id_map)
         _sync_dhcp_pools(db, device, dhcp_pools)
         _sync_credentials(db, device, credentials)
         _sync_services(db, device, services)
@@ -580,7 +580,12 @@ def _apply_client_wifi_links(
     db.flush()
 
 
-def _sync_ports(db: Session, device: Device, items: list[dict]) -> None:
+def _sync_ports(
+    db: Session,
+    device: Device,
+    items: list[dict],
+    iface_id_map: dict[int, int],
+) -> None:
     valid_interface_ids = {
         row[0]
         for row in db.query(Interface.id)
@@ -593,7 +598,7 @@ def _sync_ports(db: Session, device: Device, items: list[dict]) -> None:
 
     for data in items:
         item_id = data.get("id")
-        interface_id = data.get("interface_id")
+        interface_id = _resolve_iface_id(data.get("interface_id"), iface_id_map)
 
         if interface_id is None or interface_id not in valid_interface_ids:
             continue
@@ -962,7 +967,7 @@ def _collect_ports(form) -> list[dict]:
             continue
 
         item_id = to_int(ids[i] if i < len(ids) else None)
-        interface_id = to_int(interface_ids[i] if i < len(interface_ids) else None)
+        interface_id = (interface_ids[i] if i < len(interface_ids) else "").strip() or None
         description = (descriptions[i] if i < len(descriptions) else "").strip() or None
 
         result.append({
