@@ -24,11 +24,9 @@
             <select class="form-select form-select-sm service-protocol px-1" name="service_protocol">
                 <option value="">—</option>
                 {% set cur_p = svc.protocol if svc and svc.protocol else '' %}
-                <option value="http" {% if cur_p == 'http' %}selected{% endif %}>http</option>
-                <option value="https" {% if cur_p == 'https' %}selected{% endif %}>https</option>
-                <option value="rtsp" {% if cur_p == 'rtsp' %}selected{% endif %}>rtsp</option>
-                <option value="ssh" {% if cur_p == 'ssh' %}selected{% endif %}>ssh</option>
-                <option value="other" {% if cur_p == 'other' %}selected{% endif %}>other</option>
+                {% for proto in service_protocols %}
+                <option value="{{ proto }}" {% if cur_p == proto %}selected{% endif %}>{{ proto }}</option>
+                {% endfor %}
             </select>
         </div>
         <div class="col-6 col-md-1">

@@ -53,4 +53,25 @@ CONNECTION_TYPE_PHYSICAL = "physical"
 CONNECTION_TYPE_LOGICAL = "logical"
 VALID_CONNECTION_TYPES = {CONNECTION_TYPE_PHYSICAL, CONNECTION_TYPE_LOGICAL}
 
-VALID_SERVICE_PROTOCOLS = {"http", "https", "rtsp", "ssh", "other"}
+VALID_SERVICE_PROTOCOLS = {
+    "dhcp",
+    "dns",
+    "ftp",
+    "http",
+    "https",
+    "imap",
+    "mqtt",
+    "nfs",
+    "ntp",
+    "other",
+    "pop3",
+    "rdp",
+    "rtp",
+    "rtsp",
+    "sftp",
+    "smb",
+    "smtp",
+    "ssh",
+    "telnet",
+    "vnc",
+}

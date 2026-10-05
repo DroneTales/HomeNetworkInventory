@@ -20,6 +20,7 @@ from app.core.constants import (
     IP_TYPE_STATIC,
     PF_PROTOCOL_TCP,
     ROLE_ADMIN,
+    VALID_SERVICE_PROTOCOLS,
 )
 from app.core.deps import require_admin, require_edit, require_site, require_user
 from app.core.exceptions import ValidationError
@@ -800,6 +801,7 @@ def _form_context(db: Session, site_id: int) -> dict:
         "all_wifi_networks": crud_wifi.list_by_site(db, site_id),
         "credential_types": crud_cred_type.list_all(db),
         "all_devices": crud_device.list_all(db, site_id),
+        "service_protocols": sorted(VALID_SERVICE_PROTOCOLS),
     }
 
 def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
