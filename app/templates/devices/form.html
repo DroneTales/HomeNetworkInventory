@@ -232,29 +232,6 @@
         </div>
     </div>
 
-    {# ---------- Credentials ---------- #}
-    <div class="card info-card section-credentials mb-3">
-        <div class="card-header">
-            <i class="fa-solid fa-key"></i>
-            <span>{{ t('devices.form.section.credentials') }}</span>
-            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-credential-btn">
-                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_credential') }}
-            </button>
-        </div>
-        <div class="card-body">
-            <div id="credentials-container">
-                {% for c in fd.credentials or [] %}
-                    {% with cred = c %}
-                        {% include "devices/_credential_row.html" with context %}
-                    {% endwith %}
-                {% endfor %}
-            </div>
-            <div id="credentials-empty" class="text-muted small {% if fd.credentials %}d-none{% endif %}">
-                {{ t('devices.form.empty.credentials') }}
-            </div>
-        </div>
-    </div>
-
     {# ---------- Services ---------- #}
     <div class="card info-card section-services mb-3">
         <div class="card-header">
@@ -274,6 +251,29 @@
             </div>
             <div id="services-empty" class="text-muted small {% if fd.services %}d-none{% endif %}">
                 {{ t('devices.form.empty.services') }}
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Credentials ---------- #}
+    <div class="card info-card section-credentials mb-3">
+        <div class="card-header">
+            <i class="fa-solid fa-key"></i>
+            <span>{{ t('devices.form.section.credentials') }}</span>
+            <button type="button" class="btn btn-sm btn-outline-primary ms-auto" id="add-credential-btn">
+                <i class="fa-solid fa-plus me-1"></i>{{ t('devices.form.add_credential') }}
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="credentials-container">
+                {% for c in fd.credentials or [] %}
+                    {% with cred = c %}
+                        {% include "devices/_credential_row.html" with context %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div id="credentials-empty" class="text-muted small {% if fd.credentials %}d-none{% endif %}">
+                {{ t('devices.form.empty.credentials') }}
             </div>
         </div>
     </div>

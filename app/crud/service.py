@@ -30,8 +30,7 @@ def get_by_id(db: Session, service_id: int) -> Service | None:
 def _validate(
     name: str,
     protocol: str | None,
-    port: int | None,
-) -> tuple[str, str | None, int | None]:
+) -> tuple[str, str | None]:
     name = (name or "").strip()
     if not name:
         raise ValidationError("Name is required", field="name")
@@ -43,35 +42,25 @@ def _validate(
     else:
         protocol = None
 
-    if port is not None and (not isinstance(port, int) or port < 1 or port > 65535):
-        raise ValidationError(
-            "Port must be between 1 and 65535",
-            field="port",
-        )
-
-    return name, protocol, port
+    return name, protocol
 
 def create(
     db: Session,
     device_id: int,
     name: str,
     protocol: str | None = None,
-    port: int | None = None,
     url: str | None = None,
-    path: str | None = None,
     description: str | None = None,
 ) -> Service:
     require_found(db.get(Device, device_id), "Device", field="device_id")
 
-    name, protocol, port = _validate(name, protocol, port)
+    name, protocol = _validate(name, protocol)
 
     service = Service(
         device_id=device_id,
         name=name,
         protocol=protocol,
-        port=port,
         url=url or None,
-        path=path or None,
         description=description or None,
     )
     db.add(service)
@@ -83,20 +72,16 @@ def update(
     service_id: int,
     name: str,
     protocol: str | None = None,
-    port: int | None = None,
     url: str | None = None,
-    path: str | None = None,
     description: str | None = None,
 ) -> Service:
     service = require_found(get_by_id(db, service_id), "Service")
 
-    name, protocol, port = _validate(name, protocol, port)
+    name, protocol = _validate(name, protocol)
 
     service.name = name
     service.protocol = protocol
-    service.port = port
     service.url = url or None
-    service.path = path or None
     service.description = description or None
     db.flush()
     return service

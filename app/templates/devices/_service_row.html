@@ -29,26 +29,12 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="col-6 col-md-1">
-            <label class="form-label small mb-0">{{ t('devices.form.field.port') }}</label>
-            <input type="text" inputmode="numeric" maxlength="5"
-                   class="form-control form-control-sm service-port px-1"
-                   name="service_port"
-                   value="{{ svc.port if svc and svc.port else '' }}">
-        </div>
         <div class="col-12 col-md-3">
             <label class="form-label small mb-0">{{ t('devices.form.field.url') }}</label>
             <input type="text" class="form-control form-control-sm service-url px-1"
                    name="service_url"
                    value="{{ svc.url if svc and svc.url else '' }}"
                    placeholder="http://192.168.1.13" maxlength="255">
-        </div>
-        <div class="col-6 col-md-2">
-            <label class="form-label small mb-0">{{ t('devices.form.field.path') }}</label>
-            <input type="text" class="form-control form-control-sm service-path px-1"
-                   name="service_path"
-                   value="{{ svc.path if svc and svc.path else '' }}"
-                   placeholder="/api/v1" maxlength="255">
         </div>
         <div class="col-12 col-md-2">
             <label class="form-label small mb-0">{{ t('devices.form.field.description') }}</label>

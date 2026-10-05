@@ -607,6 +607,55 @@
 </div>
 {% endif %}
 
+{# ---------- Services ---------- #}
+{% if services %}
+<div class="card info-card section-services mb-3">
+    <div class="card-header">
+        <i class="fa-solid fa-cogs"></i>
+        <span>{{ t('devices.view.section.services') }}</span>
+        <span class="section-count">({{ services|length }})</span>
+    </div>
+    <div class="card-body">
+        {% if not services %}
+        <div class="text-muted small">{{ t('devices.view.empty.services') }}</div>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>{{ t('devices.list.name') }}</th>
+                    <th>{{ t('devices.form.field.protocol') }}</th>
+                    <th>{{ t('devices.form.field.url') }}</th>
+                    <th>{{ t('devices.form.field.description') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in services %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ dash(s.protocol) }}</td>
+                    <td>
+                        {% if s.url %}
+                            {% if s.url.startswith('http://') or s.url.startswith('https://') or s.url.startswith('rtsp://') %}
+                            <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url }}</a>
+                            {% else %}
+                            {{ s.url }}
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{{ dash(s.description) }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 {# ---------- Credentials ---------- #}
 {% if credentials %}
 <div class="card info-card section-credentials mb-3">
@@ -649,59 +698,6 @@
                         {% endif %}
                     </td>
                     <td>{{ dash(c.description) }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
-
-{# ---------- Services ---------- #}
-{% if services %}
-<div class="card info-card section-services mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-cogs"></i>
-        <span>{{ t('devices.view.section.services') }}</span>
-        <span class="section-count">({{ services|length }})</span>
-    </div>
-    <div class="card-body">
-        {% if not services %}
-        <div class="text-muted small">{{ t('devices.view.empty.services') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.list.name') }}</th>
-                    <th>{{ t('devices.form.field.protocol') }}</th>
-                    <th>{{ t('devices.form.field.port') }}</th>
-                    <th>{{ t('devices.form.field.url') }}</th>
-                    <th>{{ t('devices.form.field.path') }}</th>
-                    <th>{{ t('devices.form.field.description') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for s in services %}
-                <tr>
-                    <td>{{ s.name }}</td>
-                    <td>{{ dash(s.protocol) }}</td>
-                    <td>{{ s.port if s.port is not none else '—' }}</td>
-                    <td>
-                        {% if s.url %}
-                            {% if s.url.startswith('http://') or s.url.startswith('https://') or s.url.startswith('rtsp://') %}
-                            <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url }}</a>
-                            {% else %}
-                            {{ s.url }}
-                            {% endif %}
-                        {% else %}
-                        —
-                        {% endif %}
-                    </td>
-                    <td>{{ dash(s.path) }}</td>
-                    <td>{{ dash(s.description) }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

@@ -769,9 +769,7 @@ def _sync_services(db: Session, device: Device, items: list[dict]) -> None:
                 service_id=item_id,
                 name=data["name"],
                 protocol=data["protocol"],
-                port=data["port"],
                 url=data["url"],
-                path=data["path"],
                 description=data["description"],
             )
             seen_ids.add(item_id)
@@ -781,9 +779,7 @@ def _sync_services(db: Session, device: Device, items: list[dict]) -> None:
                 device_id=device.id,
                 name=data["name"],
                 protocol=data["protocol"],
-                port=data["port"],
                 url=data["url"],
-                path=data["path"],
                 description=data["description"],
             )
 
@@ -872,9 +868,7 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
             "id": s.id,
             "name": s.name,
             "protocol": s.protocol or "",
-            "port": s.port if s.port is not None else "",
             "url": s.url or "",
-            "path": s.path or "",
             "description": s.description or "",
         })
 
@@ -1135,9 +1129,7 @@ def _collect_services(form) -> list[dict]:
     ids = form.getlist("service_id")
     names = form.getlist("service_name")
     protocols = form.getlist("service_protocol")
-    ports = form.getlist("service_port")
     urls = form.getlist("service_url")
-    paths = form.getlist("service_path")
     descriptions = form.getlist("service_description")
 
     result = []
@@ -1148,18 +1140,14 @@ def _collect_services(form) -> list[dict]:
 
         item_id = to_int(ids[i] if i < len(ids) else None)
         protocol = (protocols[i] if i < len(protocols) else "").strip() or None
-        port = to_int(ports[i] if i < len(ports) else None)
         url = (urls[i] if i < len(urls) else "").strip() or None
-        path = (paths[i] if i < len(paths) else "").strip() or None
         description = (descriptions[i] if i < len(descriptions) else "").strip() or None
 
         result.append({
             "id": item_id,
             "name": name,
             "protocol": protocol,
-            "port": port,
             "url": url,
-            "path": path,
             "description": description,
         })
 
