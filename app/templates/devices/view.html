@@ -321,9 +321,6 @@
         <span class="section-count">({{ ports|length }})</span>
     </div>
     <div class="card-body">
-        {% if not ports %}
-        <div class="text-muted small">{{ t('devices.view.empty.ports') }}</div>
-        {% else %}
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
@@ -331,88 +328,50 @@
                     <th>{{ t('devices.list.name') }}</th>
                     <th>{{ t('devices.form.field.interface') }}</th>
                     <th>{{ t('devices.form.field.description') }}</th>
+                    <th>{{ t('devices.view.field.connected_to') }}</th>
+                    <th>{{ t('devices.view.field.direction') }}</th>
+                    <th>{{ t('devices.list.type') }}</th>
+                    <th>{{ t('devices.view.field.cable') }}</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for p in ports %}
-                <tr>
+                {% for row in port_rows %}
+                {% set p = row.port %}
+                {% set c = row.connection %}
+                {% set dir = row.direction %}
+                <tr class="{% if c and not c.is_active %}text-muted{% endif %}">
                     <td><code>{{ p.name }}</code></td>
                     <td><code>{{ p.interface.name }}</code></td>
                     <td>{{ dash(p.description) }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
-
-{# ---------- Connections ---------- #}
-{% if connections %}
-<div class="card info-card section-connections mb-3">
-    <div class="card-header">
-        <i class="fa-solid fa-link"></i>
-        <span>{{ t('devices.view.section.connections') }}</span>
-        <span class="section-count">({{ connections|length }})</span>
-        {% if current_user.role == 'admin' or current_user.can_edit %}
-        <a href="/connections/new" class="btn btn-sm btn-outline-primary ms-auto">
-            <i class="fa-solid fa-plus me-1"></i>{{ t('devices.view.btn.add_connection') }}
-        </a>
-        {% endif %}
-    </div>
-    <div class="card-body">
-        {% if not connections %}
-        <div class="text-muted small">{{ t('devices.view.empty.connections') }}</div>
-        {% else %}
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                <tr>
-                    <th>{{ t('devices.view.field.direction') }}</th>
-                    <th>{{ t('devices.view.field.this_port') }}</th>
-                    <th>{{ t('devices.view.field.other_port') }}</th>
-                    <th>{{ t('devices.list.type') }}</th>
-                    <th>{{ t('devices.view.field.cable') }}</th>
-                    <th>{{ t('devices.form.field.description') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for c in connections %}
-                <tr class="{% if not c.is_active %}text-muted{% endif %}">
-                    {% if c.source_port.device_id == device.id %}
-                    <td><i class="fa-solid fa-arrow-right text-success"></i> {{ t('devices.view.outgoing') }}</td>
-                    <td>
-                        <code>{{ c.source_port.name }}</code>
-                        <span class="text-muted small">({{ c.source_port.interface.name }})</span>
-                    </td>
-                    <td>
-                        <a href="/devices/{{ c.target_port.device.id }}">{{ c.target_port.device.hostname }}</a>
-                        / <code>{{ c.target_port.name }}</code>
-                        <span class="text-muted small">({{ c.target_port.interface.name }})</span>
-                    </td>
+                    {% if c %}
+                        {% if dir == 'outgoing' %}
+                        <td>
+                            <a href="/devices/{{ c.target_port.device.id }}">{{ c.target_port.device.hostname }}</a>
+                            / <code>{{ c.target_port.name }}</code>
+                            <span class="text-muted small">({{ c.target_port.interface.name }})</span>
+                        </td>
+                        <td><i class="fa-solid fa-arrow-right text-success"></i> {{ t('devices.view.outgoing') }}</td>
+                        {% else %}
+                        <td>
+                            <a href="/devices/{{ c.source_port.device.id }}">{{ c.source_port.device.hostname }}</a>
+                            / <code>{{ c.source_port.name }}</code>
+                            <span class="text-muted small">({{ c.source_port.interface.name }})</span>
+                        </td>
+                        <td><i class="fa-solid fa-arrow-left text-primary"></i> {{ t('devices.view.incoming') }}</td>
+                        {% endif %}
+                        <td>{{ c.connection_type }}</td>
+                        <td>{{ dash(c.cable_type) }}</td>
                     {% else %}
-                    <td><i class="fa-solid fa-arrow-left text-primary"></i> {{ t('devices.view.incoming') }}</td>
-                    <td>
-                        <code>{{ c.target_port.name }}</code>
-                        <span class="text-muted small">({{ c.target_port.interface.name }})</span>
-                    </td>
-                    <td>
-                        <a href="/devices/{{ c.source_port.device.id }}">{{ c.source_port.device.hostname }}</a>
-                        / <code>{{ c.source_port.name }}</code>
-                        <span class="text-muted small">({{ c.source_port.interface.name }})</span>
-                    </td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
                     {% endif %}
-                    <td>{{ c.connection_type }}</td>
-                    <td>{{ dash(c.cable_type) }}</td>
-                    <td>{{ dash(c.description) }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% endif %}
     </div>
 </div>
 {% endif %}

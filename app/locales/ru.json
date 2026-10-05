@@ -106,7 +106,6 @@
   "devices.view.section.credentials": "Учётные данные",
   "devices.view.section.services": "Сервисы",
   "devices.view.section.pf": "Проброс портов",
-  "devices.view.section.connections": "Связи",
   "devices.view.section.remarks": "Заметки",
   "devices.view.empty.ports": "Портов нет.",
   "devices.view.empty.wifi": "Wi-Fi сетей нет.",
@@ -114,7 +113,6 @@
   "devices.view.empty.credentials": "Учётных данных нет.",
   "devices.view.empty.services": "Сервисов нет.",
   "devices.view.empty.pf": "Правил проброса нет.",
-  "devices.view.empty.connections": "Связей нет.",
   "devices.view.dhcp_unknown": "DHCP (неизвестно)",
   "devices.view.btn.back": "Назад",
   "devices.view.btn.show_password": "показать",
@@ -132,7 +130,6 @@
   "devices.view.field.cable": "Кабель",
   "devices.view.outgoing": "исходящая",
   "devices.view.incoming": "входящая",
-  "devices.view.btn.add_connection": "Добавить связь",
   "devices.view.confirm_delete": "Удалить это устройство? Действие необратимо.",
   "users.list.add": "Добавить пользователя",
   "users.list.empty": "Пользователей нет.",
@@ -316,5 +313,6 @@
   "devices.form.no_network": "Без сети",
   "devices.form.drag_handle": "Перетащите, чтобы сменить сеть",
   "devices.view.dhcp.assigned": "Закреплённые адреса",
-  "devices.view.dhcp.dynamic_clients": "DHCP-клиенты"
+  "devices.view.dhcp.dynamic_clients": "DHCP-клиенты",
+  "devices.view.field.connected_to": "Подключено к"
 }

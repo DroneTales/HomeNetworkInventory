@@ -207,6 +207,22 @@ def view_device(
             if ip.address:
                 device_ips.append(ip.address)
 
+    conn_by_port: dict[int, tuple] = {}
+    for c in connections:
+        conn_by_port[c.source_port_id] = (c, "outgoing")
+        conn_by_port.setdefault(c.target_port_id, (c, "incoming"))
+
+    port_rows = []
+    for p in ports:
+        conn_info = conn_by_port.get(p.id)
+        conn = conn_info[0] if conn_info else None
+        direction = conn_info[1] if conn_info else None
+        port_rows.append({
+            "port": p,
+            "connection": conn,
+            "direction": direction,
+        })
+
     iface_groups_map: dict[int | None, dict] = {}
     for iface in interfaces:
         key = iface.network_id
@@ -277,11 +293,11 @@ def view_device(
         interfaces=interfaces,
         interface_groups=interface_groups,
         ports=ports,
+        port_rows=port_rows,
         wifi_networks=wifi_networks,
         dhcp_pools=dhcp_pools,
         dhcp_pools_payload=dhcp_pools_payload,
         dhcp_dynamic_clients=dhcp_dynamic_clients,
-        connections=connections,
         credentials=credentials,
         services=services,
         port_forwards=port_forwards,

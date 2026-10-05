@@ -82,12 +82,6 @@
     --section-border: rgba(25, 135, 84, 0.2);
 }
 
-.section-connections {
-    --section-color: #6610f2;
-    --section-bg: rgba(102, 16, 242, 0.08);
-    --section-border: rgba(102, 16, 242, 0.2);
-}
-
 .section-remarks {
     --section-color: #ffc107;
     --section-bg: rgba(255, 193, 7, 0.12);
@@ -102,7 +96,6 @@
 [data-bs-theme="dark"] .section-dhcp,
 [data-bs-theme="dark"] .section-credentials,
 [data-bs-theme="dark"] .section-services,
-[data-bs-theme="dark"] .section-connections,
 [data-bs-theme="dark"] .section-remarks {
     --section-bg: rgba(255, 255, 255, 0.04);
     --section-border: rgba(255, 255, 255, 0.1);

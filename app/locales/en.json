@@ -106,7 +106,6 @@
   "devices.view.section.credentials": "Credentials",
   "devices.view.section.services": "Services",
   "devices.view.section.pf": "Port forwarding",
-  "devices.view.section.connections": "Connections",
   "devices.view.section.remarks": "Remarks",
   "devices.view.empty.ports": "No ports.",
   "devices.view.empty.wifi": "No Wi-Fi networks.",
@@ -114,7 +113,6 @@
   "devices.view.empty.credentials": "No credentials.",
   "devices.view.empty.services": "No services.",
   "devices.view.empty.pf": "No port forwarding rules.",
-  "devices.view.empty.connections": "No connections.",
   "devices.view.dhcp_unknown": "DHCP (unknown)",
   "devices.view.btn.back": "Back",
   "devices.view.btn.show_password": "show",
@@ -132,7 +130,6 @@
   "devices.view.field.cable": "Cable",
   "devices.view.outgoing": "outgoing",
   "devices.view.incoming": "incoming",
-  "devices.view.btn.add_connection": "Add connection",
   "devices.view.confirm_delete": "Delete this device? This cannot be undone.",
   "users.list.add": "Add user",
   "users.list.empty": "No users.",
@@ -316,5 +313,6 @@
   "devices.form.no_network": "No network",
   "devices.form.drag_handle": "Drag to move between networks",
   "devices.view.dhcp.assigned": "Assigned IP addresses",
-  "devices.view.dhcp.dynamic_clients": "DHCP clients"
+  "devices.view.dhcp.dynamic_clients": "DHCP clients",
+  "devices.view.field.connected_to": "Connected to"
 }
