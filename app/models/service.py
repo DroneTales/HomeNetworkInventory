@@ -23,6 +23,8 @@ class Service(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     protocol: Mapped[str | None] = mapped_column(String(20))
     url: Mapped[str | None] = mapped_column(String(255))
+    username: Mapped[str | None] = mapped_column(String(100))
+    password: Mapped[str | None] = mapped_column(String(255))
     description: Mapped[str | None] = mapped_column(String(255))
 
     device: Mapped["Device"] = relationship(back_populates="services")

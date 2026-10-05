@@ -626,6 +626,8 @@
                     <th>{{ t('devices.list.name') }}</th>
                     <th>{{ t('devices.form.field.protocol') }}</th>
                     <th>{{ t('devices.form.field.url') }}</th>
+                    <th>{{ t('devices.form.field.username') }}</th>
+                    <th>{{ t('devices.form.field.password') }}</th>
                     <th>{{ t('devices.form.field.description') }}</th>
                 </tr>
                 </thead>
@@ -640,6 +642,21 @@
                             <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url }}</a>
                             {% else %}
                             {{ s.url }}
+                            {% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                    <td>{{ dash(s.username) }}</td>
+                    <td>
+                        {% if s.password %}
+                            {% if current_user.role == 'admin' or current_user.can_view_passwords %}
+                            <span class="password-cell" data-password="{{ s.password }}">
+                                <span class="password-mask">••••••••</span>
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2 toggle-password">{{ t('devices.view.btn.show_password') }}</button>
+                            </span>
+                            {% else %}
+                            <span class="text-muted">••••••••</span>
                             {% endif %}
                         {% else %}
                         —

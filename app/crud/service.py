@@ -50,6 +50,8 @@ def create(
     name: str,
     protocol: str | None = None,
     url: str | None = None,
+    username: str | None = None,
+    password: str | None = None,
     description: str | None = None,
 ) -> Service:
     require_found(db.get(Device, device_id), "Device", field="device_id")
@@ -61,6 +63,8 @@ def create(
         name=name,
         protocol=protocol,
         url=url or None,
+        username=username or None,
+        password=password or None,
         description=description or None,
     )
     db.add(service)
@@ -73,6 +77,8 @@ def update(
     name: str,
     protocol: str | None = None,
     url: str | None = None,
+    username: str | None = None,
+    password: str | None = None,
     description: str | None = None,
 ) -> Service:
     service = require_found(get_by_id(db, service_id), "Service")
@@ -82,6 +88,8 @@ def update(
     service.name = name
     service.protocol = protocol
     service.url = url or None
+    service.username = username or None
+    service.password = password or None
     service.description = description or None
     db.flush()
     return service

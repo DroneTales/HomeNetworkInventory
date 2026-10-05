@@ -770,6 +770,8 @@ def _sync_services(db: Session, device: Device, items: list[dict]) -> None:
                 name=data["name"],
                 protocol=data["protocol"],
                 url=data["url"],
+                username=data.get("username"),
+                password=data.get("password"),
                 description=data["description"],
             )
             seen_ids.add(item_id)
@@ -780,6 +782,8 @@ def _sync_services(db: Session, device: Device, items: list[dict]) -> None:
                 name=data["name"],
                 protocol=data["protocol"],
                 url=data["url"],
+                username=data.get("username"),
+                password=data.get("password"),
                 description=data["description"],
             )
 
@@ -869,6 +873,8 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
             "name": s.name,
             "protocol": s.protocol or "",
             "url": s.url or "",
+            "username": s.username or "",
+            "password": (s.password or "") if show_passwords else "",
             "description": s.description or "",
         })
 
@@ -1130,6 +1136,8 @@ def _collect_services(form) -> list[dict]:
     names = form.getlist("service_name")
     protocols = form.getlist("service_protocol")
     urls = form.getlist("service_url")
+    usernames = form.getlist("service_username")
+    passwords = form.getlist("service_password")
     descriptions = form.getlist("service_description")
 
     result = []
@@ -1141,6 +1149,8 @@ def _collect_services(form) -> list[dict]:
         item_id = to_int(ids[i] if i < len(ids) else None)
         protocol = (protocols[i] if i < len(protocols) else "").strip() or None
         url = (urls[i] if i < len(urls) else "").strip() or None
+        username = (usernames[i] if i < len(usernames) else "").strip() or None
+        password = (passwords[i] if i < len(passwords) else "").strip() or None
         description = (descriptions[i] if i < len(descriptions) else "").strip() or None
 
         result.append({
@@ -1148,6 +1158,8 @@ def _collect_services(form) -> list[dict]:
             "name": name,
             "protocol": protocol,
             "url": url,
+            "username": username,
+            "password": password,
             "description": description,
         })
 

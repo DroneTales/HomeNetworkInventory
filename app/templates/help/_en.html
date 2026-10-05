@@ -193,6 +193,7 @@
     <ul>
         <li><strong>Name</strong>, <strong>Protocol</strong> (<code>dhcp</code>, <code>dns</code>, <code>ftp</code>, <code>http</code>, <code>https</code>, <code>imap</code>, <code>mqtt</code>, <code>nfs</code>, <code>ntp</code>, <code>other</code>, <code>pop3</code>, <code>rdp</code>, <code>rtp</code>, <code>rtsp</code>, <code>sftp</code>, <code>smb</code>, <code>smtp</code>, <code>ssh</code>, <code>telnet</code>, <code>vnc</code>).</li>
         <li><strong>URL</strong> — full address. If it starts with <code>http://</code>, <code>https://</code>, or <code>rtsp://</code> — it becomes clickable.</li>
+        <li><strong>Username</strong> and <strong>Password</strong> — optional per-service credentials. Useful when each service on a device has its own login, separate from the device-level credentials. The password follows the same permission rules as credentials: it is hidden for users without <em>can_view_passwords</em> and read-only for users without <em>can_change_passwords</em>.</li>
         <li><strong>Description</strong> — short note.</li>
     </ul>
 

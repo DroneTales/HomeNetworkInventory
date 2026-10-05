@@ -193,6 +193,7 @@
     <ul>
         <li><strong>Name</strong>, <strong>Protocol</strong> (<code>dhcp</code>, <code>dns</code>, <code>ftp</code>, <code>http</code>, <code>https</code>, <code>imap</code>, <code>mqtt</code>, <code>nfs</code>, <code>ntp</code>, <code>other</code>, <code>pop3</code>, <code>rdp</code>, <code>rtp</code>, <code>rtsp</code>, <code>sftp</code>, <code>smb</code>, <code>smtp</code>, <code>ssh</code>, <code>telnet</code>, <code>vnc</code>).</li>
         <li><strong>URL</strong> — полный адрес. Если начинается с <code>http://</code>, <code>https://</code> или <code>rtsp://</code> — станет кликабельным.</li>
+        <li><strong>Username</strong> и <strong>Password</strong> — опциональные логин и пароль конкретного сервиса. Полезно, когда у каждого сервиса на устройстве своя учётная запись, отдельная от общих credentials. Пароль подчиняется тем же правилам доступа, что и credentials: скрыт от пользователей без <em>can_view_passwords</em> и доступен только на чтение без <em>can_change_passwords</em>.</li>
         <li><strong>Description</strong> — короткое описание.</li>
     </ul>
 

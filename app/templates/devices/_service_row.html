@@ -29,12 +29,40 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-2">
             <label class="form-label small mb-0">{{ t('devices.form.field.url') }}</label>
             <input type="text" class="form-control form-control-sm service-url px-1"
                    name="service_url"
                    value="{{ svc.url if svc and svc.url else '' }}"
                    placeholder="http://192.168.1.13" maxlength="255">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">{{ t('devices.form.field.username') }}</label>
+            <input type="text" class="form-control form-control-sm service-username px-1"
+                   name="service_username"
+                   value="{{ svc.username if svc and svc.username else '' }}"
+                   maxlength="100">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-0">
+                {{ t('devices.form.field.password') }}
+                {% if not can_change_passwords %}
+                <i class="fa-solid fa-lock text-muted ms-1" title="{{ t('devices.form.hint.password_locked') }}"></i>
+                {% endif %}
+            </label>
+            {% if can_view_passwords %}
+            <input type="text" class="form-control form-control-sm service-password px-1"
+                   name="service_password"
+                   value="{{ svc.password if svc and svc.password else '' }}"
+                   maxlength="255"
+                   {% if not can_change_passwords %}readonly{% endif %}>
+            {% else %}
+            <input type="password" class="form-control form-control-sm service-password px-1"
+                   name="service_password"
+                   value=""
+                   placeholder="••••••••"
+                   readonly>
+            {% endif %}
         </div>
         <div class="col-12 col-md-2">
             <label class="form-label small mb-0">{{ t('devices.form.field.description') }}</label>
