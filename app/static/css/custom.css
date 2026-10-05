@@ -768,3 +768,27 @@
     border-color: #fb923c;
     color: #fed7aa;
 }
+
+/* Interface drag & drop between network groups */
+.iface-drag-handle {
+    color: var(--bs-secondary-color);
+    cursor: grab;
+    padding: 0 2px;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+.iface-drag-handle:active {
+    cursor: grabbing;
+}
+.interface-row.dragging {
+    opacity: 0.5;
+}
+.iface-group.drag-over > .iface-group-container {
+    outline: 2px dashed var(--bs-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+.iface-group.drag-over > .d-flex .fw-semibold,
+.iface-group.drag-over > .d-flex a {
+    color: var(--bs-primary);
+}

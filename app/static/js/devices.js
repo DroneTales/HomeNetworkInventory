@@ -53,6 +53,98 @@
         if (options.afterMutation) options.afterMutation();
     }
 
+    function rowType(row) {
+        const sel = row.querySelector(".iface-type");
+        return sel ? sel.value.trim() : "ethernet";
+    }
+
+    function refreshGroupEmptyStates() {
+        document.querySelectorAll(".iface-group").forEach(function (g) {
+            const cont = g.querySelector(".iface-group-container");
+            const hint = g.querySelector(".iface-group-empty");
+            if (!cont || !hint) return;
+            hint.classList.toggle("d-none", cont.querySelectorAll(".interface-row").length > 0);
+        });
+    }
+
+    function moveRowToNoNetwork(row) {
+        const noNetGroup = document.querySelector('.iface-group[data-network-id=""]');
+        if (!noNetGroup) return;
+        const container = noNetGroup.querySelector(".iface-group-container");
+        if (!container || container.contains(row)) return;
+        container.appendChild(row);
+        const netInput = row.querySelector(".iface-network-id");
+        if (netInput) netInput.value = "";
+        refreshGroupEmptyStates();
+    }
+
+    function rowHasHandle(row) {
+        return row.querySelector(".iface-drag-handle") !== null;
+    }
+
+    let draggedRow = null;
+
+    function setupInterfaceDragDrop() {
+        document.addEventListener("dragstart", function (e) {
+            const handle = e.target.closest ? e.target.closest(".iface-drag-handle") : null;
+            if (!handle) return;
+            const row = handle.closest(".interface-row");
+            if (!row) return;
+            if (!rowHasHandle(row)) { e.preventDefault(); return; }
+            if (rowType(row) === "port") { e.preventDefault(); return; }
+
+            draggedRow = row;
+            row.classList.add("dragging");
+            if (e.dataTransfer) {
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", "iface");
+            }
+        });
+
+        document.addEventListener("dragend", function () {
+            if (draggedRow) draggedRow.classList.remove("dragging");
+            draggedRow = null;
+            document.querySelectorAll(".iface-group.drag-over").forEach(function (g) {
+                g.classList.remove("drag-over");
+            });
+        });
+
+        document.querySelectorAll(".iface-group").forEach(function (group) {
+            group.addEventListener("dragover", function (e) {
+                if (!draggedRow) return;
+                const targetNetworkId = group.dataset.networkId || "";
+                if (rowType(draggedRow) === "port" && targetNetworkId !== "") return;
+                e.preventDefault();
+                if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+                group.classList.add("drag-over");
+            });
+
+            group.addEventListener("dragleave", function (e) {
+                if (e.target !== group && group.contains(e.relatedTarget)) return;
+                group.classList.remove("drag-over");
+            });
+
+            group.addEventListener("drop", function (e) {
+                e.preventDefault();
+                group.classList.remove("drag-over");
+                if (!draggedRow) return;
+                const targetNetworkId = group.dataset.networkId || "";
+                if (rowType(draggedRow) === "port" && targetNetworkId !== "") return;
+
+                const container = group.querySelector(".iface-group-container");
+                if (!container) return;
+                container.appendChild(draggedRow);
+
+                const netInput = draggedRow.querySelector(".iface-network-id");
+                if (netInput) netInput.value = targetNetworkId;
+
+                refreshGroupEmptyStates();
+                rebuildBroadcastSelects();
+                rebuildPortInterfaceSelects();
+            });
+        });
+    }
+
     function allInterfaceRows() {
         return document.querySelectorAll(".iface-group-container .interface-row");
     }
@@ -104,6 +196,7 @@
     }
 
     document.querySelectorAll(".iface-group").forEach(setupInterfaceGroup);
+    setupInterfaceDragDrop();
     rebuildBroadcastSelects();
     rebuildPortInterfaceSelects();
 
@@ -163,7 +256,12 @@
             }
         }
 
-        if (typeSelect) typeSelect.addEventListener("change", function () { refresh(); rebuildBroadcastSelects(); rebuildPortInterfaceSelects(); });
+        if (typeSelect) typeSelect.addEventListener("change", function () {
+            refresh();
+            if (typeSelect.value === "port") moveRowToNoNetwork(row);
+            rebuildBroadcastSelects();
+            rebuildPortInterfaceSelects();
+        });
         if (addressTypeSelect) addressTypeSelect.addEventListener("change", refresh);
 
         const nameInput = row.querySelector(".iface-name");

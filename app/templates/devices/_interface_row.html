@@ -19,6 +19,13 @@
     {% set cur_band = iface.band if iface else '' %}
 
     <div class="row g-1 align-items-end iface-row-cols">
+        {% if is_edit %}
+        <div class="col-auto iface-col-drag d-flex align-items-end pb-1">
+            <i class="fa-solid fa-ellipsis-vertical iface-drag-handle"
+               role="button" tabindex="0" draggable="true"
+               title="{{ t('devices.form.drag_handle') }}"></i>
+        </div>
+        {% endif %}
         <div class="col-6 col-md iface-col-name">
             <label class="form-label small mb-0">{{ t('devices.form.field.name') }}</label>
             <input type="text" class="form-control form-control-sm iface-name px-1"
