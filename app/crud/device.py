@@ -7,7 +7,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.exceptions import ValidationError
 from app.core.validation import require_found, validate_hostname
@@ -23,6 +23,16 @@ from app.models.vendor import Vendor
 def list_all(db: Session, site_id: int) -> list[Device]:
     return (
         db.query(Device)
+        .options(
+            selectinload(Device.interfaces).selectinload(Interface.ip_addresses),
+            selectinload(Device.interfaces).joinedload(Interface.connected_wifi_network),
+            selectinload(Device.wifi_networks),
+            selectinload(Device.dhcp_pools),
+            selectinload(Device.ports),
+            selectinload(Device.services),
+            selectinload(Device.port_forwards),
+            selectinload(Device.port_forwards_targeted),
+        )
         .filter(Device.site_id == site_id)
         .order_by(Device.hostname)
         .all()

@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.constants import PF_PROTOCOL_BOTH, VALID_PF_PROTOCOLS
 from app.core.exceptions import ValidationError
@@ -20,6 +20,7 @@ from app.models.port_forward import PortForward
 def list_by_device(db: Session, device_id: int) -> list[PortForward]:
     return (
         db.query(PortForward)
+        .options(joinedload(PortForward.internal_device))
         .filter(PortForward.device_id == device_id)
         .order_by(PortForward.external_port_start, PortForward.protocol)
         .all()
@@ -42,6 +43,7 @@ def list_incoming(
     return (
         db.query(PortForward)
         .join(Device, PortForward.device_id == Device.id)
+        .options(joinedload(PortForward.device))
         .filter(
             Device.site_id == site_id,
             or_(*conds),

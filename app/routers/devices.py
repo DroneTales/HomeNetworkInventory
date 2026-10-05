@@ -167,7 +167,7 @@ def view_device(
 
     device_ips = []
     for iface in interfaces:
-        for ip in crud_ip.list_by_interface(db, iface.id):
+        for ip in iface.ip_addresses:
             if ip.address:
                 device_ips.append(ip.address)
 
@@ -206,13 +206,12 @@ def view_device(
     incoming_pfs = crud_pf.list_incoming(db, device_id, site.id, device_ips)
     incoming = []
     for pf in incoming_pfs:
-        src_device = crud_device.get_by_id(db, pf.device_id, site_id=site.id)
         matched_ip = None
         if pf.internal_device_id is None and pf.internal_ip_manual:
             matched_ip = pf.internal_ip_manual
         incoming.append({
             "pf": pf,
-            "source_device": src_device,
+            "source_device": pf.device,
             "matched_ip": matched_ip,
         })
 

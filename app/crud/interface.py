@@ -7,7 +7,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.core.constants import (
     IFACE_TYPE_PORT,
@@ -105,6 +105,11 @@ def _validate_network(
 def list_by_device(db: Session, device_id: int) -> list[Interface]:
     return (
         db.query(Interface)
+        .options(
+            selectinload(Interface.ip_addresses),
+            joinedload(Interface.connected_wifi_network),
+            joinedload(Interface.network),
+        )
         .filter(Interface.device_id == device_id)
         .order_by(Interface.name)
         .all()

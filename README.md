@@ -178,7 +178,6 @@ HomeNetworkInventory/
 │   │   ├── templating.py   # Jinja2 render helper
 │   │   └── validation.py   # IP, MAC, hostname validators
 │   ├── models/             # SQLAlchemy models (one file per entity)
-│   ├── schemas/            # Pydantic schemas (reserved for future use)
 │   ├── crud/               # Database operations with validation
 │   ├── routers/            # HTTP endpoints (auth, sites, devices, …)
 │   ├── templates/          # Jinja2 templates

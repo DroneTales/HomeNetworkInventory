@@ -7,7 +7,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.constants import IFACE_TYPE_WIFI_AP
 from app.core.exceptions import ValidationError
@@ -28,6 +28,9 @@ VALID_ENCRYPTIONS = {
 def list_by_device(db: Session, device_id: int) -> list[WiFiNetwork]:
     return (
         db.query(WiFiNetwork)
+        .options(
+            selectinload(WiFiNetwork.connected_interfaces).joinedload(Interface.device),
+        )
         .filter(WiFiNetwork.device_id == device_id)
         .order_by(WiFiNetwork.ssid)
         .all()
