@@ -484,7 +484,7 @@ def _sync_interfaces(
                 type=data["type"],
                 mac=data["mac"],
                 band=data.get("band"),
-                connected_wifi_network_id=iface.connected_wifi_network_id if is_wifi_client else None,
+                connected_wifi_network_id=None,
                 network_id=iface_network_id,
                 defer_wifi_validation=is_wifi_client,
             )
@@ -505,9 +505,8 @@ def _sync_interfaces(
         iface_id_map[idx] = iface.id
 
         if is_wifi_client:
-            raw = data.get("connected_wifi_network_id")
-            if raw:
-                deferred_links.append((iface.id, str(raw).strip()))
+            raw = data.get("connected_wifi_network_id") or ""
+            deferred_links.append((iface.id, str(raw).strip()))
 
         existing_ips = {ip.id: ip for ip in iface.ip_addresses}
         # Always attempt to create/update the IP record (except for port);
@@ -574,8 +573,14 @@ def _apply_client_wifi_links(
     for iface_id, raw in deferred_links:
         wifi_id = _resolve_wifi_id(raw, wifi_map)
         iface = db.get(Interface, iface_id)
-        if iface is not None:
-            iface.connected_wifi_network_id = wifi_id
+        if iface is None:
+            continue
+        if wifi_id is None:
+            raise ValidationError(
+                "Wi-Fi interface must be connected to a Wi-Fi network",
+                field="connected_wifi_network_id",
+            )
+        iface.connected_wifi_network_id = wifi_id
     db.flush()
 
 

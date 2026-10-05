@@ -42,12 +42,14 @@
             if (!device) return;
 
             device.ports.forEach(function (p) {
+                const isCurrent = selectedPortId && String(selectedPortId) === String(p.id);
+                if (p.occupied && !isCurrent) return;
                 const opt = document.createElement("option");
                 opt.value = p.id;
                 opt.textContent = p.interface_name
                     ? p.name + " (" + p.interface_name + ")"
                     : p.name;
-                if (selectedPortId && String(selectedPortId) === String(p.id)) {
+                if (isCurrent) {
                     opt.selected = true;
                 }
                 portSelect.appendChild(opt);

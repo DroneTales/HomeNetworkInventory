@@ -21,6 +21,7 @@ from app.crud import connection as crud_connection
 from app.crud import device as crud_device
 from app.crud import wifi_network as crud_wifi
 from app.database import get_db
+from app.models.connection import Connection
 from app.models.site import Site
 from app.models.user import User
 
@@ -175,7 +176,7 @@ def edit_connection_form(
     if connection is None:
         raise HTTPException(status_code=404, detail="Connection not found")
 
-    devices_payload = _devices_with_ports(db, site.id)
+    devices_payload = _devices_with_ports(db, site.id, exclude_connection_id=connection_id)
     return render(
         request,
         "connections/form.html",
@@ -227,7 +228,7 @@ async def edit_connection_submit(
 
     except ValidationError as e:
         db.rollback()
-        devices_payload = _devices_with_ports(db, site.id)
+        devices_payload = _devices_with_ports(db, site.id, exclude_connection_id=connection_id)
         return render(
             request,
             "connections/form.html",
@@ -285,7 +286,19 @@ async def move_device(
 
     return JSONResponse({"ok": True})
 
-def _devices_with_ports(db: Session, site_id: int) -> list[dict]:
+def _devices_with_ports(
+    db: Session,
+    site_id: int,
+    exclude_connection_id: int | None = None,
+) -> list[dict]:
+    occupied_query = db.query(Connection.source_port_id, Connection.target_port_id)
+    if exclude_connection_id is not None:
+        occupied_query = occupied_query.filter(Connection.id != exclude_connection_id)
+    occupied = set()
+    for src, tgt in occupied_query.all():
+        occupied.add(src)
+        occupied.add(tgt)
+
     devices = crud_device.list_all(db, site_id)
     payload = []
     for d in devices:
@@ -295,6 +308,7 @@ def _devices_with_ports(db: Session, site_id: int) -> list[dict]:
                 "id": p.id,
                 "name": p.name,
                 "interface_name": p.interface.name if p.interface else "",
+                "occupied": p.id in occupied,
             })
         if ports:
             payload.append({

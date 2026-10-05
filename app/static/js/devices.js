@@ -220,6 +220,16 @@
                 wifiBlock.classList.toggle("d-none", tval !== "wifi");
             }
 
+            const wifiSel = row.querySelector(".iface-connected-wifi");
+            if (wifiSel) {
+                const hasReal = Array.from(wifiSel.options).some(function (o) { return o.value !== ""; });
+                if (tval === "wifi" && hasReal) {
+                    wifiSel.setAttribute("required", "required");
+                } else {
+                    wifiSel.removeAttribute("required");
+                }
+            }
+
             const fieldsToHide = isPort || isDhcp;
             [".iface-field-address", ".iface-field-mask", ".iface-field-gateway", ".iface-field-dns"]
                 .forEach(function (sel) {
@@ -270,7 +280,14 @@
         const bandSelect = row.querySelector(".iface-band");
         if (bandSelect) bandSelect.addEventListener("change", rebuildBroadcastSelects);
 
+        row._ifaceRefresh = refresh;
         refresh();
+    }
+
+    function refreshAllInterfaceRows() {
+        allInterfaceRows().forEach(function (row) {
+            if (typeof row._ifaceRefresh === "function") row._ifaceRefresh();
+        });
     }
 
     function ifaceRowRawId(row) {
@@ -347,14 +364,22 @@
         const typeSelect = row.querySelector(".iface-type");
         if (!typeSelect || typeSelect.value !== "wifi_ap") return true;
 
-        const rows = allInterfaceRows();
-        let idx = -1;
-        rows.forEach(function (r, i) { if (r === row) idx = i; });
-        if (idx < 0) return true;
-
         const idInput = row.querySelector(".iface-id");
         const realId = idInput ? idInput.value.trim() : "";
-        const targetValue = realId ? realId : ("new:" + idx);
+        let targetValue = realId;
+        if (!targetValue) {
+            let idx = -1;
+            let counter = 0;
+            allInterfaceRows().forEach(function (r) {
+                const nameInput = r.querySelector(".iface-name");
+                const name = nameInput ? nameInput.value.trim() : "";
+                if (!name) return;
+                if (r === row) { idx = counter; return; }
+                counter++;
+            });
+            if (idx < 0) return true;
+            targetValue = "new:" + idx;
+        }
 
         const ssids = [];
         document.querySelectorAll(".wifi-row").forEach(function (wrow) {
@@ -377,21 +402,26 @@
     function rebuildBroadcastSelects() {
         const rows = allInterfaceRows();
         const options = [{value: "", label: "—"}];
-        rows.forEach(function (r, idx) {
-            const type = r.querySelector(".iface-type");
-            if (!type || type.value !== "wifi_ap") return;
-            const idInput = r.querySelector(".iface-id");
+        let idx = 0;
+        rows.forEach(function (r) {
             const nameInput = r.querySelector(".iface-name");
-            const bandSelect = r.querySelector(".iface-band");
-            const realId = idInput ? idInput.value.trim() : "";
             const name = nameInput ? nameInput.value.trim() : "";
-            const band = bandSelect ? bandSelect.value : "";
-            let label = name || "wifi_ap";
-            if (band) label += " (" + band + ")";
-            options.push({
-                value: realId ? realId : ("new:" + idx),
-                label: label,
-            });
+            if (!name) return;
+
+            const type = r.querySelector(".iface-type");
+            if (type && type.value === "wifi_ap") {
+                const idInput = r.querySelector(".iface-id");
+                const bandSelect = r.querySelector(".iface-band");
+                const realId = idInput ? idInput.value.trim() : "";
+                const band = bandSelect ? bandSelect.value : "";
+                let label = name;
+                if (band) label += " (" + band + ")";
+                options.push({
+                    value: realId ? realId : ("new:" + idx),
+                    label: label,
+                });
+            }
+            idx++;
         });
 
         document.querySelectorAll(".wifi-broadcast-by").forEach(function (sel) {
@@ -433,6 +463,10 @@
         templateId: "wifi-row-template",
         rowClass: "wifi-row",
         removeBtnClass: "remove-wifi-btn",
+        afterMutation: function () {
+            rebuildBroadcastSelects();
+            refreshAllInterfaceRows();
+        },
     });
 
     setupList({
