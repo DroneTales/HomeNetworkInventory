@@ -160,6 +160,49 @@ python -c "import secrets; print(secrets.token_urlsafe(48))"
    corresponding group. Interfaces that do not belong to any network go
    into the **No network** group.
 
+## Upgrading
+
+On startup the application compares the SQLAlchemy models against the
+actual SQLite database and refuses to start if the database is missing
+columns or tables that the current code expects:
+
+```
+================================================================
+  DATABASE SCHEMA IS OUT OF DATE
+================================================================
+Missing columns:
+  services.username VARCHAR(100)
+  services.password VARCHAR(255)
+
+Run the migration script to bring the database up to date:
+  Windows:     migrate.bat
+  Linux/macOS: ./migrate.command
+  From source: python -m app.migrate
+================================================================
+```
+
+To upgrade:
+
+1. Stop the application.
+2. Run the migration script:
+   - local distribution: `migrate.bat` (Windows) or `./migrate.command`
+     (Linux/macOS), next to `start.bat` / `start.command`;
+   - from source: `python -m app.migrate` inside the activated venv.
+3. The script prints the diff, asks for confirmation, and writes a
+   timestamped backup of the database (`home_network.db.before-migrate-...`)
+   before applying changes.
+4. Start the application again.
+
+The migration only **adds** missing columns. Extra columns that are no
+longer used by the model are listed but never dropped automatically -
+remove them manually if you want. Databases are never recreated, so
+existing data is preserved.
+
+To upgrade a local installation without losing data: keep the old
+`data/` folder, unpack the new build into a fresh folder, and copy
+`data/` over. Then run `start.bat` / `start.command` and migrate if
+prompted.
+
 ## Project structure
 
 ```

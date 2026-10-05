@@ -7,6 +7,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -21,6 +22,7 @@ from app.core.bootstrap import ensure_default_admin
 from app.core.deps import get_current_site, require_user
 from app.core.i18n import load_translations
 from app.core.middleware import CurrentSiteMiddleware
+from app.core.schema_sync import get_schema_diff
 from app.database import Base, check_database_path, engine, get_db
 from app.models.user import User
 from app.routers import (
@@ -38,10 +40,50 @@ from app.routers import (
 
 BASE_DIR = Path(__file__).resolve().parent
 
+def _check_schema() -> None:
+    diff = get_schema_diff(engine)
+    if diff.is_ok:
+        if diff.extra_columns:
+            print("WARNING: extra columns in database (not used by the current model):")
+            for c in diff.extra_columns:
+                print(f"  {c.table}.{c.name} {c.type_sql}")
+        return
+
+    print("")
+    print("=" * 64)
+    print("  DATABASE SCHEMA IS OUT OF DATE")
+    print("=" * 64)
+    if diff.missing_tables:
+        print("Missing tables:")
+        for t in diff.missing_tables:
+            print(f"  {t}")
+    if diff.missing_columns:
+        print("Missing columns:")
+        for c in diff.missing_columns:
+            flags = []
+            if not c.nullable:
+                flags.append("NOT NULL")
+            if c.default_sql is not None:
+                flags.append(f"DEFAULT {c.default_sql}")
+            if c.guessed:
+                flags.append("(guessed)")
+            suffix = (" " + " ".join(flags)) if flags else ""
+            print(f"  {c.table}.{c.name} {c.type_sql}{suffix}")
+    print("")
+    print("Run the migration script to bring the database up to date:")
+    print("  Windows:     migrate.bat")
+    print("  Linux/macOS: ./migrate.command")
+    print("  From source: python -m app.migrate")
+    print("=" * 64)
+    print("")
+    sys.exit(1)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     check_database_path()
     Base.metadata.create_all(bind=engine)
+    _check_schema()
     ensure_default_admin()
     load_translations()
     yield
