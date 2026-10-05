@@ -50,6 +50,24 @@ from app.models.wifi_network import WiFiNetwork
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
+def _ip_to_int(ip: str | None) -> int | None:
+    if not ip:
+        return None
+    parts = ip.split(".")
+    if len(parts) != 4:
+        return None
+    n = 0
+    for part in parts:
+        try:
+            v = int(part)
+        except ValueError:
+            return None
+        if v < 0 or v > 255:
+            return None
+        n = (n << 8) | v
+    return n
+
+
 def _can_view_passwords(user: User) -> bool:
     return user.role == ROLE_ADMIN or user.can_view_passwords
 
@@ -158,6 +176,23 @@ def view_device(
 
     interfaces = crud_interface.list_by_device(db, device_id)
     ports = crud_port.list_by_device(db, device_id)
+
+    all_devices = crud_device.list_all(db, site.id)
+    all_dhcp_clients = []
+    all_reserved_entries = []
+    for dev in all_devices:
+        for iface in dev.interfaces:
+            for ip in iface.ip_addresses:
+                if not ip.address:
+                    continue
+                entry = {"device": dev, "interface": iface, "ip": ip}
+                if ip.address_type == "dhcp":
+                    all_dhcp_clients.append(entry)
+                elif ip.address_type == "reserved":
+                    all_reserved_entries.append(entry)
+
+    all_dhcp_clients.sort(key=lambda e: (e["device"].hostname.lower(), e["interface"].name))
+    all_reserved_entries.sort(key=lambda e: (e["device"].hostname.lower(), e["interface"].name))
     wifi_networks = crud_wifi.list_by_device(db, device_id)
     dhcp_pools = crud_dhcp.list_by_device(db, device_id)
     connections = crud_connection.list_by_device(db, device_id)
@@ -188,6 +223,23 @@ def view_device(
     no_network = iface_groups_map.get(None)
     if no_network:
         interface_groups.append(no_network)
+
+    dhcp_pools_payload = []
+    for pool in dhcp_pools:
+        clients = []
+        if pool.type == "fixed":
+            lo = _ip_to_int(pool.start_ip)
+            hi = _ip_to_int(pool.end_ip)
+            if lo is not None and hi is not None and lo <= hi:
+                for entry in all_reserved_entries:
+                    v = _ip_to_int(entry["ip"].address)
+                    if v is not None and lo <= v <= hi:
+                        clients.append(entry)
+        dhcp_pools_payload.append({"pool": pool, "clients": clients})
+
+    dhcp_pools_payload.sort(key=lambda x: (0 if x["pool"].type == "fixed" else 1, x["pool"].start_ip or ""))
+
+    dhcp_dynamic_clients = all_dhcp_clients
 
     wifi_clients = []
     for w in wifi_networks:
@@ -226,6 +278,8 @@ def view_device(
         ports=ports,
         wifi_networks=wifi_networks,
         dhcp_pools=dhcp_pools,
+        dhcp_pools_payload=dhcp_pools_payload,
+        dhcp_dynamic_clients=dhcp_dynamic_clients,
         connections=connections,
         credentials=credentials,
         services=services,

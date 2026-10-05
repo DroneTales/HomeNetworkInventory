@@ -316,5 +316,7 @@
   "topology.btn.save": "Save layout",
   "devices.badge.wifi_ap": "Broadcasts Wi-Fi",
   "devices.form.no_network": "No network",
-  "devices.form.drag_handle": "Drag to move between networks"
+  "devices.form.drag_handle": "Drag to move between networks",
+  "devices.view.dhcp.assigned": "Assigned IP addresses",
+  "devices.view.dhcp.dynamic_clients": "DHCP clients"
 }

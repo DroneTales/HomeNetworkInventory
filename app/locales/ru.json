@@ -316,5 +316,7 @@
   "topology.btn.save": "Сохранить раскладку",
   "devices.badge.wifi_ap": "Раздаёт Wi-Fi",
   "devices.form.no_network": "Без сети",
-  "devices.form.drag_handle": "Перетащите, чтобы сменить сеть"
+  "devices.form.drag_handle": "Перетащите, чтобы сменить сеть",
+  "devices.view.dhcp.assigned": "Закреплённые адреса",
+  "devices.view.dhcp.dynamic_clients": "DHCP-клиенты"
 }
