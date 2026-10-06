@@ -8,9 +8,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+import json
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlalchemy.orm import Session
+
+from app.core.backup import export_all, import_all
 
 from app.core.constants import ROLE_ADMIN
 from app.core.deps import (
@@ -54,6 +59,43 @@ def list_sites(
         sites=sites,
         error=error,
     )
+
+@router.get("/export")
+def export_data(
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    payload = export_all(db)
+    body = json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    filename = f"home_network_export_{ts}.json"
+    return Response(
+        content=body,
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+@router.post("/import")
+async def import_data(
+    file: UploadFile = File(...),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    raw = await file.read()
+    if not raw:
+        return redirect_with_error("/sites", "Import file is empty")
+    try:
+        data = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return redirect_with_error("/sites", "Import file is not valid JSON")
+    try:
+        import_all(db, data)
+    except ValidationError as e:
+        db.rollback()
+        return redirect_with_error("/sites", str(e))
+    response = RedirectResponse("/sites", status_code=303)
+    clear_current_site_cookie(response)
+    return response
 
 @router.get("/switch")
 @router.post("/switch")

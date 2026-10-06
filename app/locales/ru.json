@@ -314,5 +314,8 @@
   "devices.view.dhcp.assigned": "Закреплённые адреса",
   "devices.view.dhcp.dynamic_clients": "DHCP-клиенты",
   "devices.view.field.connected_to": "Подключено к",
-  "devices.view.wifi.clients": "Подключённые клиенты"
+  "devices.view.wifi.clients": "Подключённые клиенты",
+  "sites.list.export": "Экспорт",
+  "sites.list.import": "Импорт",
+  "sites.list.import_warning": "Импорт удалит все текущие данные (дома, устройства, пользователей — всё) и заменит их содержимым загруженного файла. Действие необратимо."
 }

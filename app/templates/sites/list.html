@@ -31,10 +31,23 @@
         </div>
     </div>
     {% if current_user.role == 'admin' %}
-    <a href="/sites/new" class="btn btn-primary">
-        <i class="fa-solid fa-plus me-1"></i>
-        {{ t('sites.list.add') }}
-    </a>
+    <div class="d-flex gap-2">
+        <a href="/sites/export" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-file-export me-1"></i>
+            {{ t('sites.list.export') }}
+        </a>
+        <button type="button"
+                class="btn btn-outline-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#importModal">
+            <i class="fa-solid fa-file-import me-1"></i>
+            {{ t('sites.list.import') }}
+        </button>
+        <a href="/sites/new" class="btn btn-primary">
+            <i class="fa-solid fa-plus me-1"></i>
+            {{ t('sites.list.add') }}
+        </a>
+    </div>
     {% endif %}
 </div>
 
@@ -96,6 +109,42 @@
     {% endfor %}
 </div>
 
+{% endif %}
+
+{% if current_user.role == 'admin' %}
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content" method="post" action="/sites/import" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-file-import me-1"></i>
+                    {{ t('sites.list.import') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger mb-3">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                    {{ t('sites.list.import_warning') }}
+                </div>
+                <input type="file"
+                       name="file"
+                       accept="application/json,.json"
+                       class="form-control"
+                       required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    {{ t('common.cancel') }}
+                </button>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-file-import me-1"></i>
+                    {{ t('sites.list.import') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endif %}
 {% endblock %}
 
