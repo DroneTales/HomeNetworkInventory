@@ -381,19 +381,21 @@
                             <table class="table table-sm table-borderless align-middle mb-0 small">
                                 <thead>
                                 <tr class="text-muted">
+                                    <th>{{ t('devices.list.local_ip') }}</th>
+                                    <th>{{ t('devices.list.mac') }}</th>
                                     <th>{{ t('devices.list.hostname') }}</th>
                                     <th>{{ t('devices.list.name') }}</th>
                                     <th>{{ t('devices.form.field.interface') }}</th>
-                                    <th>{{ t('devices.list.local_ip') }}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for c in item.clients %}
                                 <tr>
+                                    <td>{{ dash(c.ip.address) }}</td>
+                                    <td>{{ dash(c.interface.mac) }}</td>
                                     <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a></td>
                                     <td>{{ dash(c.device.human_readable_name) }}</td>
                                     <td><code>{{ c.interface.name }}</code></td>
-                                    <td>{{ dash(c.ip.address) }}</td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>
@@ -414,6 +416,7 @@
             <table class="table table-sm table-borderless align-middle mb-0 small">
                 <thead>
                 <tr class="text-muted">
+                    <th>{{ t('devices.list.mac') }}</th>
                     <th>{{ t('devices.list.hostname') }}</th>
                     <th>{{ t('devices.list.name') }}</th>
                     <th>{{ t('devices.form.field.interface') }}</th>
@@ -422,6 +425,7 @@
                 <tbody>
                 {% for c in dhcp_dynamic_clients %}
                 <tr>
+                    <td>{{ dash(c.interface.mac) }}</td>
                     <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a></td>
                     <td>{{ dash(c.device.human_readable_name) }}</td>
                     <td><code>{{ c.interface.name }}</code></td>

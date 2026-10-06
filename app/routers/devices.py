@@ -192,8 +192,16 @@ def view_device(
                 elif ip.address_type == "reserved":
                     all_reserved_entries.append(entry)
 
-    all_dhcp_clients.sort(key=lambda e: (e["device"].hostname.lower(), e["interface"].name))
-    all_reserved_entries.sort(key=lambda e: (e["device"].hostname.lower(), e["interface"].name))
+    def _ip_sort_key(entry):
+        v = _ip_to_int(entry["ip"].address)
+        return (0, v) if v is not None else (1, 0)
+
+    def _mac_sort_key(entry):
+        mac = (entry["interface"].mac or "").strip().lower()
+        return (1, "") if not mac else (0, mac)
+
+    all_dhcp_clients.sort(key=_mac_sort_key)
+    all_reserved_entries.sort(key=_ip_sort_key)
     wifi_networks = crud_wifi.list_by_device(db, device_id)
     dhcp_pools = crud_dhcp.list_by_device(db, device_id)
     connections = crud_connection.list_by_device(db, device_id)
