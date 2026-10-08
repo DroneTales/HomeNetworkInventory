@@ -13,6 +13,7 @@ from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from app.config import settings
 from app.core.i18n import detect_language, translate
 from app.models.site import Site
 from app.models.user import User
@@ -52,6 +53,7 @@ def render(
         "current_user": user,
         "current_site": current_site,
         "bs_theme": _resolve_theme(user),
+        "app_version": settings.app_version,
     }
     context.update(extra)
     return templates.TemplateResponse(template, context)

@@ -785,3 +785,10 @@
 .iface-group.drag-over > .d-flex a {
     color: var(--bs-primary);
 }
+
+.app-version {
+    font-size: 0.7em;
+    vertical-align: super;
+    color: var(--bs-secondary-color);
+    font-weight: 400;
+}
