@@ -317,5 +317,17 @@
   "devices.view.wifi.clients": "Connected clients",
   "sites.list.export": "Export",
   "sites.list.import": "Import",
-  "sites.list.import_warning": "Import will delete all current data (sites, devices, users, everything) and replace it with the contents of the uploaded file. This cannot be undone."
+  "sites.list.import_warning": "Import will delete all current data (sites, devices, users, everything) and replace it with the contents of the uploaded file. This cannot be undone.",
+  "devices.export": "Export",
+  "devices.export.xlsx": "Excel (XLSX)",
+  "devices.export.csv": "CSV (ZIP)",
+  "export.sheet.devices": "Devices",
+  "export.sheet.connections": "Connections",
+  "export.connections.source_location": "Source location",
+  "export.connections.source_device": "Source device",
+  "export.connections.source_port": "Source port",
+  "export.connections.target_location": "Target location",
+  "export.connections.target_device": "Target device",
+  "export.connections.target_port": "Target port",
+  "export.connections.cable": "Cable"
 }

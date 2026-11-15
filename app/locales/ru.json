@@ -317,5 +317,17 @@
   "devices.view.wifi.clients": "Подключённые клиенты",
   "sites.list.export": "Экспорт",
   "sites.list.import": "Импорт",
-  "sites.list.import_warning": "Импорт удалит все текущие данные (дома, устройства, пользователей — всё) и заменит их содержимым загруженного файла. Действие необратимо."
+  "sites.list.import_warning": "Импорт удалит все текущие данные (дома, устройства, пользователей — всё) и заменит их содержимым загруженного файла. Действие необратимо.",
+  "devices.export": "Экспорт",
+  "devices.export.xlsx": "Excel (XLSX)",
+  "devices.export.csv": "CSV (ZIP)",
+  "export.sheet.devices": "Устройства",
+  "export.sheet.connections": "Соединения",
+  "export.connections.source_location": "Локация источника",
+  "export.connections.source_device": "Устройство-источник",
+  "export.connections.source_port": "Порт-источник",
+  "export.connections.target_location": "Локация назначения",
+  "export.connections.target_device": "Устройство-назначение",
+  "export.connections.target_port": "Порт-назначения",
+  "export.connections.cable": "Кабель"
 }
