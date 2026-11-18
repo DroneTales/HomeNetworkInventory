@@ -106,16 +106,36 @@ def list_devices(
     for d in devices:
         ips = []
         gateway = None
+        lines = []
         for iface in d.interfaces:
-            for ip in iface.ip_addresses:
-                ips.append(ip)
-                if gateway is None and ip.gateway:
-                    gateway = ip.gateway
+            if iface.ip_addresses:
+                for ip in iface.ip_addresses:
+                    ips.append(ip)
+                    if gateway is None and ip.gateway:
+                        gateway = ip.gateway
+                    lines.append({
+                        "ip": ip.address,
+                        "ip_type": ip.address_type,
+                        "gateway": ip.gateway,
+                        "mac": iface.mac,
+                        "iface_type": iface.type,
+                        "iface_name": iface.name,
+                    })
+            elif iface.mac:
+                lines.append({
+                    "ip": None,
+                    "ip_type": None,
+                    "gateway": None,
+                    "mac": iface.mac,
+                    "iface_type": iface.type,
+                    "iface_name": iface.name,
+                })
 
         rows.append({
             "device": d,
             "ips": ips,
             "gateway": gateway,
+            "lines": lines,
             "flags": {
                 "dhcp": len(d.dhcp_pools) > 0,
                 "ports": len(d.ports),

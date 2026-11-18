@@ -32,6 +32,20 @@
 </form>
 {% endmacro %}
 
+{% macro iface_icon(iface_type, iface_name) -%}
+{%- set icons = {
+    'ethernet': 'fa-ethernet',
+    'wifi': 'fa-wifi',
+    'wifi_ap': 'fa-tower-broadcast',
+    'wan': 'fa-globe',
+    'virtual': 'fa-layer-group',
+    'port': 'fa-plug',
+    'voip': 'fa-phone',
+    'tr069': 'fa-cloud',
+} -%}
+<i class="fa-solid {{ icons.get(iface_type, 'fa-circle-question') }} iface-type-icon" title="{{ iface_name }}"></i>
+{%- endmacro %}
+
 {% macro ip_badge(address, address_type) %}
 <span class="ip-line">
 {%- if address_type == 'external' -%}

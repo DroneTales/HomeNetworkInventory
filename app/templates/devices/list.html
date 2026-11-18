@@ -8,7 +8,7 @@
 {# SPDX-License-Identifier: AGPL-3.0-or-later #}
 
 {% extends "base.html" %}
-{% from "_macros.html" import dash, ip_badge %}
+{% from "_macros.html" import dash, ip_badge, iface_icon %}
 
 {% block title %}{{ t('devices.title') }}{% endblock %}
 
@@ -136,19 +136,25 @@
                 {% if not sort_ip.v and ip.address %}{% set sort_ip.v = ip.address %}{% endif %}
             {% endfor %}
             <td data-sort-value="{{ sort_ip.v }}">
-                {% if row.ips %}
-                    {% for ip in row.ips %}
-                    <div>{{ ip_badge(ip.address, ip.address_type) }}</div>
+                {% if row.lines %}
+                    {% for line in row.lines %}
+                    <div class="ip-line">{{ iface_icon(line.iface_type, line.iface_name) }} {% if line.ip %}{{ ip_badge(line.ip, line.ip_type) }}{% elif line.ip_type %}{{ dash(None) }} {{ ip_badge('', line.ip_type) }}{% else %}—{% endif %}</div>
                     {% endfor %}
                 {% else %}—{% endif %}
             </td>
-            <td>{{ dash(row.gateway) }}</td>
             <td>
-                {% set macs = [] %}
-                {% for iface in d.interfaces %}
-                    {% if iface.mac %}{% set _ = macs.append(iface.mac) %}{% endif %}
-                {% endfor %}
-                {{ macs | join(', ') if macs else '—' }}
+                {% if row.lines %}
+                    {% for line in row.lines %}
+                    <div class="ip-line">{{ dash(line.gateway) }}</div>
+                    {% endfor %}
+                {% else %}—{% endif %}
+            </td>
+            <td>
+                {% if row.lines %}
+                    {% for line in row.lines %}
+                    <div class="ip-line">{{ dash(line.mac) }}</div>
+                    {% endfor %}
+                {% else %}—{% endif %}
             </td>
             <td class="text-end">
                 <a href="/devices/{{ d.id }}" class="btn btn-sm btn-outline-secondary" title="{{ t('common.view') }}">
