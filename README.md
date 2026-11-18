@@ -11,8 +11,7 @@ with its own isolated inventory.
 Designed to be simple enough for a home lab, but structured enough to keep the
 inventory clean and searchable.
 
-> Early but stable. Works well for home use. Feedback and contributions are
-> welcome.
+> Feedback and contributions are welcome.
 
 ---
 
