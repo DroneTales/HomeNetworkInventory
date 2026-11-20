@@ -735,16 +735,19 @@
 .ip-tag-edhcp { background: #134e4a; border-color: #2dd4bf; color: #99f6e4; }
 .ip-tag-estat { background: #14532d; border-color: #22c55e; color: #bbf7d0; }
 
-/* IP line: address left, tag right */
+/* IP line: tag left, address right after it */
 .ip-line {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
 }
 .ip-addr {
     font-variant-numeric: tabular-nums;
+}
+.ip-addr-empty {
+    /* empty marker — no stretch, no centering */
 }
 
 /* Interface row responsive layout */
