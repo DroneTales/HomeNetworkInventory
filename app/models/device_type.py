@@ -21,5 +21,6 @@ class DeviceType(Base):
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     supports_port_forwarding: Mapped[bool] = mapped_column(default=False, nullable=False)
     description: Mapped[str | None] = mapped_column(String(255))
+    icon: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
     devices: Mapped[list["Device"]] = relationship(back_populates="device_type")

@@ -11,7 +11,8 @@ with its own isolated inventory.
 Designed to be simple enough for a home lab, but structured enough to keep the
 inventory clean and searchable.
 
-> Feedback and contributions are welcome.
+> Early but stable. Works well for home use. Feedback and contributions are
+> welcome.
 
 ---
 
@@ -25,7 +26,8 @@ inventory clean and searchable.
   - Delete a home only when it is empty
 - **Devices** — full inventory with a colour-coded device page:
   - basic info (hostname, type, vendor, model, location)
-  - network interfaces (Ethernet, Wi-Fi, WAN, virtual, physical ports)
+  - network interfaces with a per-type icon (Ethernet, Wi-Fi, Wi-Fi AP, WAN,
+    virtual, VoIP, TR-069, physical ports)
   - IP addresses with four address types: `static`, `dhcp`, `reserved`, `external`
   - physical ports (WAN, LAN1, LAN2, …) mapped to interfaces
   - Wi-Fi networks the device broadcasts (SSID, band, encryption, password)
@@ -33,6 +35,9 @@ inventory clean and searchable.
   - credentials (admin, ssh, wifi, camera, matter, other)
   - services (web UI, RTSP streams, HomeBridge, etc.)
   - free-form remarks
+- **Export** — export devices and connections to Excel (`.xlsx`, two sheets:
+  Devices and Connections) or CSV (a ZIP with two CSV files) from the Devices
+  list.
 - **Networks per interface** — a device can belong to several logical
   networks at once, because network membership is a property of each
   interface, not of the device. A router with LAN, WAN, and guest Wi-Fi has
@@ -42,12 +47,14 @@ inventory clean and searchable.
   same CIDR but have different gateways (for example, `Home` on
   `192.168.1.1/24` and `Work` on `192.168.1.2/24`).
 - **Connections** — physical and logical links between device ports, with
-  cable colour/type and description. Bidirectional: a connection shows up on
-  both device pages. Cross-home links are not permitted.
+  cable colour/type and description. The list is grouped by source device, and
+  each connection appears under both devices, marked with an incoming/outgoing
+  arrow. Cross-home links are not permitted.
 - **Reference** — locations and networks per home, editable by any user with
   `Can edit`. Global lists (device types, vendors, models, credential types)
-  are shared across all homes and can only be changed by admins. Full CRUD
-  with reference-integrity checks.
+  are shared across all homes and can only be changed by admins. Each device
+  type has a custom icon, chosen from a built-in set in the device type form.
+  Full CRUD with reference-integrity checks.
 - **Users** — multi-user with three independent permission flags for
   non-admin users:
   - `Can edit` — create, edit, delete devices and connections
@@ -162,25 +169,12 @@ python -c "import secrets; print(secrets.token_urlsafe(48))"
 ## Upgrading
 
 On startup the application compares the SQLAlchemy models against the
-actual SQLite database and refuses to start if the database is missing
-columns or tables that the current code expects:
+actual SQLite database and **applies any missing tables or columns
+automatically** — new tables are created and missing columns are added, so an
+upgrade normally needs no manual step.
 
-```
-================================================================
-  DATABASE SCHEMA IS OUT OF DATE
-================================================================
-Missing columns:
-  services.username VARCHAR(100)
-  services.password VARCHAR(255)
-
-Run the migration script to bring the database up to date:
-  Windows:     migrate.bat
-  Linux/macOS: ./migrate.command
-  From source: python -m app.migrate
-================================================================
-```
-
-To upgrade:
+For a controlled upgrade with an explicit timestamped backup, run the
+standalone migration script:
 
 1. Stop the application.
 2. Run the migration script:

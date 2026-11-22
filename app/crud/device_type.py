@@ -29,6 +29,7 @@ def create(
     is_active: bool = True,
     supports_port_forwarding: bool = False,
     description: str | None = None,
+    icon: str | None = None,
 ) -> DeviceType:
     name = (name or "").strip()
     if not name:
@@ -42,6 +43,7 @@ def create(
         is_active=is_active,
         supports_port_forwarding=supports_port_forwarding,
         description=description,
+        icon=icon,
     )
     db.add(device_type)
     db.flush()
@@ -54,6 +56,7 @@ def update(
     is_active: bool,
     supports_port_forwarding: bool = False,
     description: str | None = None,
+    icon: str | None = None,
 ) -> DeviceType:
     device_type = require_found(get_by_id(db, type_id), "Device type")
 
@@ -69,6 +72,7 @@ def update(
     device_type.is_active = is_active
     device_type.supports_port_forwarding = supports_port_forwarding
     device_type.description = description
+    device_type.icon = icon
     db.flush()
     return device_type
 

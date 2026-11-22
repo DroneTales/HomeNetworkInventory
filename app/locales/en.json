@@ -329,5 +329,10 @@
   "export.connections.target_location": "Target location",
   "export.connections.target_device": "Target device",
   "export.connections.target_port": "Target port",
-  "export.connections.cable": "Cable"
+  "export.connections.cable": "Cable",
+  "reference.col.icon": "Icon",
+  "reference.device_type.icon": "Icon",
+  "reference.device_type.select_icon": "Select Icon",
+  "reference.device_type.clear_icon": "Clear",
+  "reference.device_type.search_icons": "Search icons (e.g., wifi, server, camera)..."
 }

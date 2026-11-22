@@ -266,7 +266,7 @@
                         wifi = '<span class="topo-badge topo-badge-wifi-client" title="Connected via Wi-Fi"><i class="fa-solid fa-wifi"></i></span>';
                     }
                     return '<div class="topo-node topo-cat-' + d.category + '">' +
-                           '<i class="fa-solid ' + d.icon + '"></i>' +
+                           '<i class="icon icon-' + d.icon + '"></i>' +
                            wifi +
                            '</div>';
                 }

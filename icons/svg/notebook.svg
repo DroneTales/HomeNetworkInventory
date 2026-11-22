@@ -1,0 +1,6 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+  <!-- Screen: ring (stroke 2 → outer + inner contours) -->
+  <path d="M5 6h22v15H5z M7 8v11h18V8z"/>
+  <!-- Base: ring approximating the trapezoid outline -->
+  <path d="M2 22 L5 19 H27 L30 22 V26 H2 Z M4 24 H28 V22.5 L26.5 20.5 H5.5 L4 22.5 Z"/>
+</svg>

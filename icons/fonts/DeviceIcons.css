@@ -1,0 +1,128 @@
+@font-face {
+  font-family: 'DeviceIcons';
+  src: url('/static/fonts/DeviceIcons.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.icon {
+  font-family: 'DeviceIcons';
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-adsl-modem:before {
+  content: '\E002';
+}
+
+.icon-camera:before {
+  content: '\E008';
+}
+
+.icon-desktop-pc:before {
+  content: '\E00B';
+}
+
+.icon-door-bell:before {
+  content: '\E016';
+}
+
+.icon-managed-switch:before {
+  content: '\E007';
+}
+
+.icon-micro-pc:before {
+  content: '\E00C';
+}
+
+.icon-notebook:before {
+  content: '\E00D';
+}
+
+.icon-nvr:before {
+  content: '\E009';
+}
+
+.icon-optical-modem:before {
+  content: '\E001';
+}
+
+.icon-other:before {
+  content: '\E01A';
+}
+
+.icon-phone:before {
+  content: '\E00F';
+}
+
+.icon-printer:before {
+  content: '\E017';
+}
+
+.icon-router:before {
+  content: '\E003';
+}
+
+.icon-scanner:before {
+  content: '\E018';
+}
+
+.icon-server:before {
+  content: '\E00A';
+}
+
+.icon-smart-lamp:before {
+  content: '\E014';
+}
+
+.icon-smart-plug:before {
+  content: '\E013';
+}
+
+.icon-smart-relay:before {
+  content: '\E015';
+}
+
+.icon-smart-watch:before {
+  content: '\E010';
+}
+
+.icon-speaker:before {
+  content: '\E019';
+}
+
+.icon-tablet:before {
+  content: '\E00E';
+}
+
+.icon-tv-box:before {
+  content: '\E011';
+}
+
+.icon-tv:before {
+  content: '\E012';
+}
+
+.icon-unmanaged-switch:before {
+  content: '\E006';
+}
+
+.icon-wifi-ap:before {
+  content: '\E005';
+}
+
+.icon-wifi-router:before {
+  content: '\E004';
+}
+

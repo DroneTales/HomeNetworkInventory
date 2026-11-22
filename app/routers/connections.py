@@ -7,13 +7,14 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.core.constants import CONNECTION_TYPE_PHYSICAL
 from app.core.deps import require_admin, require_edit, require_site, require_user
-from app.core.device_classify import classify_device
 from app.core.exceptions import ValidationError
 from app.core.templating import render
 from app.core.utils import to_int
@@ -24,6 +25,10 @@ from app.database import get_db
 from app.models.connection import Connection
 from app.models.site import Site
 from app.models.user import User
+
+def _natural_key(name: str) -> list:
+    return [int(t) if t.isdigit() else t.lower() for t in re.split(r"(\d+)", name)]
+
 
 router = APIRouter(prefix="/connections", tags=["connections"])
 
@@ -37,6 +42,34 @@ def list_connections(
     connections = crud_connection.list_all(db, site.id)
     warning = request.session.pop("warning", None)
 
+    connection_groups = []
+    groups_by_device = {}
+    for c in connections:
+        for local, remote_dev, remote, direction in (
+            (c.source_port, c.target_port.device, c.target_port, "outgoing"),
+            (c.target_port, c.source_port.device, c.source_port, "incoming"),
+        ):
+            dev = local.device
+            if dev.id not in groups_by_device:
+                icon = (
+                    dev.device_type.icon
+                    if dev.device_type and dev.device_type.icon
+                    else None
+                )
+                group = {"device": dev, "icon": icon, "connections": []}
+                groups_by_device[dev.id] = group
+                connection_groups.append(group)
+            groups_by_device[dev.id]["connections"].append({
+                "conn": c,
+                "local": local,
+                "remote_dev": remote_dev,
+                "remote": remote,
+                "dir": direction,
+            })
+
+    for group in connection_groups:
+        group["connections"].sort(key=lambda e: _natural_key(e["local"].name))
+
     wifi_nets = crud_wifi.list_by_site(db, site.id)
     devices = crud_device.list_all(db, site.id)
     location_groups_by_key: dict = {}
@@ -47,7 +80,7 @@ def list_connections(
             group = {"location": d.location, "devices": []}
             location_groups_by_key[key] = group
             location_groups.append(group)
-        _, icon = classify_device(d)
+        icon = d.device_type.icon if d.device_type and d.device_type.icon else None
         location_groups_by_key[key]["devices"].append({"device": d, "icon": icon})
 
     for g in location_groups:
@@ -86,7 +119,7 @@ def list_connections(
         "connections/list.html",
         user=user,
         current_site=site,
-        connections=connections,
+        connection_groups=connection_groups,
         wireless=wireless,
         location_groups=location_groups,
         warning=warning,

@@ -12,7 +12,6 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 
 from app.core.deps import require_edit, require_site, require_user
-from app.core.device_classify import classify_device
 from app.core.templating import render
 from app.crud import device as crud_device
 from app.crud import topology_position as crud_pos
@@ -86,7 +85,8 @@ def topology_data(
                 if ssid not in wifi_client_ssids:
                     wifi_client_ssids.append(ssid)
 
-        category, icon = classify_device(d)
+        category = "other"  # Keep for CSS compatibility
+        icon = d.device_type.icon if d.device_type and d.device_type.icon else None
 
         # Prefer the IP flagged as primary; otherwise fall back to the
         # first non-empty address on any interface

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <!-- Main Body (thin rectangle) -->
+  <rect x="4" y="10" width="16" height="0.8" rx="0.4"/>
+  <rect x="4" y="18.2" width="16" height="0.8" rx="0.4"/>
+  <rect x="4" y="10" width="0.8" height="9"/>
+  <rect x="19.2" y="10" width="0.8" height="9"/>
+  
+  <!-- Left Antenna -->
+  <rect x="7" y="3" width="0.8" height="7" rx="0.4" transform="rotate(-15 7.4 6.5)"/>
+  
+  <!-- Right Antenna -->
+  <rect x="16.2" y="3" width="0.8" height="7" rx="0.4" transform="rotate(15 16.6 6.5)"/>
+  
+  <!-- Indicator Lights (small circles) -->
+  <circle cx="8" cy="14.5" r="0.6"/>
+  <circle cx="12" cy="14.5" r="0.6"/>
+  <circle cx="16" cy="14.5" r="0.6"/>
+  
+  <!-- Left Signal Waves (thin arcs) -->
+  <path d="M3 14.5 Q3 11 5 9 L5.5 9.5 Q4 11 4 14.5 Z"/>
+  <path d="M1 14.5 Q1 9 4 6.5 L4.5 7.2 Q2 9.5 2 14.5 Z"/>
+  
+  <!-- Right Signal Waves (thin arcs) -->
+  <path d="M21 14.5 Q21 11 19 9 L18.5 9.5 Q20 11 20 14.5 Z"/>
+  <path d="M23 14.5 Q23 9 20 6.5 L19.5 7.2 Q22 9.5 22 14.5 Z"/>
+</svg>

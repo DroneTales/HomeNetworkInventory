@@ -1,0 +1,8 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+  <path d="M32,55 H57 V51 L50,44 V25 A18,18 0 0,0 14,25 V44 L7,51 V55 Z
+           M32,53 L8.5,53 L8.5,51.3 L15.7,44.1 L15.7,25 A16.3,16.3 0 0,1 48.3,25 L48.3,44.1 L55.5,51.3 L55.5,53 Z"/>
+  <rect x="14" y="34" width="36" height="2"/>
+  <rect x="14" y="40" width="36" height="2"/>
+  <path d="M39,55 A7,7 0 0,1 25,55 Z"/>
+  <path d="M28,7 V1 H36 V7 H34 V3 H30 V7 Z"/>
+</svg>

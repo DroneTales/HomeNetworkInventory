@@ -33,7 +33,7 @@
     </div>
 </div>
 
-{% if not connections %}
+{% if not connection_groups %}
 <div class="alert alert-info">{{ t('connections.list.empty') }}</div>
 {% else %}
 
@@ -42,7 +42,6 @@
     <table class="table table-hover align-middle">
         <thead>
         <tr>
-            <th>{{ t('connections.list.source_device') }}</th>
             <th>{{ t('connections.list.source_port') }}</th>
             <th>{{ t('connections.list.target_device') }}</th>
             <th>{{ t('connections.list.target_port') }}</th>
@@ -53,40 +52,57 @@
         </tr>
         </thead>
         <tbody>
-        {% for c in connections %}
-        <tr class="{% if not c.is_active %}text-muted{% endif %}">
+        {% for group in connection_groups %}
+        <tr>
+            <td colspan="7" class="pt-3 pb-1 border-top">
+                {% if group.icon %}
+                <i class="icon icon-{{ group.icon }} me-2"></i>
+                {% else %}
+                <i class="icon icon-other me-2"></i>
+                {% endif %}
+                <a href="/devices/{{ group.device.id }}" class="fw-bold text-decoration-none">
+                    {{ group.device.hostname }}
+                </a>
+                {% if group.device.human_readable_name %}
+                <span class="text-muted">— {{ group.device.human_readable_name }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% for c in group.connections %}
+        <tr class="{% if not c.conn.is_active %}text-muted{% endif %}">
             <td>
-                <a href="/devices/{{ c.source_port.device.id }}">
-                    {{ c.source_port.device.hostname }}
+                {% if c.dir == 'outgoing' %}
+                <i class="fa-solid fa-arrow-right text-success me-1"></i>
+                {% else %}
+                <i class="fa-solid fa-arrow-left text-primary me-1"></i>
+                {% endif %}
+                <code>{{ c.local.name }}</code>
+                <span class="text-muted small">({{ c.local.interface.name }})</span>
+            </td>
+            <td>
+                <a href="/devices/{{ c.remote_dev.id }}">
+                    {{ c.remote_dev.hostname }}
                 </a>
             </td>
             <td>
-                <code>{{ c.source_port.name }}</code>
-                <span class="text-muted small">({{ c.source_port.interface.name }})</span>
+                <code>{{ c.remote.name }}</code>
+                <span class="text-muted small">({{ c.remote.interface.name }})</span>
             </td>
-            <td>
-                <a href="/devices/{{ c.target_port.device.id }}">
-                    {{ c.target_port.device.hostname }}
-                </a>
-            </td>
-            <td>
-                <code>{{ c.target_port.name }}</code>
-                <span class="text-muted small">({{ c.target_port.interface.name }})</span>
-            </td>
-            <td>{{ c.connection_type }}</td>
-            <td>{{ dash(c.cable_type) }}</td>
-            <td>{{ dash(c.description) }}</td>
+            <td>{{ c.conn.connection_type }}</td>
+            <td>{{ dash(c.conn.cable_type) }}</td>
+            <td>{{ dash(c.conn.description) }}</td>
             <td class="text-end">
                 {% if current_user.role == 'admin' or current_user.can_edit %}
-                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary" title="{{ t('common.edit') }}">
+                <a href="/connections/{{ c.conn.id }}/edit" class="btn btn-sm btn-outline-secondary" title="{{ t('common.edit') }}">
                     <i class="fa-solid fa-pen fa-fw"></i>
                 </a>
                 {% endif %}
                 {% if current_user.role == 'admin' %}
-                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete'), icon_only=True) }}
+                {{ delete_form('/connections/' ~ c.conn.id ~ '/delete', t('connections.list.confirm_delete'), icon_only=True) }}
                 {% endif %}
             </td>
         </tr>
+        {% endfor %}
         {% endfor %}
         </tbody>
     </table>
@@ -94,56 +110,72 @@
 
 {# Mobile cards #}
 <div class="d-md-none">
-    {% for c in connections %}
-    <div class="card mb-2 {% if not c.is_active %}text-muted{% endif %}">
+    {% for group in connection_groups %}
+    <div class="d-flex align-items-center mt-3 mb-2">
+        {% if group.icon %}
+        <i class="icon icon-{{ group.icon }} me-1"></i>
+        {% else %}
+        <i class="icon icon-other me-1"></i>
+        {% endif %}
+        <a href="/devices/{{ group.device.id }}" class="fw-bold text-decoration-none">
+            {{ group.device.hostname }}
+        </a>
+        {% if group.device.human_readable_name %}
+        <span class="text-muted small">— {{ group.device.human_readable_name }}</span>
+        {% endif %}
+    </div>
+    {% for c in group.connections %}
+    <div class="card mb-2 {% if not c.conn.is_active %}text-muted{% endif %}">
         <div class="card-body">
             <div class="mb-2">
-                <a href="/devices/{{ c.source_port.device.id }}" class="fw-bold text-decoration-none">
-                    {{ c.source_port.device.hostname }}
-                </a>
-                <span class="text-muted">/</span>
-                <code>{{ c.source_port.name }}</code>
+                {% if c.dir == 'outgoing' %}
+                <i class="fa-solid fa-arrow-right text-success me-1"></i>
+                {% else %}
+                <i class="fa-solid fa-arrow-left text-primary me-1"></i>
+                {% endif %}
+                <code>{{ c.local.name }}</code>
                 <span class="text-muted">→</span>
-                <a href="/devices/{{ c.target_port.device.id }}" class="fw-bold text-decoration-none">
-                    {{ c.target_port.device.hostname }}
+                <a href="/devices/{{ c.remote_dev.id }}" class="fw-bold text-decoration-none">
+                    {{ c.remote_dev.hostname }}
                 </a>
                 <span class="text-muted">/</span>
-                <code>{{ c.target_port.name }}</code>
+                <code>{{ c.remote.name }}</code>
             </div>
 
             <div class="row small">
                 <div class="col-5 text-muted">{{ t('connections.list.source_interface') }}</div>
-                <div class="col-7">{{ c.source_port.interface.name }}</div>
+                <div class="col-7">{{ c.local.interface.name }}</div>
 
                 <div class="col-5 text-muted">{{ t('connections.list.target_interface') }}</div>
-                <div class="col-7">{{ c.target_port.interface.name }}</div>
+                <div class="col-7">{{ c.remote.interface.name }}</div>
 
                 <div class="col-5 text-muted">{{ t('devices.list.type') }}</div>
-                <div class="col-7">{{ c.connection_type }}</div>
+                <div class="col-7">{{ c.conn.connection_type }}</div>
 
-                {% if c.cable_type %}
+                {% if c.conn.cable_type %}
                 <div class="col-5 text-muted">{{ t('devices.view.field.cable') }}</div>
-                <div class="col-7">{{ c.cable_type }}</div>
+                <div class="col-7">{{ c.conn.cable_type }}</div>
                 {% endif %}
 
-                {% if c.description %}
+                {% if c.conn.description %}
                 <div class="col-5 text-muted">{{ t('devices.form.field.description') }}</div>
-                <div class="col-7">{{ c.description }}</div>
+                <div class="col-7">{{ c.conn.description }}</div>
                 {% endif %}
             </div>
 
             <div class="mt-2 d-flex gap-1">
                 {% if current_user.role == 'admin' or current_user.can_edit %}
-                <a href="/connections/{{ c.id }}/edit" class="btn btn-sm btn-outline-secondary flex-fill" title="{{ t('common.edit') }}">
+                <a href="/connections/{{ c.conn.id }}/edit" class="btn btn-sm btn-outline-secondary flex-fill" title="{{ t('common.edit') }}">
                     <i class="fa-solid fa-pen"></i> {{ t('common.edit') }}
                 </a>
                 {% endif %}
                 {% if current_user.role == 'admin' %}
-                {{ delete_form('/connections/' ~ c.id ~ '/delete', t('connections.list.confirm_delete'), fill=True) }}
+                {{ delete_form('/connections/' ~ c.conn.id ~ '/delete', t('connections.list.confirm_delete'), fill=True) }}
                 {% endif %}
             </div>
         </div>
     </div>
+    {% endfor %}
     {% endfor %}
 </div>
 
@@ -177,7 +209,11 @@
                 <ul class="list-unstyled mb-0 small">
                     {% for c in w.clients %}
                     <li class="py-1">
-                        <i class="fa-solid fa-plug text-muted me-1"></i>
+                        {% if c.device.device_type and c.device.device_type.icon %}
+                        <i class="icon icon-{{ c.device.device_type.icon }} text-muted me-1"></i>
+                        {% else %}
+                        <i class="icon icon-other text-muted me-1"></i>
+                        {% endif %}
                         <a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a>
                         {% if c.device.human_readable_name %}
                         <span class="text-muted">— {{ c.device.human_readable_name }}</span>
@@ -211,7 +247,7 @@
                 <i class="fa-solid fa-location-dot me-1"></i>
                 <span class="fw-bold">{{ g.location.name }}</span>
                 {% else %}
-                <i class="fa-solid fa-circle-question me-1"></i>
+                <i class="icon icon-other me-1"></i>
                 <span class="fw-bold">{{ t('connections.locations.undefined') }}</span>
                 {% endif %}
                 <span class="badge bg-secondary ms-2 location-count">{{ g.devices|length }}</span>
@@ -223,9 +259,9 @@
                     <li class="py-1 d-flex justify-content-between align-items-center location-device" data-device-id="{{ d.id }}">
                         <a href="/devices/{{ d.id }}" class="text-decoration-none">
                             {% if current_user.role == 'admin' or current_user.can_edit %}
-                            <i class="fa-solid {{ item.icon }} text-muted me-1 drag-handle" draggable="true" title="{{ t('connections.locations.drag_hint') }}"></i>
+                            <i class="icon icon-{{ item.icon }} text-muted me-1 drag-handle" draggable="true" title="{{ t('connections.locations.drag_hint') }}"></i>
                             {% else %}
-                            <i class="fa-solid {{ item.icon }} text-muted me-1"></i>
+                            <i class="icon icon-{{ item.icon }} text-muted me-1"></i>
                             {% endif %}{{ d.hostname }}
                             {% if d.human_readable_name %}
                             <span class="text-muted">— {{ d.human_readable_name }}</span>

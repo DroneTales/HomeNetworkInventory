@@ -33,6 +33,29 @@
                 <input type="text" class="form-control" id="name" name="name"
                        value="{{ fd.name or '' }}" required maxlength="100">
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">{{ t('reference.device_type.icon') }}</label>
+                <div class="d-flex align-items-center gap-3">
+                    <div id="icon-preview" class="border rounded d-flex align-items-center justify-content-center bg-body-tertiary" style="width: 50px; height: 50px;">
+                        {% if fd.icon %}
+                            <i class="icon icon-{{ fd.icon }} text-primary" style="font-size: 2rem;"></i>
+                        {% else %}
+                            <i class="icon icon-other text-muted" style="font-size: 2rem;"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <input type="hidden" id="icon" name="icon" value="{{ fd.icon or '' }}">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#iconSelectorModal">
+                            <i class="fa-solid fa-icons me-1"></i> {{ t('reference.device_type.select_icon') }}
+                        </button>
+                        {% if fd.icon %}
+                            <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none" onclick="clearIcon()">{{ t('reference.device_type.clear_icon') }}</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
             <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
                        {% if fd.is_active %}checked{% endif %}>
@@ -60,5 +83,73 @@
         <button type="submit" class="btn btn-primary">{{ t('common.save') }}</button>
     </div>
 </form>
-{% endblock %}
 
+<!-- Icon Selector Modal -->
+<div class="modal fade" id="iconSelectorModal" tabindex="-1" aria-labelledby="iconSelectorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iconSelectorModalLabel">{{ t('reference.device_type.select_icon') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="iconSearch" class="form-control mb-3" placeholder="{{ t('reference.device_type.search_icons') }}">
+                <div class="row g-2" id="iconGrid" style="max-height: 400px; overflow-y: auto;">
+                    {% for icon in available_icons %}
+                    <div class="col-4 col-md-3 col-lg-2 icon-item" data-icon="{{ icon }}" 
+                         style="cursor: pointer; text-align: center; padding: 12px; border: 1px solid #dee2e6; border-radius: 6px; transition: all 0.2s;"
+                         onmouseover="this.style.borderColor='#0d6efd'; this.style.backgroundColor='#f0f7ff'"
+                         onmouseout="this.style.borderColor='#dee2e6'; this.style.backgroundColor='transparent'"
+                         onclick="selectIcon('{{ icon }}')">
+                        <i class="icon icon-{{ icon }} mb-2 text-secondary" style="font-size: 2rem;"></i>
+                        <div class="small text-muted text-break" style="font-size: 0.75rem;">{{ icon }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectIcon(iconName) {
+    document.getElementById('icon').value = iconName;
+    document.getElementById('icon-preview').innerHTML = '<i class="icon icon-' + iconName + ' text-primary" style="font-size: 2rem;"></i>';
+    
+    // Update clear button visibility
+    const form = document.querySelector('form');
+    let clearBtn = form.querySelector('.btn-link.text-danger');
+    if (!clearBtn) {
+        clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'btn btn-link btn-sm text-danger text-decoration-none';
+        clearBtn.textContent = 'Clear';
+        clearBtn.onclick = clearIcon;
+        document.getElementById('icon').parentNode.appendChild(clearBtn);
+    }
+    
+    var modal = bootstrap.Modal.getInstance(document.getElementById('iconSelectorModal'));
+    modal.hide();
+}
+
+function clearIcon() {
+    document.getElementById('icon').value = '';
+    document.getElementById('icon-preview').innerHTML = '<i class="icon icon-other text-muted"></i>';
+    const clearBtn = document.querySelector('.btn-link.text-danger');
+    if (clearBtn) clearBtn.remove();
+}
+
+document.getElementById('iconSearch').addEventListener('input', function(e) {
+    var query = e.target.value.toLowerCase().trim();
+    var items = document.querySelectorAll('.icon-item');
+    items.forEach(function(item) {
+        var iconName = item.getAttribute('data-icon');
+        if (iconName.includes(query)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -78,6 +78,8 @@
     <h3 class="h6 mt-3">5.1. Device list</h3>
     <p>Shows all devices of the <strong>current home</strong> as a table (desktop) or cards (mobile). Columns: Hostname, Name, Type, Vendor, Model, Location, IP Addresses, Gateway, MAC, Actions. Click any column header to sort; click again to reverse.</p>
     <p>Inactive devices are greyed out with an <code>inactive</code> badge.</p>
+    <p>A <strong>device type icon</strong> is shown next to the hostname — it is configured in the device type reference (section 9. Reference).</p>
+    <p>The <strong>Export</strong> button (next to <strong>Add device</strong>) exports the data to Excel (<code>.xlsx</code>) or a CSV archive (<code>.zip</code>). The XLSX has two sheets — "Devices" and "Connections"; the CSV archive has two files. Rows follow the current list sort order, and IP/MAC addresses are placed on separate lines within a cell.</p>
 
     <p><strong>Status badges.</strong> Under the hostname, on a second line, small coloured badges summarise the device at a glance (hover for a tooltip):</p>
     <ul>
@@ -220,7 +222,12 @@
 
 <section id="connections" class="mb-4">
     <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-link me-2 text-primary"></i>6. Connections</h2>
-    <p>The section lists all physical and logical connections between device ports of the <strong>current home</strong>.</p>
+    <p>The section lists all physical and logical connections between device ports of the <strong>current home</strong>. Connections are <strong>grouped by source device</strong>: the header is the device name, with its connections listed underneath.</p>
+    <p>Each connection is shown <strong>twice</strong> — under both devices it connects. The direction is marked with an arrow before the port name:</p>
+    <ul>
+        <li><span class="text-success"><i class="fa-solid fa-arrow-right"></i></span> — outgoing (this device is the source).</li>
+        <li><span class="text-primary"><i class="fa-solid fa-arrow-left"></i></span> — incoming (this device is the target).</li>
+    </ul>
 
     <h3 class="h6 mt-3">6.1. Creating a connection</h3>
     <p>Click <strong>Add connection</strong>. First choose a <strong>device</strong>, then a <strong>port</strong> of that device — for both Source and Target. Dropdowns show only devices and ports of the current home.</p>
@@ -276,7 +283,7 @@
     <ul>
         <li>Devices are grouped into compound containers: <strong>Home</strong> → <strong>Locations</strong> → <strong>Devices</strong>.</li>
         <li>Devices without a location are outlined in <strong>orange</strong> and placed outside the location frames.</li>
-        <li>Each device node shows a category icon and the hostname. The icon colour depends on the device category (modem, hub, Wi-Fi router, Wi-Fi access point, router, camera, video server, server, other).</li>
+        <li>Each device node shows a <strong>device type icon</strong> (configured in section 9. Reference) and the hostname.</li>
         <li>Physical and logical connections between devices are drawn as edges (device-level, ignoring individual ports).</li>
         <li>Wi-Fi relationships: broadcasters get a Wi-Fi badge; clients connected to a Wi-Fi network get a client badge with the SSID.</li>
     </ul>
@@ -345,7 +352,7 @@
 
     <p><strong>Global — admin only</strong> (shared across all homes):</p>
     <ul>
-        <li><strong>Device Types</strong> — types of devices. <strong>Active = yes</strong> — a "smart" device (must have an IP). <strong>Active = no</strong> — passive (hub, unmanaged switch), must not have an IP.</li>
+        <li><strong>Device Types</strong> — types of devices. <strong>Active = yes</strong> — a "smart" device (must have an IP). <strong>Active = no</strong> — passive (hub, unmanaged switch), must not have an IP. Each type has an <strong>icon</strong> — picked from a set in a modal with a grid and search. The icon is shown in device lists, on the Connections page, and in the topology.</li>
         <li><strong>Vendors</strong> — manufacturers.</li>
         <li><strong>Models</strong> — hardware models. Belong to a vendor.</li>
         <li><strong>Credential Types</strong> — types of credentials.</li>

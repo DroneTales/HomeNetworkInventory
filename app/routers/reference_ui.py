@@ -8,6 +8,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from markupsafe import Markup
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -16,6 +17,7 @@ from app.core.exceptions import ValidationError
 from app.core.templating import render
 from app.core.utils import redirect_with_error, to_int
 from app.crud import credential_type as crud_cred_type
+from app.core.icons import AVAILABLE_ICONS
 from app.crud import device_type as crud_device_type
 from app.crud import location as crud_location
 from app.crud import model as crud_model
@@ -211,13 +213,24 @@ def device_types_list(
     site: Site = Depends(require_site),
 ):
     items = crud_device_type.list_all(db)
-    rows = [
-        {
+    rows = []
+    for x in items:
+        # Build icon HTML
+        if x.icon:
+            icon_html = f'<i class="icon icon-{x.icon} text-primary" style="font-size: 1.75rem;"></i>'
+        else:
+            icon_html = '<i class="icon icon-other text-muted" style="font-size: 1.75rem;"></i>'
+        
+        rows.append({
             "id": x.id,
-            "cells": [x.name, "✓" if x.is_active else "—", "✓" if x.supports_port_forwarding else "—", x.description or "—"],
-        }
-        for x in items
-    ]
+            "cells": [
+                Markup(icon_html),
+                x.name,
+                "✓" if x.is_active else "—",
+                "✓" if x.supports_port_forwarding else "—",
+                x.description or "—"
+            ],
+        })
     return render(
         request,
         "reference/list.html",
@@ -227,7 +240,7 @@ def device_types_list(
         add_url="/reference/device-types/new",
         edit_url_prefix="/reference/device-types/",
         delete_url_prefix="/reference/device-types/",
-        column_keys=["devices.list.name", "devices.form.field.active", "reference.col.pf", "devices.form.field.description"],
+        column_keys=["reference.col.icon", "devices.list.name", "devices.form.field.active", "reference.col.pf", "devices.form.field.description"],
         rows=rows,
     )
 
@@ -245,6 +258,7 @@ def device_types_new_form(
             "/reference/device-types/new",
             False,
             {"is_active": True, "supports_port_forwarding": False},
+            available_icons=AVAILABLE_ICONS,
         )
 
 @router.post("/device-types/new")
@@ -259,9 +273,10 @@ async def device_types_new_submit(
     is_active = form.get("is_active") == "on"
     supports_pf = form.get("supports_port_forwarding") == "on"
     description = (form.get("description") or "").strip() or None
+    icon = (form.get("icon") or "").strip() or None
 
     try:
-        crud_device_type.create(db, name=name, is_active=is_active, supports_port_forwarding=supports_pf, description=description)
+        crud_device_type.create(db, name=name, is_active=is_active, supports_port_forwarding=supports_pf, description=description, icon=icon)
         db.commit()
     except ValidationError as e:
         db.rollback()
@@ -300,7 +315,9 @@ def device_types_edit_form(
             "is_active": item.is_active,
             "supports_port_forwarding": item.supports_port_forwarding,
             "description": item.description or "",
+            "icon": item.icon or "",
         },
+            available_icons=AVAILABLE_ICONS,
         )
 
 @router.post("/device-types/{item_id}/edit")
@@ -316,10 +333,11 @@ async def device_types_edit_submit(
     is_active = form.get("is_active") == "on"
     supports_pf = form.get("supports_port_forwarding") == "on"
     description = (form.get("description") or "").strip() or None
+    icon = (form.get("icon") or "").strip() or None
 
     try:
         crud_device_type.update(
-            db, type_id=item_id, name=name, is_active=is_active, supports_port_forwarding=supports_pf, description=description
+            db, type_id=item_id, name=name, is_active=is_active, supports_port_forwarding=supports_pf, description=description, icon=icon
         )
         db.commit()
     except ValidationError as e:
