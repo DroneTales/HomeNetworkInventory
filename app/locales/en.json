@@ -334,5 +334,13 @@
   "reference.device_type.icon": "Icon",
   "reference.device_type.select_icon": "Select Icon",
   "reference.device_type.clear_icon": "Clear",
-  "reference.device_type.search_icons": "Search icons (e.g., wifi, server, camera)..."
+  "reference.device_type.search_icons": "Search icons (e.g., wifi, server, camera)...",
+  "devices.form.field.mac_filter": "MAC filter",
+  "devices.form.mac_filter.disabled": "Disabled",
+  "devices.form.mac_filter.white": "White List",
+  "devices.form.mac_filter.black": "Black List",
+  "devices.form.mac_filter.active": "active",
+  "devices.form.mac_filter.add": "Add device…",
+  "devices.view.mac_filter": "MAC filter",
+  "common.add": "Add"
 }

@@ -39,7 +39,7 @@
                 <option value="Open" {% if cur_enc == 'Open' %}selected{% endif %}>Open</option>
             </select>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md">
             <label class="form-label small mb-0">
                 {{ t('devices.form.field.password') }}
                 {% if not can_change_passwords %}
@@ -68,6 +68,54 @@
         </div>
         <div class="col-6 col-md-auto text-end">
             <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-btn px-1">{{ t('devices.form.btn.remove') }}</button>
+        </div>
+    </div>
+
+    {# MAC filter #}
+    {% set cur_mf = (wifi.mac_filter if wifi and wifi.mac_filter is not none else 0) %}
+    <div class="row g-1 mt-1">
+        <div class="col-12 col-md-4">
+            <label class="form-label small mb-0">{{ t('devices.form.field.mac_filter') }}</label>
+            <select class="form-select form-select-sm wifi-mac-filter px-1" name="wifi_mac_filter">
+                <option value="0" {% if cur_mf == 0 %}selected{% endif %}>{{ t('devices.form.mac_filter.disabled') }}</option>
+                <option value="1" {% if cur_mf == 1 %}selected{% endif %}>{{ t('devices.form.mac_filter.white') }}</option>
+                <option value="2" {% if cur_mf == 2 %}selected{% endif %}>{{ t('devices.form.mac_filter.black') }}</option>
+            </select>
+        </div>
+    </div>
+    <div class="wifi-mac-filter-block {% if not cur_mf %}d-none{% endif %} mt-1">
+        <input type="hidden" name="wifi_mac_filter_data" class="wifi-mac-filter-data" value="">
+        <div class="wifi-mac-filter-entries">
+            {% if wifi and wifi.mac_filter_entries %}
+            {% for e in wifi.mac_filter_entries %}
+            <div class="row g-1 align-items-center wifi-mac-filter-entry py-1" data-id="{{ e.id }}" data-device="{{ e.device_id }}" data-name="{{ e.device_name }}" data-mac="{{ e.mac }}">
+                <div class="col-12 col-md">
+                    <span class="small">{{ e.device_name }} <code class="ms-1">{{ e.mac }}</code></span>
+                </div>
+                <div class="col-6 col-md-1">
+                    <label class="form-check-label small text-nowrap"><input type="checkbox" class="form-check-input wifi-mac-active" {% if e.is_active %}checked{% endif %}> {{ t('devices.form.mac_filter.active') }}</label>
+                </div>
+                <div class="col-6 col-md-auto text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-wifi-mac px-1">{{ t('devices.form.btn.remove') }}</button>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row g-1 align-items-center mt-1">
+            <div class="col">
+                <select class="form-select form-select-sm wifi-mac-add-select">
+                    <option value="">{{ t('devices.form.mac_filter.add') }}</option>
+                    {% if wifi and wifi.eligible_devices %}
+                    {% for d in wifi.eligible_devices %}
+                    <option value="{{ d.id }}" data-name="{{ d.hostname }}" data-mac="{{ d.mac }}">{{ d.hostname }} ({{ d.mac }})</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="col-auto text-end">
+                <button type="button" class="btn btn-sm btn-outline-primary add-wifi-mac text-nowrap"><i class="fa-solid fa-plus me-1"></i>{{ t('common.add') }}</button>
+            </div>
         </div>
     </div>
 </div>

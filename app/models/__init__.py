@@ -16,6 +16,7 @@ from app.models.dhcp_pool import DhcpPool
 from app.models.interface import Interface
 from app.models.ip_address import IPAddress
 from app.models.location import Location
+from app.models.mac_filter import MacFilter
 from app.models.model import Model
 from app.models.network import Network
 from app.models.port import Port
@@ -38,6 +39,7 @@ __all__ = [
     "IPAddress",
     "Interface",
     "Location",
+    "MacFilter",
     "Model",
     "Network",
     "Port",

@@ -118,6 +118,7 @@ def create(
     encryption: str | None = None,
     password: str | None = None,
     is_guest: bool = False,
+    mac_filter: int = 0,
 ) -> WiFiNetwork:
     require_found(db.get(Device, device_id), "Device", field="device_id")
 
@@ -137,6 +138,7 @@ def create(
         encryption=encryption,
         password=password or None,
         is_guest=is_guest,
+        mac_filter=mac_filter,
     )
     db.add(wifi)
     db.flush()
@@ -150,6 +152,7 @@ def update(
     encryption: str | None = None,
     password: str | None = None,
     is_guest: bool = False,
+    mac_filter: int = 0,
 ) -> WiFiNetwork:
     wifi = require_found(get_by_id(db, wifi_id), "Wi-Fi network")
 
@@ -168,6 +171,7 @@ def update(
     wifi.encryption = encryption
     wifi.password = password or None
     wifi.is_guest = is_guest
+    wifi.mac_filter = mac_filter
     db.flush()
     return wifi
 

@@ -315,11 +315,46 @@
                                 </thead>
                                 <tbody>
                                 {% for c in row.clients %}
-                                <tr>
+                                <tr class="{% if c.gray %}table-secondary{% endif %}">
                                     <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a></td>
                                     <td>{{ dash(c.device.human_readable_name) }}</td>
                                     <td><code>{{ c.interface.name }}</code></td>
                                     <td>{{ dash(c.ip.address) if c.ip else '—' }}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if row.mac_filters or row.wifi.mac_filter %}
+                <tr>
+                    <td colspan="5" class="bg-body-tertiary">
+                        <div class="small fw-semibold mb-2 ms-4">
+                            <i class="fa-solid fa-filter me-1"></i>{{ t('devices.view.mac_filter') }}
+                            <span class="badge bg-secondary ms-1">
+                                {% if row.wifi.mac_filter == 1 %}{{ t('devices.form.mac_filter.white') }}
+                                {% elif row.wifi.mac_filter == 2 %}{{ t('devices.form.mac_filter.black') }}
+                                {% else %}{{ t('devices.form.mac_filter.disabled') }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="ms-4">
+                            <table class="table table-sm table-borderless align-middle mb-0 small">
+                                <thead>
+                                <tr class="text-muted">
+                                    <th>{{ t('devices.list.hostname') }}</th>
+                                    <th>{{ t('devices.list.mac') }}</th>
+                                    <th>{{ t('devices.form.mac_filter.active') }}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for m in row.mac_filters %}
+                                <tr class="{{ '' if m.filter.is_active else 'text-muted' }}">
+                                    <td>{% if m.device %}<a href="/devices/{{ m.device.id }}" class="text-decoration-none">{{ m.device.hostname }}</a>{% else %}—{% endif %}</td>
+                                    <td><code>{{ m.mac or '—' }}</code></td>
+                                    <td>{{ check(m.filter.is_active) }}</td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

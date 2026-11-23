@@ -70,7 +70,7 @@
         </tr>
         {% for c in group.connections %}
         <tr class="{% if not c.conn.is_active %}text-muted{% endif %}">
-            <td>
+            <td class="ps-3">
                 {% if c.dir == 'outgoing' %}
                 <i class="fa-solid fa-arrow-right text-success me-1"></i>
                 {% else %}
@@ -125,7 +125,7 @@
         {% endif %}
     </div>
     {% for c in group.connections %}
-    <div class="card mb-2 {% if not c.conn.is_active %}text-muted{% endif %}">
+    <div class="card mb-2 ms-3 {% if not c.conn.is_active %}text-muted{% endif %}">
         <div class="card-body">
             <div class="mb-2">
                 {% if c.dir == 'outgoing' %}

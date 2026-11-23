@@ -334,5 +334,13 @@
   "reference.device_type.icon": "Иконка",
   "reference.device_type.select_icon": "Выбрать иконку",
   "reference.device_type.clear_icon": "Очистить",
-  "reference.device_type.search_icons": "Поиск иконок (например, wifi, server, camera)..."
+  "reference.device_type.search_icons": "Поиск иконок (например, wifi, server, camera)...",
+  "devices.form.field.mac_filter": "MAC-фильтр",
+  "devices.form.mac_filter.disabled": "Отключён",
+  "devices.form.mac_filter.white": "Белый список",
+  "devices.form.mac_filter.black": "Чёрный список",
+  "devices.form.mac_filter.active": "активна",
+  "devices.form.mac_filter.add": "Добавить устройство…",
+  "devices.view.mac_filter": "MAC-фильтр",
+  "common.add": "Добавить"
 }

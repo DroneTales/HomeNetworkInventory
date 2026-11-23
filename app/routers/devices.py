@@ -7,6 +7,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import json
 from datetime import datetime, timezone
 from urllib.parse import quote
 
@@ -40,6 +41,7 @@ from app.crud import dhcp_pool as crud_dhcp
 from app.crud import interface as crud_interface
 from app.crud import ip_address as crud_ip
 from app.crud import location as crud_location
+from app.crud import mac_filter as crud_mac_filter
 from app.crud import network as crud_network
 from app.crud import port as crud_port
 from app.crud import port_forward as crud_pf
@@ -347,8 +349,26 @@ def view_device(
             seen.add(cli_dev.id)
             ip = iface.ip_addresses[0] if iface.ip_addresses else None
             clients.append({"device": cli_dev, "interface": iface, "ip": ip})
-        clients.sort(key=lambda c: c["device"].hostname.lower())
-        wifi_rows.append({"wifi": w, "clients": clients})
+        in_filter = {mf.device_id for mf in w.mac_filters if mf.is_active}
+        _mode = w.mac_filter or 0
+        for c in clients:
+            dev_id = c["device"].id
+            if _mode == 1:
+                c["gray"] = dev_id not in in_filter
+            elif _mode == 2:
+                c["gray"] = dev_id in in_filter
+            else:
+                c["gray"] = False
+        clients.sort(key=lambda c: (c["gray"], (c["device"].hostname or "").lower()))
+        mac_entries = []
+        for mf in w.mac_filters:
+            dev = mf.device
+            mac_entries.append({
+                "filter": mf,
+                "device": dev,
+                "mac": _device_mac_for_wifi(dev, w.id),
+            })
+        wifi_rows.append({"wifi": w, "clients": clients, "mac_filters": mac_entries})
 
     incoming_pfs = crud_pf.list_incoming(db, device_id, site.id, device_ips)
     incoming = []
@@ -403,7 +423,7 @@ def edit_device_form(
     context["can_view_passwords"] = can_view
     context["can_change_passwords"] = can_change
 
-    form_data = _device_to_form_dict(device, show_passwords=can_view)
+    form_data = _device_to_form_dict(db, device, show_passwords=can_view)
 
     return render(
         request,
@@ -559,6 +579,66 @@ def _process_device_form(
 # _sync_* helpers reconcile submitted form rows with existing children:
 # rows with an "id" are updated, rows without are created, rows missing
 # from the submission are deleted. The pattern is shared by all _sync_* below.
+def _device_mac_for_wifi(device, wifi_id: int) -> str:
+    if device is None:
+        return ""
+    for iface in device.interfaces:
+        if iface.connected_wifi_network_id == wifi_id and iface.mac:
+            return iface.mac
+    return ""
+
+
+def _parse_mac_filter_data(raw: str) -> list[dict]:
+    raw = (raw or "").strip()
+    if not raw:
+        return []
+    try:
+        data = json.loads(raw)
+    except (ValueError, TypeError):
+        return []
+    if not isinstance(data, list):
+        return []
+    result = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        device_id = to_int(item.get("device"))
+        if device_id is None:
+            continue
+        result.append({
+            "id": to_int(item.get("id")),
+            "device": device_id,
+            "active": bool(item.get("active", True)),
+        })
+    return result
+
+
+def _sync_mac_filters(db: Session, wifi, entries: list[dict]) -> None:
+    existing = {mf.id: mf for mf in wifi.mac_filters}
+    seen = set()
+    for entry in entries:
+        device_id = entry.get("device")
+        if not device_id:
+            continue
+        fid = entry.get("id")
+        active = bool(entry.get("active", True))
+        if fid and fid in existing:
+            existing[fid].is_active = active
+            seen.add(fid)
+        else:
+            mf = crud_mac_filter.create(
+                db,
+                wifi_network_id=wifi.id,
+                device_id=device_id,
+                is_active=active,
+            )
+            seen.add(mf.id)
+    for fid, mf in existing.items():
+        if fid not in seen:
+            db.delete(mf)
+    db.flush()
+
+
 def _sync_wifi_networks(
     db: Session,
     device: Device,
@@ -586,6 +666,7 @@ def _sync_wifi_networks(
                 encryption=data["encryption"],
                 password=password,
                 is_guest=data["is_guest"],
+                mac_filter=data.get("mac_filter", 0),
             )
             seen_ids.add(item_id)
             wifi_map[idx] = item_id
@@ -598,8 +679,11 @@ def _sync_wifi_networks(
                 encryption=data["encryption"],
                 password=data["password"],
                 is_guest=data["is_guest"],
+                mac_filter=data.get("mac_filter", 0),
             )
             wifi_map[idx] = wifi.id
+
+        _sync_mac_filters(db, wifi, data.get("mac_filters") or [])
 
     for wifi_id, wifi in existing.items():
         if wifi_id not in seen_ids:
@@ -898,7 +982,7 @@ def _form_context(db: Session, site_id: int) -> dict:
         "service_protocols": sorted(VALID_SERVICE_PROTOCOLS),
     }
 
-def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
+def _device_to_form_dict(db: Session, device: Device, show_passwords: bool = True) -> dict:
     interfaces = []
     for iface in device.interfaces:
         ip = iface.ip_addresses[0] if iface.ip_addresses else None
@@ -928,6 +1012,21 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
 
     wifi_networks = []
     for w in device.wifi_networks:
+        mac_entries = []
+        for mf in w.mac_filters:
+            dev = mf.device
+            mac_entries.append({
+                "id": mf.id,
+                "device_id": mf.device_id,
+                "device_name": dev.hostname if dev else "",
+                "mac": _device_mac_for_wifi(dev, w.id),
+                "is_active": mf.is_active,
+            })
+        eligible = crud_mac_filter.eligible_devices(db, w.id)
+        eligible_data = [
+            {"id": e["device"].id, "hostname": e["device"].hostname, "mac": e["mac"]}
+            for e in eligible
+        ]
         wifi_networks.append({
             "id": w.id,
             "ssid": w.ssid,
@@ -935,6 +1034,9 @@ def _device_to_form_dict(device: Device, show_passwords: bool = True) -> dict:
             "encryption": w.encryption or "",
             "password": (w.password or "") if show_passwords else "",
             "is_guest": w.is_guest,
+            "mac_filter": w.mac_filter or 0,
+            "mac_filter_entries": mac_entries,
+            "eligible_devices": eligible_data,
         })
 
     dhcp_pools = []
@@ -1140,6 +1242,8 @@ def _collect_wifi_networks(form) -> list[dict]:
     encryptions = form.getlist("wifi_encryption")
     passwords = form.getlist("wifi_password")
     guests = form.getlist("wifi_is_guest")
+    mac_filter_modes = form.getlist("wifi_mac_filter")
+    mac_filter_data = form.getlist("wifi_mac_filter_data")
 
     result = []
     for i, ssid in enumerate(ssids):
@@ -1152,6 +1256,8 @@ def _collect_wifi_networks(form) -> list[dict]:
         encryption = (encryptions[i] if i < len(encryptions) else "").strip() or None
         password = (passwords[i] if i < len(passwords) else "").strip() or None
         guest = (guests[i] if i < len(guests) else "") == "on"
+        mac_filter = to_int(mac_filter_modes[i] if i < len(mac_filter_modes) else "0") or 0
+        raw_filters = mac_filter_data[i] if i < len(mac_filter_data) else ""
 
         result.append({
             "id": item_id,
@@ -1160,6 +1266,8 @@ def _collect_wifi_networks(form) -> list[dict]:
             "encryption": encryption,
             "password": password,
             "is_guest": guest,
+            "mac_filter": mac_filter,
+            "mac_filters": _parse_mac_filter_data(raw_filters),
         })
 
     return result

@@ -366,9 +366,12 @@
 
 <script>
 window.DEVICES_FORM_CONFIG = {
-    cannotDeleteWifiAp: {{ t('devices.form.hint.cannot_delete_wifi_ap')|tojson }}
+    cannotDeleteWifiAp: {{ t('devices.form.hint.cannot_delete_wifi_ap')|tojson }},
+    macFilterActive: {{ t('devices.form.mac_filter.active')|tojson }},
+    wifiRemoveLabel: {{ t('devices.form.btn.remove')|tojson }}
 };
 </script>
 <script src="/static/js/devices.js?v=10"></script>
+<script src="/static/js/wifi-mac-filter.js?v=1"></script>
 {% endblock %}
 

@@ -121,13 +121,19 @@ def get_by_id(db: Session, interface_id: int) -> Interface | None:
 def _check_mac_unique(
     db: Session,
     mac: str | None,
+    device_id: int | None = None,
     exclude_id: int | None = None,
 ) -> None:
-    # MAC addresses are unique globally (across all sites)
+    # MAC addresses are unique across different devices (and sites).
+    # The same physical NIC may be exposed by several logical interfaces
+    # of the same device (e.g. LAN and WLAN sharing one MAC), so duplicates
+    # within one device are allowed.
     if not mac:
         return
 
     query = db.query(Interface).filter(Interface.mac == mac)
+    if device_id is not None:
+        query = query.filter(Interface.device_id != device_id)
     if exclude_id is not None:
         query = query.filter(Interface.id != exclude_id)
 
@@ -158,7 +164,7 @@ def create(
 
     if mac is not None and mac.strip():
         mac = validate_mac(mac, field="mac")
-        _check_mac_unique(db, mac)
+        _check_mac_unique(db, mac, device_id=device_id)
     else:
         mac = None
 
@@ -204,7 +210,7 @@ def update(
 
     if mac is not None and mac.strip():
         mac = validate_mac(mac, field="mac")
-        _check_mac_unique(db, mac, exclude_id=interface_id)
+        _check_mac_unique(db, mac, device_id=iface.device_id, exclude_id=interface_id)
     else:
         mac = None
 

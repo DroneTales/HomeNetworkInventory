@@ -63,18 +63,12 @@ def device_rows(db: Session, site_id: int, t: Callable) -> list[list]:
 
 def connection_rows(db: Session, site_id: int) -> list[list]:
     connections = crud_connection.list_all(db, site_id)
-    connections = sorted(
-        connections,
-        key=lambda c: (
-            (c.source_port.device.location.name if c.source_port.device.location else "").lower(),
-            (c.source_port.device.hostname or "").lower(),
-            (c.source_port.name or "").lower(),
-        ),
-    )
     rows = []
     for c in connections:
         sp = c.source_port
         tp = c.target_port
+        cable = c.cable_type or ""
+        # source -> target
         rows.append([
             sp.device.location.name if sp.device.location else "",
             sp.device.hostname or "",
@@ -82,8 +76,24 @@ def connection_rows(db: Session, site_id: int) -> list[list]:
             tp.device.location.name if tp.device.location else "",
             tp.device.hostname or "",
             tp.name or "",
-            c.cable_type or "",
+            cable,
         ])
+        # target -> source (duplicate, as on the Connections page)
+        rows.append([
+            tp.device.location.name if tp.device.location else "",
+            tp.device.hostname or "",
+            tp.name or "",
+            sp.device.location.name if sp.device.location else "",
+            sp.device.hostname or "",
+            sp.name or "",
+            cable,
+        ])
+    # group by source device, then by port
+    rows.sort(key=lambda r: (
+        (r[0] or "").lower(),
+        (r[1] or "").lower(),
+        (r[2] or "").lower(),
+    ))
     return rows
 
 def _headers(t: Callable) -> tuple[list[str], list[str]]:
