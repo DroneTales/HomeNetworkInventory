@@ -93,15 +93,17 @@ def _check_not_same(source_port_id: int, target_port_id: int) -> None:
 def _check_port_free(
     db: Session,
     port_id: int,
+    connection_type: str,
     field: str,
     exclude_id: int | None = None,
 ) -> None:
-    # A physical port can only participate in a single connection
+    # A port may hold one physical cable and one logical link at the same time.
     query = db.query(Connection).filter(
+        Connection.connection_type == connection_type,
         or_(
             Connection.source_port_id == port_id,
             Connection.target_port_id == port_id,
-        )
+        ),
     )
     if exclude_id is not None:
         query = query.filter(Connection.id != exclude_id)
@@ -154,8 +156,14 @@ def _validate(
     _check_port(db, source_port_id, site_id, field="source_port_id")
     _check_port(db, target_port_id, site_id, field="target_port_id")
     _check_not_same(source_port_id, target_port_id)
-    _check_port_free(db, source_port_id, field="source_port_id", exclude_id=exclude_id)
-    _check_port_free(db, target_port_id, field="target_port_id", exclude_id=exclude_id)
+    _check_port_free(
+        db, source_port_id, connection_type,
+        field="source_port_id", exclude_id=exclude_id,
+    )
+    _check_port_free(
+        db, target_port_id, connection_type,
+        field="target_port_id", exclude_id=exclude_id,
+    )
     _check_duplicate(db, source_port_id, target_port_id, exclude_id=exclude_id)
 
     return connection_type

@@ -324,13 +324,17 @@ def _devices_with_ports(
     site_id: int,
     exclude_connection_id: int | None = None,
 ) -> list[dict]:
-    occupied_query = db.query(Connection.source_port_id, Connection.target_port_id)
+    occupied_query = db.query(
+        Connection.source_port_id,
+        Connection.target_port_id,
+        Connection.connection_type,
+    )
     if exclude_connection_id is not None:
         occupied_query = occupied_query.filter(Connection.id != exclude_connection_id)
-    occupied = set()
-    for src, tgt in occupied_query.all():
-        occupied.add(src)
-        occupied.add(tgt)
+    occupied: dict[int, set[str]] = {}
+    for src, tgt, ctype in occupied_query.all():
+        occupied.setdefault(src, set()).add(ctype)
+        occupied.setdefault(tgt, set()).add(ctype)
 
     devices = crud_device.list_all(db, site_id)
     payload = []
@@ -341,7 +345,7 @@ def _devices_with_ports(
                 "id": p.id,
                 "name": p.name,
                 "interface_name": p.interface.name if p.interface else "",
-                "occupied": p.id in occupied,
+                "occupied_types": sorted(occupied.get(p.id, set())),
             })
         if ports:
             payload.append({

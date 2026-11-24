@@ -9,6 +9,7 @@
 
 from sqlalchemy.orm import Session, selectinload
 
+from app.core.constants import IFACE_TYPE_PORT
 from app.core.exceptions import ValidationError
 from app.core.validation import require_found, validate_hostname
 from app.models.device import Device
@@ -92,7 +93,10 @@ def _check_references(
 
 
 def _validate_consistency(db: Session, device: Device) -> None:
-    # Active device types require at least one IP; passive ones must have none
+    # Active device types require an IP only when the device has interfaces
+    # that can carry one. A device whose interfaces are all passive "port"
+    # sockets (e.g. a bridge) is allowed to have no IP at all.
+    # Passive types, on the other hand, must never have an IP.
     if device.device_type is None:
         return
 
@@ -103,8 +107,17 @@ def _validate_consistency(db: Session, device: Device) -> None:
         .count()
         > 0
     )
+    has_addressable = (
+        db.query(Interface)
+        .filter(
+            Interface.device_id == device.id,
+            Interface.type != IFACE_TYPE_PORT,
+        )
+        .count()
+        > 0
+    )
 
-    if device.device_type.is_active and not has_ip:
+    if device.device_type.is_active and has_addressable and not has_ip:
         raise ValidationError(
             f"Device type '{device.device_type.name}' is active, "
             "but device has no interfaces with IP address",

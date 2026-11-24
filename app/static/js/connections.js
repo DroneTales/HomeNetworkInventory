@@ -41,9 +41,12 @@
             const device = byId[String(deviceId)];
             if (!device) return;
 
+            const typeEl = document.getElementById("connection_type");
+            const connType = typeEl ? typeEl.value : "physical";
             device.ports.forEach(function (p) {
                 const isCurrent = selectedPortId && String(selectedPortId) === String(p.id);
-                if (p.occupied && !isCurrent) return;
+                const busy = (p.occupied_types || []).indexOf(connType) !== -1;
+                if (busy && !isCurrent) return;
                 const opt = document.createElement("option");
                 opt.value = p.id;
                 opt.textContent = p.interface_name
@@ -65,6 +68,16 @@
 
     const source = setupSide("source");
     const target = setupSide("target");
+
+    const typeEl = document.getElementById("connection_type");
+    if (typeEl) {
+        typeEl.addEventListener("change", function () {
+            const srcVal = document.getElementById("source_port_id").value;
+            const tgtVal = document.getElementById("target_port_id").value;
+            if (source) source.fillPorts(srcVal);
+            if (target) target.fillPorts(tgtVal);
+        });
+    }
 
     // Initial values (edit mode or validation-error restore) come from a JSON tag.
     const stateEl = document.getElementById("form-state");
