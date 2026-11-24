@@ -71,18 +71,24 @@
         {% for c in group.connections %}
         <tr class="{% if not c.conn.is_active %}text-muted{% endif %}">
             <td class="ps-3">
-                {% if c.dir == 'outgoing' %}
-                <i class="fa-solid fa-arrow-right text-success me-1"></i>
+                {% if c.dir == 'internal' %}
+                <i class="fa-solid fa-arrows-left-right text-secondary me-1" title="{{ t('connections.list.internal') }}"></i>
+                {% elif c.dir == 'outgoing' %}
+                <i class="fa-solid fa-arrow-left text-success me-1"></i>
                 {% else %}
-                <i class="fa-solid fa-arrow-left text-primary me-1"></i>
+                <i class="fa-solid fa-arrow-right text-primary me-1"></i>
                 {% endif %}
                 <code>{{ c.local.name }}</code>
                 <span class="text-muted small">({{ c.local.interface.name }})</span>
             </td>
             <td>
+                {% if c.dir == 'internal' %}
+                <span class="text-muted">—</span>
+                {% else %}
                 <a href="/devices/{{ c.remote_dev.id }}">
                     {{ c.remote_dev.hostname }}
                 </a>
+                {% endif %}
             </td>
             <td>
                 <code>{{ c.remote.name }}</code>
@@ -128,10 +134,16 @@
     <div class="card mb-2 ms-3 {% if not c.conn.is_active %}text-muted{% endif %}">
         <div class="card-body">
             <div class="mb-2">
-                {% if c.dir == 'outgoing' %}
-                <i class="fa-solid fa-arrow-right text-success me-1"></i>
+                {% if c.dir == 'internal' %}
+                <i class="fa-solid fa-arrows-left-right text-secondary me-1" title="{{ t('connections.list.internal') }}"></i>
+                <code>{{ c.local.name }}</code>
+                <span class="text-muted">↔</span>
+                <code>{{ c.remote.name }}</code>
                 {% else %}
-                <i class="fa-solid fa-arrow-left text-primary me-1"></i>
+                {% if c.dir == 'outgoing' %}
+                <i class="fa-solid fa-arrow-left text-success me-1"></i>
+                {% else %}
+                <i class="fa-solid fa-arrow-right text-primary me-1"></i>
                 {% endif %}
                 <code>{{ c.local.name }}</code>
                 <span class="text-muted">→</span>
@@ -140,6 +152,7 @@
                 </a>
                 <span class="text-muted">/</span>
                 <code>{{ c.remote.name }}</code>
+                {% endif %}
             </div>
 
             <div class="row small">

@@ -342,5 +342,6 @@
   "devices.form.mac_filter.active": "active",
   "devices.form.mac_filter.add": "Add device…",
   "devices.view.mac_filter": "MAC filter",
-  "common.add": "Add"
+  "common.add": "Add",
+  "connections.list.internal": "Internal link"
 }

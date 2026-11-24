@@ -44,28 +44,34 @@ def list_connections(
 
     connection_groups = []
     groups_by_device = {}
+
+    def _add_entry(c, local, remote_dev, remote, direction):
+        dev = local.device
+        if dev.id not in groups_by_device:
+            icon = (
+                dev.device_type.icon
+                if dev.device_type and dev.device_type.icon
+                else None
+            )
+            group = {"device": dev, "icon": icon, "connections": []}
+            groups_by_device[dev.id] = group
+            connection_groups.append(group)
+        groups_by_device[dev.id]["connections"].append({
+            "conn": c,
+            "local": local,
+            "remote_dev": remote_dev,
+            "remote": remote,
+            "dir": direction,
+        })
+
     for c in connections:
-        for local, remote_dev, remote, direction in (
-            (c.source_port, c.target_port.device, c.target_port, "outgoing"),
-            (c.target_port, c.source_port.device, c.source_port, "incoming"),
-        ):
-            dev = local.device
-            if dev.id not in groups_by_device:
-                icon = (
-                    dev.device_type.icon
-                    if dev.device_type and dev.device_type.icon
-                    else None
-                )
-                group = {"device": dev, "icon": icon, "connections": []}
-                groups_by_device[dev.id] = group
-                connection_groups.append(group)
-            groups_by_device[dev.id]["connections"].append({
-                "conn": c,
-                "local": local,
-                "remote_dev": remote_dev,
-                "remote": remote,
-                "dir": direction,
-            })
+        if c.source_port.device_id == c.target_port.device_id:
+            # Internal link (e.g. WAN <-> LAN bridge inside one device):
+            # show it once, in the device's own group.
+            _add_entry(c, c.source_port, c.target_port.device, c.target_port, "internal")
+        else:
+            _add_entry(c, c.source_port, c.target_port.device, c.target_port, "outgoing")
+            _add_entry(c, c.target_port, c.source_port.device, c.source_port, "incoming")
 
     for group in connection_groups:
         group["connections"].sort(key=lambda e: _natural_key(e["local"].name))
