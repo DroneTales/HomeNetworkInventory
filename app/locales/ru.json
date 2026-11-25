@@ -343,5 +343,8 @@
   "devices.form.mac_filter.add": "Добавить устройство…",
   "devices.view.mac_filter": "MAC-фильтр",
   "common.add": "Добавить",
-  "connections.list.internal": "Внутренняя связь"
+  "connections.list.internal": "Внутренняя связь",
+  "connections.gateways.title": "Устройства по шлюзам",
+  "connections.gateways.undefined": "Без шлюза",
+  "connections.gateways.empty": "Устройств пока нет."
 }

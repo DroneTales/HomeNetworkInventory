@@ -343,5 +343,8 @@
   "devices.form.mac_filter.add": "Add device…",
   "devices.view.mac_filter": "MAC filter",
   "common.add": "Add",
-  "connections.list.internal": "Internal link"
+  "connections.list.internal": "Internal link",
+  "connections.gateways.title": "Devices by gateway",
+  "connections.gateways.undefined": "No gateway",
+  "connections.gateways.empty": "No devices yet."
 }

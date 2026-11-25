@@ -105,6 +105,56 @@ def list_connections(
         )
     )
 
+    # ---- Devices by gateway ----
+    ip_owner: dict = {}
+    for d in devices:
+        for iface in d.interfaces:
+            for ip in iface.ip_addresses:
+                if ip.address:
+                    ip_owner.setdefault(ip.address, d)
+
+    gateway_groups_by_key: dict = {}
+    gateway_groups: list[dict] = []
+    for d in devices:
+        gw_set = set()
+        for iface in d.interfaces:
+            for ip in iface.ip_addresses:
+                gw = (ip.gateway or "").strip()
+                if gw:
+                    gw_set.add(gw)
+        if not gw_set:
+            gw_set = {None}
+        icon = d.device_type.icon if d.device_type and d.device_type.icon else None
+        for gw in gw_set:
+            if gw not in gateway_groups_by_key:
+                group = {
+                    "gateway": gw,
+                    "owner": ip_owner.get(gw) if gw else None,
+                    "devices": [],
+                }
+                gateway_groups_by_key[gw] = group
+                gateway_groups.append(group)
+            gateway_groups_by_key[gw]["devices"].append({"device": d, "icon": icon})
+
+    for g in gateway_groups:
+        g["devices"].sort(key=lambda x: x["device"].hostname.lower())
+
+    def _gateway_ip_key(value):
+        parts = (value or "").split(".")
+        if len(parts) != 4:
+            return (999, 999, 999, 999)
+        try:
+            return tuple(int(p) for p in parts)
+        except ValueError:
+            return (999, 999, 999, 999)
+
+    gateway_groups.sort(
+        key=lambda g: (
+            1 if g["gateway"] is None else 0,
+            _gateway_ip_key(g["gateway"]),
+        )
+    )
+
     wireless = []
     for w in wifi_nets:
         clients = []
@@ -134,6 +184,7 @@ def list_connections(
         connection_groups=connection_groups,
         wireless=wireless,
         location_groups=location_groups,
+        gateway_groups=gateway_groups,
         warning=warning,
     )
 

@@ -293,6 +293,65 @@
 </div>
 {% endif %}
 
+<div class="section-header section-services mt-4 mb-3">
+    <h2 class="h4">
+        <i class="fa-solid fa-network-wired me-2"></i>{{ t('connections.gateways.title') }}
+    </h2>
+</div>
+
+{% if not gateway_groups %}
+<div class="alert alert-info">{{ t('connections.gateways.empty') }}</div>
+{% else %}
+<div class="row g-3">
+    {% for g in gateway_groups %}
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card info-card h-100 gateway-group">
+            <div class="card-header d-flex align-items-center">
+                <i class="fa-solid fa-network-wired me-1"></i>
+                <span class="fw-bold">
+                    {% if g.gateway %}
+                        {% if g.owner %}
+                        <a href="/devices/{{ g.owner.id }}" class="text-decoration-none">{{ g.gateway }}</a>
+                        {% else %}
+                        {{ g.gateway }}
+                        {% endif %}
+                    {% else %}
+                        {{ t('connections.gateways.undefined') }}
+                    {% endif %}
+                </span>
+                <span class="badge bg-secondary ms-2">{{ g.devices|length }}</span>
+                {% if g.owner %}
+                <a href="/devices/{{ g.owner.id }}" class="ms-auto small text-decoration-none">{{ g.owner.hostname }}</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 small">
+                    {% for item in g.devices %}
+                    {% set d = item.device %}
+                    <li class="py-1 d-flex justify-content-between align-items-center">
+                        <a href="/devices/{{ d.id }}" class="text-decoration-none">
+                            {% if item.icon %}
+                            <i class="icon icon-{{ item.icon }} text-muted me-1"></i>
+                            {% else %}
+                            <i class="icon icon-other text-muted me-1"></i>
+                            {% endif %}{{ d.hostname }}
+                            {% if d.human_readable_name %}
+                            <span class="text-muted">— {{ d.human_readable_name }}</span>
+                            {% endif %}
+                        </a>
+                        {% if not d.is_active %}
+                        <span class="badge bg-secondary">{{ t('common.inactive') }}</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <script>
 window.CONNECTIONS_LIST_CONFIG = {
     successMsg: {{ t('connections.locations.move_success')|tojson }},
