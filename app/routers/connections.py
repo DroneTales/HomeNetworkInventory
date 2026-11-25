@@ -39,7 +39,10 @@ def list_connections(
     user: User = Depends(require_user),
     site: Site = Depends(require_site),
 ):
-    connections = crud_connection.list_all(db, site.id)
+    connections = [
+        c for c in crud_connection.list_all(db, site.id)
+        if c.source_port is not None and c.target_port is not None
+    ]
     warning = request.session.pop("warning", None)
 
     connection_groups = []
@@ -73,6 +76,9 @@ def list_connections(
             _add_entry(c, c.source_port, c.target_port.device, c.target_port, "outgoing")
             _add_entry(c, c.target_port, c.source_port.device, c.source_port, "incoming")
 
+    connection_groups.sort(
+        key=lambda g: (g["device"].hostname or "").lower()
+    )
     for group in connection_groups:
         group["connections"].sort(key=lambda e: _natural_key(e["local"].name))
 
@@ -337,12 +343,16 @@ def _devices_with_ports(
     )
     if exclude_connection_id is not None:
         occupied_query = occupied_query.filter(Connection.id != exclude_connection_id)
+    devices = crud_device.list_all(db, site_id)
+    valid_port_ids = {p.id for d in devices for p in d.ports}
+
     occupied: dict[int, set[str]] = {}
     for src, tgt, ctype in occupied_query.all():
+        if src not in valid_port_ids or tgt not in valid_port_ids:
+            continue
         occupied.setdefault(src, set()).add(ctype)
         occupied.setdefault(tgt, set()).add(ctype)
 
-    devices = crud_device.list_all(db, site_id)
     payload = []
     for d in devices:
         ports = []

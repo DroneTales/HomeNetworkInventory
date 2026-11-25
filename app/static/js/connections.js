@@ -25,59 +25,74 @@
         byId[String(d.id)] = d;
     });
 
-    function setupSide(prefix) {
-        const deviceSelect = document.getElementById(prefix + "_device_id");
-        const portSelect = document.getElementById(prefix + "_port_id");
-        if (!deviceSelect || !portSelect) return;
+    const typeEl = document.getElementById("connection_type");
 
-        function fillPorts(selectedPortId) {
-            while (portSelect.options.length > 1) {
-                portSelect.remove(1);
-            }
+    function currentType() {
+        return typeEl ? typeEl.value : "physical";
+    }
 
-            const deviceId = deviceSelect.value;
-            if (!deviceId) return;
+    function deviceEl(side) {
+        return document.getElementById(side + "_device_id");
+    }
 
-            const device = byId[String(deviceId)];
-            if (!device) return;
+    function portEl(side) {
+        return document.getElementById(side + "_port_id");
+    }
 
-            const typeEl = document.getElementById("connection_type");
-            const connType = typeEl ? typeEl.value : "physical";
-            device.ports.forEach(function (p) {
-                const isCurrent = selectedPortId && String(selectedPortId) === String(p.id);
-                const busy = (p.occupied_types || []).indexOf(connType) !== -1;
-                if (busy && !isCurrent) return;
-                const opt = document.createElement("option");
-                opt.value = p.id;
-                opt.textContent = p.interface_name
-                    ? p.name + " (" + p.interface_name + ")"
-                    : p.name;
-                if (isCurrent) {
-                    opt.selected = true;
-                }
-                portSelect.appendChild(opt);
-            });
+    function portValue(side) {
+        const el = portEl(side);
+        return el ? el.value : "";
+    }
+
+    function fillPorts(side, selectedPortId, otherPortId) {
+        const devSelect = deviceEl(side);
+        const select = portEl(side);
+        if (!devSelect || !select) return;
+
+        while (select.options.length > 1) {
+            select.remove(1);
         }
 
-        deviceSelect.addEventListener("change", function () {
-            fillPorts("");
-        });
+        const deviceId = devSelect.value;
+        if (!deviceId) return;
 
-        return { fillPorts: fillPorts };
+        const device = byId[String(deviceId)];
+        if (!device) return;
+
+        const connType = currentType();
+        device.ports.forEach(function (p) {
+            // Never offer the port already chosen on the other side.
+            if (otherPortId && String(otherPortId) === String(p.id)) return;
+            const isCurrent = selectedPortId && String(selectedPortId) === String(p.id);
+            const busy = (p.occupied_types || []).indexOf(connType) !== -1;
+            if (busy && !isCurrent) return;
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = p.interface_name
+                ? p.name + " (" + p.interface_name + ")"
+                : p.name;
+            if (isCurrent) {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        });
     }
 
-    const source = setupSide("source");
-    const target = setupSide("target");
-
-    const typeEl = document.getElementById("connection_type");
-    if (typeEl) {
-        typeEl.addEventListener("change", function () {
-            const srcVal = document.getElementById("source_port_id").value;
-            const tgtVal = document.getElementById("target_port_id").value;
-            if (source) source.fillPorts(srcVal);
-            if (target) target.fillPorts(tgtVal);
-        });
+    function refresh() {
+        const srcVal = portValue("source");
+        const tgtVal = portValue("target");
+        fillPorts("source", srcVal, tgtVal);
+        fillPorts("target", tgtVal, portValue("source"));
     }
+
+    ["source", "target"].forEach(function (side) {
+        const dev = deviceEl(side);
+        const port = portEl(side);
+        if (dev) dev.addEventListener("change", refresh);
+        if (port) port.addEventListener("change", refresh);
+    });
+
+    if (typeEl) typeEl.addEventListener("change", refresh);
 
     // Initial values (edit mode or validation-error restore) come from a JSON tag.
     const stateEl = document.getElementById("form-state");
@@ -89,8 +104,6 @@
             state = {};
         }
     }
-    const initialSourcePortId = state.source_port_id || "";
-    const initialTargetPortId = state.target_port_id || "";
 
     function findDeviceByPort(portId) {
         if (!portId) return null;
@@ -105,19 +118,14 @@
         return null;
     }
 
-    if (source) {
-        const found = findDeviceByPort(initialSourcePortId);
-        if (found) {
-            document.getElementById("source_device_id").value = found.device.id;
-            source.fillPorts(found.port.id);
-        }
-    }
-    if (target) {
-        const found = findDeviceByPort(initialTargetPortId);
-        if (found) {
-            document.getElementById("target_device_id").value = found.device.id;
-            target.fillPorts(found.port.id);
-        }
-    }
-})();
+    const initialSourcePortId = state.source_port_id || "";
+    const initialTargetPortId = state.target_port_id || "";
 
+    const foundSource = findDeviceByPort(initialSourcePortId);
+    if (foundSource && deviceEl("source")) deviceEl("source").value = foundSource.device.id;
+    const foundTarget = findDeviceByPort(initialTargetPortId);
+    if (foundTarget && deviceEl("target")) deviceEl("target").value = foundTarget.device.id;
+
+    fillPorts("source", initialSourcePortId, initialTargetPortId);
+    fillPorts("target", initialTargetPortId, initialSourcePortId);
+})();
