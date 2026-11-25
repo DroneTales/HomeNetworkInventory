@@ -22,7 +22,7 @@ from app.core.bootstrap import ensure_default_admin
 from app.core.deps import get_current_site, require_user
 from app.core.i18n import load_translations
 from app.core.middleware import CurrentSiteMiddleware
-from app.core.schema_sync import apply_missing_columns, get_schema_diff
+from app.core.schema_sync import apply_data_migrations, apply_missing_columns, get_schema_diff
 from app.database import Base, check_database_path, engine, get_db
 from app.models.user import User
 from app.routers import (
@@ -52,6 +52,8 @@ def _check_schema() -> None:
     if diff.missing_columns:
         applied_cols = apply_missing_columns(engine, diff)
         applied.extend(f"column: {c}" for c in applied_cols)
+
+    applied.extend(apply_data_migrations(engine))
     
     if applied:
         print("")

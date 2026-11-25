@@ -477,6 +477,7 @@ def _process_device_form(
 ):
     hostname = (form.get("hostname") or "").strip()
     human_readable_name = (form.get("human_readable_name") or "").strip() or None
+    description = (form.get("description") or "").strip() or None
     remarks = (form.get("remarks") or "").strip() or None
     device_type_id = to_int(form.get("device_type_id"))
     vendor_id = to_int(form.get("vendor_id"))
@@ -508,6 +509,7 @@ def _process_device_form(
                 device_id=existing_device.id,
                 hostname=hostname,
                 human_readable_name=human_readable_name,
+                description=description,
                 remarks=remarks,
                 device_type_id=device_type_id,
                 vendor_id=vendor_id,
@@ -521,6 +523,7 @@ def _process_device_form(
                 site_id=site.id,
                 hostname=hostname,
                 human_readable_name=human_readable_name,
+                description=description,
                 remarks=remarks,
                 device_type_id=device_type_id,
                 vendor_id=vendor_id,
@@ -1018,13 +1021,13 @@ def _device_to_form_dict(db: Session, device: Device, show_passwords: bool = Tru
             mac_entries.append({
                 "id": mf.id,
                 "device_id": mf.device_id,
-                "device_name": dev.hostname if dev else "",
+                "device_name": dev.human_readable_name if dev else "",
                 "mac": _device_mac_for_wifi(dev, w.id),
                 "is_active": mf.is_active,
             })
         eligible = crud_mac_filter.eligible_devices(db, w.id)
         eligible_data = [
-            {"id": e["device"].id, "hostname": e["device"].hostname, "mac": e["mac"]}
+            {"id": e["device"].id, "hostname": e["device"].hostname, "human_readable_name": e["device"].human_readable_name, "mac": e["mac"]}
             for e in eligible
         ]
         wifi_networks.append({
@@ -1092,6 +1095,7 @@ def _device_to_form_dict(db: Session, device: Device, show_passwords: bool = Tru
     return {
         "hostname": device.hostname,
         "human_readable_name": device.human_readable_name or "",
+        "description": device.description or "",
         "remarks": device.remarks or "",
         "device_type_id": device.device_type_id or "",
         "vendor_id": device.vendor_id or "",
@@ -1111,6 +1115,7 @@ def _form_dict(form) -> dict:
     return {
         "hostname": form.get("hostname") or "",
         "human_readable_name": form.get("human_readable_name") or "",
+        "description": form.get("description") or "",
         "remarks": form.get("remarks") or "",
         "device_type_id": form.get("device_type_id") or "",
         "vendor_id": form.get("vendor_id") or "",

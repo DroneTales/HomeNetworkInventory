@@ -76,6 +76,11 @@ def topology_data(
             iface.connected_wifi_network_id is not None
             for iface in d.interfaces
         )
+        has_loop = any(
+            c.target_port is not None and c.target_port.device_id == d.id
+            for p in d.ports
+            for c in p.connections_from
+        )
 
         wifi_ssids = [w.ssid for w in d.wifi_networks if w.ssid]
         wifi_client_ssids = []
@@ -112,8 +117,8 @@ def topology_data(
         nodes.append({
             "id": f"device-{d.id}",
             "device_id": d.id,
-            "label": d.hostname,
-            "human_name": d.human_readable_name or "",
+            "label": d.human_readable_name or "",
+            "human_name": d.hostname or "",
             "location_id": d.location_id,
             "category": category,
             "icon": icon,
@@ -121,6 +126,7 @@ def topology_data(
             "mac": macs[0] if macs else "",
             "ports_count": ports_count,
             "has_wifi": has_wifi,
+            "has_loop": has_loop,
             "is_wifi_client": is_wifi_client,
             "wifi_ssids": wifi_ssids,
             "wifi_client_ssids": wifi_client_ssids,

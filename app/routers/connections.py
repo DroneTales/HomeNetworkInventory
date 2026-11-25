@@ -96,7 +96,7 @@ def list_connections(
         location_groups_by_key[key]["devices"].append({"device": d, "icon": icon})
 
     for g in location_groups:
-        g["devices"].sort(key=lambda x: x["device"].hostname.lower())
+        g["devices"].sort(key=lambda x: (x["device"].hostname or "").lower())
 
     location_groups.sort(
         key=lambda g: (
@@ -137,7 +137,7 @@ def list_connections(
             gateway_groups_by_key[gw]["devices"].append({"device": d, "icon": icon})
 
     for g in gateway_groups:
-        g["devices"].sort(key=lambda x: x["device"].hostname.lower())
+        g["devices"].sort(key=lambda x: (x["device"].hostname or "").lower())
 
     def _gateway_ip_key(value):
         parts = (value or "").split(".")
@@ -169,7 +169,7 @@ def list_connections(
                 "interface": iface,
             })
         if clients:
-            clients.sort(key=lambda c: c["device"].hostname.lower())
+            clients.sort(key=lambda c: (c["device"].hostname or "").lower())
             wireless.append({
                 "wifi": w,
                 "device": w.device,
@@ -418,6 +418,7 @@ def _devices_with_ports(
             payload.append({
                 "id": d.id,
                 "hostname": d.hostname,
+                "name": d.human_readable_name,
                 "ports": ports,
             })
     return payload

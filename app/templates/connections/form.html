@@ -32,7 +32,7 @@
                     <select class="form-select" id="source_device_id">
                         <option value="">—</option>
                         {% for d in devices_payload %}
-                        <option value="{{ d.id }}">{{ d.hostname }}</option>
+                        <option value="{{ d.id }}">{{ d.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -55,7 +55,7 @@
                     <select class="form-select" id="target_device_id">
                         <option value="">—</option>
                         {% for d in devices_payload %}
-                        <option value="{{ d.id }}">{{ d.hostname }}</option>
+                        <option value="{{ d.id }}">{{ d.name }}</option>
                         {% endfor %}
                     </select>
                 </div>

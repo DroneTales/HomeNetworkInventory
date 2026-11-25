@@ -44,14 +44,29 @@ def validate_mac(value: str, field: str = "mac") -> str:
     hex_only = re.sub(r"[:-]", "", raw).upper()
     return ":".join(hex_only[i : i + 2] for i in range(0, 12, 2))
 
-def validate_hostname(value: str, field: str = "hostname") -> str:
+def validate_hostname(value: str | None, field: str = "hostname") -> str | None:
     if value is None or not value.strip():
-        raise ValidationError("Hostname is required", field=field)
+        return None
     raw = value.strip()
     if not HOSTNAME_RE.match(raw):
         raise ValidationError(
             f"Invalid hostname: {value}. Only letters, digits, dots, dashes and underscores "
             "are allowed, no spaces.",
+            field=field,
+        )
+    return raw
+
+def validate_name(
+    value: str | None,
+    field: str = "human_readable_name",
+    max_length: int = 60,
+) -> str:
+    if value is None or not value.strip():
+        raise ValidationError("Name is required", field=field)
+    raw = value.strip()
+    if len(raw) > max_length:
+        raise ValidationError(
+            f"Name must be at most {max_length} characters",
             field=field,
         )
     return raw

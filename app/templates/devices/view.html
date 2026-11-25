@@ -10,17 +10,17 @@
 {% extends "base.html" %}
 {% from "_macros.html" import check, dash %}
 
-{% block title %}{{ device.hostname }}{% endblock %}
+{% block title %}{{ device.human_readable_name }}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
         <h1 class="mb-1">
-            {{ device.hostname }}
+            {{ device.human_readable_name }}
             {% if not device.is_active %}<span class="badge bg-secondary">{{ t('common.inactive') }}</span>{% endif %}
         </h1>
-        {% if device.human_readable_name %}
-        <div class="text-muted">{{ device.human_readable_name }}</div>
+        {% if device.hostname %}
+        <div class="text-muted">{{ device.hostname }}</div>
         {% endif %}
     </div>
     <div>
@@ -53,11 +53,14 @@
         <div class="row">
             <div class="col-md-6">
                 <dl class="row mb-0">
-                    <dt class="col-sm-4">{{ t('devices.list.hostname') }}</dt>
-                    <dd class="col-sm-8">{{ device.hostname }}</dd>
-
-                    <dt class="col-sm-4">{{ t('devices.view.field.human_name') }}</dt>
+                    <dt class="col-sm-4">{{ t('devices.list.name') }}</dt>
                     <dd class="col-sm-8">{{ dash(device.human_readable_name) }}</dd>
+
+                    <dt class="col-sm-4">{{ t('devices.list.hostname') }}</dt>
+                    <dd class="col-sm-8">{{ dash(device.hostname) }}</dd>
+
+                    <dt class="col-sm-4">{{ t('devices.form.field.description') }}</dt>
+                    <dd class="col-sm-8">{{ dash(device.description) }}</dd>
 
                     <dt class="col-sm-4">{{ t('devices.form.field.device_type') }}</dt>
                     <dd class="col-sm-8">
@@ -222,7 +225,7 @@
                         {% set remote = c.target_port if dir == 'outgoing' else c.source_port %}
                         <td>
                             {% if remote and remote.device %}
-                            <a href="/devices/{{ remote.device.id }}">{{ remote.device.hostname }}</a>
+                            <a href="/devices/{{ remote.device.id }}">{{ remote.device.human_readable_name }}</a>
                             / <code>{{ remote.name }}</code>
                             <span class="text-muted small">({{ remote.interface.name if remote.interface else '' }})</span>
                             {% else %}
@@ -309,7 +312,7 @@
                             <table class="table table-sm table-borderless align-middle mb-0 small">
                                 <thead>
                                 <tr class="text-muted">
-                                    <th>{{ t('devices.list.hostname') }}</th>
+                                    <th>{{ t('devices.list.name') }}</th>
                                     <th>{{ t('devices.list.name') }}</th>
                                     <th>{{ t('devices.form.field.interface') }}</th>
                                     <th>{{ t('devices.list.local_ip') }}</th>
@@ -318,7 +321,7 @@
                                 <tbody>
                                 {% for c in row.clients %}
                                 <tr class="{% if c.gray %}table-secondary{% endif %}">
-                                    <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a></td>
+                                    <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.human_readable_name }}</a></td>
                                     <td>{{ dash(c.device.human_readable_name) }}</td>
                                     <td><code>{{ c.interface.name }}</code></td>
                                     <td>{{ dash(c.ip.address) if c.ip else '—' }}</td>
@@ -346,7 +349,7 @@
                             <table class="table table-sm table-borderless align-middle mb-0 small">
                                 <thead>
                                 <tr class="text-muted">
-                                    <th>{{ t('devices.list.hostname') }}</th>
+                                    <th>{{ t('devices.list.name') }}</th>
                                     <th>{{ t('devices.list.mac') }}</th>
                                     <th>{{ t('devices.form.mac_filter.active') }}</th>
                                 </tr>
@@ -354,7 +357,7 @@
                                 <tbody>
                                 {% for m in row.mac_filters %}
                                 <tr class="{{ '' if m.filter.is_active else 'text-muted' }}">
-                                    <td>{% if m.device %}<a href="/devices/{{ m.device.id }}" class="text-decoration-none">{{ m.device.hostname }}</a>{% else %}—{% endif %}</td>
+                                    <td>{% if m.device %}<a href="/devices/{{ m.device.id }}" class="text-decoration-none">{{ m.device.human_readable_name }}</a>{% else %}—{% endif %}</td>
                                     <td><code>{{ m.mac or '—' }}</code></td>
                                     <td>{{ check(m.filter.is_active) }}</td>
                                 </tr>
@@ -420,7 +423,7 @@
                                 <tr class="text-muted">
                                     <th>{{ t('devices.list.local_ip') }}</th>
                                     <th>{{ t('devices.list.mac') }}</th>
-                                    <th>{{ t('devices.list.hostname') }}</th>
+                                    <th>{{ t('devices.list.name') }}</th>
                                     <th>{{ t('devices.list.name') }}</th>
                                     <th>{{ t('devices.form.field.interface') }}</th>
                                 </tr>
@@ -430,7 +433,7 @@
                                 <tr>
                                     <td>{{ dash(c.ip.address) }}</td>
                                     <td>{{ dash(c.interface.mac) }}</td>
-                                    <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a></td>
+                                    <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.human_readable_name }}</a></td>
                                     <td>{{ dash(c.device.human_readable_name) }}</td>
                                     <td><code>{{ c.interface.name }}</code></td>
                                 </tr>
@@ -454,7 +457,7 @@
                 <thead>
                 <tr class="text-muted">
                     <th>{{ t('devices.list.mac') }}</th>
-                    <th>{{ t('devices.list.hostname') }}</th>
+                    <th>{{ t('devices.list.name') }}</th>
                     <th>{{ t('devices.list.name') }}</th>
                     <th>{{ t('devices.form.field.interface') }}</th>
                 </tr>
@@ -463,7 +466,7 @@
                 {% for c in dhcp_dynamic_clients %}
                 <tr>
                     <td>{{ dash(c.interface.mac) }}</td>
-                    <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.hostname }}</a></td>
+                    <td><a href="/devices/{{ c.device.id }}" class="text-decoration-none">{{ c.device.human_readable_name }}</a></td>
                     <td>{{ dash(c.device.human_readable_name) }}</td>
                     <td><code>{{ c.interface.name }}</code></td>
                 </tr>
@@ -633,7 +636,7 @@
                     <td>{{ pf.protocol }}</td>
                     <td>
                         {% if pf.internal_device %}
-                            <a href="/devices/{{ pf.internal_device.id }}">{{ pf.internal_device.hostname }}</a>
+                            <a href="/devices/{{ pf.internal_device.id }}">{{ pf.internal_device.human_readable_name }}</a>
                         {% elif pf.internal_ip_manual %}
                             {{ pf.internal_ip_manual }}
                         {% else %}
@@ -686,7 +689,7 @@
                 <tr>
                     <td>
                         {% if item.source_device %}
-                            <a href="/devices/{{ item.source_device.id }}">{{ item.source_device.hostname }}</a>
+                            <a href="/devices/{{ item.source_device.id }}">{{ item.source_device.human_readable_name }}</a>
                         {% else %}
                             —
                         {% endif %}

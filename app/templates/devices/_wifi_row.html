@@ -108,7 +108,7 @@
                     <option value="">{{ t('devices.form.mac_filter.add') }}</option>
                     {% if wifi and wifi.eligible_devices %}
                     {% for d in wifi.eligible_devices %}
-                    <option value="{{ d.id }}" data-name="{{ d.hostname }}" data-mac="{{ d.mac }}">{{ d.hostname }} ({{ d.mac }})</option>
+                    <option value="{{ d.id }}" data-name="{{ d.human_readable_name }}" data-mac="{{ d.mac }}">{{ d.human_readable_name }} ({{ d.mac }})</option>
                     {% endfor %}
                     {% endif %}
                 </select>

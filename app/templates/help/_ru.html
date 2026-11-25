@@ -76,7 +76,7 @@
     <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-desktop me-2 text-primary"></i>5. Устройства</h2>
 
     <h3 class="h6 mt-3">5.1. Список устройств</h3>
-    <p>Показывает все устройства <strong>текущего дома</strong> в виде таблицы (на десктопе) или карточек (на телефоне). Колонки: Hostname, Name, Type, Vendor, Model, Location, IP Addresses, Gateway, MAC, Actions. Клик по заголовку колонки сортирует список; повторный — меняет порядок на обратный.</p>
+    <p>Показывает все устройства <strong>текущего дома</strong> в виде таблицы (на десктопе) или карточек (на телефоне). Колонки: Name, Description, Type, Vendor, Model, Location, IP Addresses, Gateway, MAC, Actions. Клик по заголовку колонки сортирует список; повторный — меняет порядок на обратный.</p>
     <p>Неактивные устройства показываются серым с бейджем <code>inactive</code>.</p>
     <p>Рядом с hostname показывается <strong>иконка типа устройства</strong> — она настраивается в справочнике типов (раздел 9. Справочники).</p>
     <p>Кнопка <strong>Export</strong> (рядом с <strong>Add device</strong>) выгружает данные в Excel (<code>.xlsx</code>) или в CSV-архив (<code>.zip</code>). В XLSX два листа — «Devices» и «Connections», в CSV-архиве — два файла. Порядок строк повторяет текущую сортировку списка, а IP- и MAC-адреса в одной ячейке переносятся на отдельные строки.</p>
@@ -105,8 +105,8 @@
 
     <p><strong>Basic (серый):</strong></p>
     <ul>
-        <li><strong>Hostname</strong> — обязательно. Без пробелов, уникально <em>в пределах дома</em>.</li>
-        <li><strong>Human readable name</strong> — короткое понятное имя.</li>
+        <li><strong>Hostname</strong> — необязательно. Без пробелов, уникально <em>в пределах дома</em>.</li>
+        <li><strong>Название</strong> — обязательно. Короткое понятное имя, уникальное <em>в пределах дома</em>.</li>
         <li><strong>Device type</strong> — тип из справочника. Тип может быть <em>активным</em> (должен иметь IP) или <em>пассивным</em> (хаб, неуправляемый свитч).</li>
         <li><strong>Vendor</strong> и <strong>Model</strong> — производитель и модель. После выбора вендора список моделей обновляется автоматически.</li>
         <li><strong>Location</strong> — где физически находится <em>в текущем доме</em>.</li>
@@ -441,7 +441,7 @@
         <li><strong>Внешний IP модема</strong> добавляется как отдельный интерфейс типа <code>wan</code> с типом адреса <code>external</code>. Маска, шлюз, MAC можно не указывать.</li>
         <li><strong>Wi-Fi: раздача vs подключение.</strong> Сети, которые устройство раздаёт — в блоке Wi-Fi networks. Подключение — в интерфейсе типа <code>wifi</code> через поле Connected Wi-Fi network.</li>
         <li><strong>Предупреждение про DHCP.</strong> Если <code>static</code> IP попал в диапазон пула — жёлтый баннер. Это не ошибка, но проверь на конфликт.</li>
-        <li><strong>Уникальность в доме.</strong> Hostname, Local IP, имена локаций и сетей уникальны в пределах дома. MAC — глобально.</li>
+        <li><strong>Уникальность в доме.</strong> Название, Hostname, Local IP, имена локаций и сетей уникальны в пределах дома. MAC — глобально.</li>
     </ul>
 </section>
 

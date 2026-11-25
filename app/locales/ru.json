@@ -63,7 +63,6 @@
   "devices.form.empty.services": "Сервисы пока не добавлены.",
   "devices.form.empty.pf": "Правила проброса пока не добавлены.",
   "devices.form.hint.ports_need_interface": "Порты можно добавить после сохранения хотя бы одного интерфейса.",
-  "devices.form.field.human_readable_name": "Человекочитаемое имя",
   "devices.form.field.device_type": "Тип устройства",
   "devices.form.field.active": "Активно",
   "devices.form.passive": "пассивное",
@@ -117,7 +116,6 @@
   "devices.view.btn.back": "Назад",
   "devices.view.btn.show_password": "показать",
   "devices.view.badge.active": "активное",
-  "devices.view.field.human_name": "Человекочитаемое имя",
   "devices.view.field.created": "Создано",
   "devices.view.field.updated": "Обновлено",
   "devices.view.field.range": "Диапазон",
@@ -346,5 +344,6 @@
   "connections.list.internal": "Внутренняя связь",
   "connections.gateways.title": "Устройства по шлюзам",
   "connections.gateways.undefined": "Без шлюза",
-  "connections.gateways.empty": "Устройств пока нет."
+  "connections.gateways.empty": "Устройств пока нет.",
+  "devices.list.description": "Описание"
 }

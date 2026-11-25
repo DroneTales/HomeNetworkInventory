@@ -22,8 +22,9 @@ class Device(Base):
     site_id: Mapped[int] = mapped_column(
         ForeignKey("sites.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    hostname: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
-    human_readable_name: Mapped[str | None] = mapped_column(String(60))
+    hostname: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    human_readable_name: Mapped[str] = mapped_column(String(60), nullable=False)
+    description: Mapped[str | None] = mapped_column(String(255))
     remarks: Mapped[str | None] = mapped_column(String)
 
     device_type_id: Mapped[int | None] = mapped_column(ForeignKey("device_types.id"))

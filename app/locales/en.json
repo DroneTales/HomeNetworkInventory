@@ -63,7 +63,6 @@
   "devices.form.empty.services": "No services added yet.",
   "devices.form.empty.pf": "No port forwarding rules yet.",
   "devices.form.hint.ports_need_interface": "Ports can be added after at least one interface is saved.",
-  "devices.form.field.human_readable_name": "Human readable name",
   "devices.form.field.device_type": "Device type",
   "devices.form.field.active": "Active",
   "devices.form.passive": "passive",
@@ -117,7 +116,6 @@
   "devices.view.btn.back": "Back",
   "devices.view.btn.show_password": "show",
   "devices.view.badge.active": "active",
-  "devices.view.field.human_name": "Human name",
   "devices.view.field.created": "Created",
   "devices.view.field.updated": "Updated",
   "devices.view.field.range": "Range",
@@ -346,5 +344,6 @@
   "connections.list.internal": "Internal link",
   "connections.gateways.title": "Devices by gateway",
   "connections.gateways.undefined": "No gateway",
-  "connections.gateways.empty": "No devices yet."
+  "connections.gateways.empty": "No devices yet.",
+  "devices.list.description": "Description"
 }

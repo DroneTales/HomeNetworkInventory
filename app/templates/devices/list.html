@@ -103,8 +103,8 @@
     <table class="table table-hover align-middle" data-sortable="true">
         <thead>
         <tr>
-            <th data-sort="hostname" data-type="text">{{ t('devices.list.hostname') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="name" data-type="text">{{ t('devices.list.name') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="description" data-type="text">{{ t('devices.list.description') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="type" data-type="text">{{ t('devices.list.type') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="vendor" data-type="text">{{ t('devices.list.vendor') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="model" data-type="text">{{ t('devices.list.model') }} <span class="sort-arrow text-muted"></span></th>
@@ -120,13 +120,13 @@
         {% set d = row.device %}
         <tr class="{% if not d.is_active %}text-muted{% endif %}">
             <td>
-                <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
+                <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.human_readable_name or '' }}</a>
                 {% if not d.is_active %}
                 <span class="badge bg-secondary ms-1">{{ t('common.inactive') }}</span>
                 {% endif %}
                 {{ dev_badges(row.flags) }}
             </td>
-            <td>{{ dash(d.human_readable_name) }}</td>
+            <td>{{ dash(d.description) }}</td>
             <td>{{ d.device_type.name if d.device_type else '—' }}</td>
             <td>{{ d.vendor.name if d.vendor else '—' }}</td>
             <td>{{ d.model.name if d.model else '—' }}</td>
@@ -179,14 +179,14 @@
     <div class="card info-card section-interfaces mb-2 {% if not d.is_active %}text-muted{% endif %}">
         <div class="card-body">
             <h5 class="card-title mb-1">
-                <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.hostname }}</a>
+                <a href="/devices/{{ d.id }}" class="text-decoration-none">{{ d.human_readable_name or '' }}</a>
                 {{ dev_badges(row.flags, inline=True) }}
                 {% if not d.is_active %}
                 <span class="badge bg-secondary ms-1">{{ t('common.inactive') }}</span>
                 {% endif %}
             </h5>
-            {% if d.human_readable_name %}
-            <p class="card-subtitle mb-2 text-muted small">{{ d.human_readable_name }}</p>
+            {% if d.description %}
+            <p class="card-subtitle mb-2 text-muted small">{{ d.description }}</p>
             {% endif %}
 
             <div class="row small">

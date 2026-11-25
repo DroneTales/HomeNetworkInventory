@@ -56,7 +56,7 @@
                 {% for d in all_devices %}
                 <option value="{{ d.id }}"
                     {% if pf and pf.internal_device_id and pf.internal_device_id|string == d.id|string %}selected{% endif %}>
-                    {{ d.hostname }}{% if d.human_readable_name %} ({{ d.human_readable_name }}){% endif %}
+                    {{ d.human_readable_name }}{% if d.hostname %} ({{ d.hostname }}){% endif %}
                 </option>
                 {% endfor %}
             </select>

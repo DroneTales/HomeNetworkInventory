@@ -98,6 +98,7 @@
                     ip: d.ip,
                     mac: d.mac,
                     has_wifi: d.has_wifi ? 1 : 0,
+                    has_loop: d.has_loop ? 1 : 0,
                     is_wifi_client: d.is_wifi_client ? 1 : 0,
                     wifi_ssids: (d.wifi_ssids || []).join(", "),
                     wifi_client_ssids: (d.wifi_client_ssids || []).join(", "),
@@ -265,9 +266,13 @@
                     } else if (d.is_wifi_client) {
                         wifi = '<span class="topo-badge topo-badge-wifi-client" title="Connected via Wi-Fi"><i class="fa-solid fa-wifi"></i></span>';
                     }
+                    let loop = '';
+                    if (d.has_loop) {
+                        loop = '<span class="topo-badge topo-badge-loop" title="Internal loop (bridge)"><i class="fa-solid fa-arrows-left-right"></i></span>';
+                    }
                     return '<div class="topo-node topo-cat-' + d.category + '">' +
                            '<i class="icon icon-' + d.icon + '"></i>' +
-                           wifi +
+                           wifi + loop +
                            '</div>';
                 }
             },
@@ -372,8 +377,8 @@
 
             let html = "";
             if (d.human_name) {
-                html += '<div class="topo-tooltip-title">' + d.human_name + '</div>';
-                html += '<div class="topo-tooltip-sub">' + d.label + '</div>';
+                html += '<div class="topo-tooltip-title">' + d.label + '</div>';
+                html += '<div class="topo-tooltip-sub">' + d.human_name + '</div>';
             } else {
                 html += '<div class="topo-tooltip-title">' + d.label + '</div>';
             }
@@ -492,9 +497,8 @@
 
             let titleHtml = "";
             if (d.human_name) {
-                titleHtml += d.label ? "" : "";
-                titleHtml += esc(d.human_name);
-                titleHtml += '<span class="topo-panel-sub">' + esc(d.label) + '</span>';
+                titleHtml += esc(d.label);
+                titleHtml += '<span class="topo-panel-sub">' + esc(d.human_name) + '</span>';
             } else {
                 titleHtml += esc(d.label);
             }
@@ -522,7 +526,7 @@
                             if (otherDev) {
                                 targets.push({
                                     device_id: otherDev.device_id,
-                                    hostname: otherDev.label,
+                                    name: otherDev.label,
                                     port: otherPort.label
                                 });
                             }
@@ -536,7 +540,7 @@
                         targets.forEach(function (tg) {
                             body += '<span class="topo-port-arrow">→</span>';
                             body += '<a class="topo-port-target" data-device="device-' + tg.device_id + '">' +
-                                    esc(tg.hostname) + ' / ' + esc(tg.port) + '</a>';
+                                    esc(tg.name) + ' / ' + esc(tg.port) + '</a>';
                         });
                     }
                     body += '</div>';

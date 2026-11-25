@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.core.constants import IFACE_TYPE_PORT
 from app.core.exceptions import ValidationError
-from app.core.validation import require_found, validate_hostname
+from app.core.validation import require_found, validate_hostname, validate_name
 from app.models.device import Device
 from app.models.device_type import DeviceType
 from app.models.interface import Interface
@@ -50,10 +50,12 @@ def get_by_id(db: Session, device_id: int, site_id: int | None = None) -> Device
 
 def _check_hostname_unique(
     db: Session,
-    hostname: str,
+    hostname: str | None,
     site_id: int,
     exclude_id: int | None = None,
 ) -> None:
+    if not hostname:
+        return
     query = (
         db.query(Device)
         .filter(Device.hostname == hostname, Device.site_id == site_id)
@@ -65,6 +67,25 @@ def _check_hostname_unique(
         raise ValidationError(
             f"Hostname '{hostname}' already exists in this home",
             field="hostname",
+        )
+
+def _check_name_unique(
+    db: Session,
+    name: str,
+    site_id: int,
+    exclude_id: int | None = None,
+) -> None:
+    query = (
+        db.query(Device)
+        .filter(Device.human_readable_name == name, Device.site_id == site_id)
+    )
+    if exclude_id is not None:
+        query = query.filter(Device.id != exclude_id)
+    existing = query.first()
+    if existing is not None:
+        raise ValidationError(
+            f"Name '{name}' already exists in this home",
+            field="human_readable_name",
         )
 
 def _check_references(
@@ -136,6 +157,7 @@ def create(
     site_id: int,
     hostname: str,
     human_readable_name: str | None = None,
+    description: str | None = None,
     remarks: str | None = None,
     device_type_id: int | None = None,
     vendor_id: int | None = None,
@@ -144,16 +166,19 @@ def create(
     is_active: bool = True,
 ) -> Device:
     hostname = validate_hostname(hostname, field="hostname")
+    name = validate_name(human_readable_name, field="human_readable_name")
 
     _check_references(
         db, site_id, device_type_id, vendor_id, model_id, location_id
     )
     _check_hostname_unique(db, hostname, site_id)
+    _check_name_unique(db, name, site_id)
 
     device = Device(
         site_id=site_id,
         hostname=hostname,
-        human_readable_name=human_readable_name or None,
+        human_readable_name=name,
+        description=description or None,
         remarks=remarks or None,
         device_type_id=device_type_id,
         vendor_id=vendor_id,
@@ -170,6 +195,7 @@ def update(
     device_id: int,
     hostname: str,
     human_readable_name: str | None = None,
+    description: str | None = None,
     remarks: str | None = None,
     device_type_id: int | None = None,
     vendor_id: int | None = None,
@@ -180,6 +206,7 @@ def update(
     device = require_found(get_by_id(db, device_id), "Device")
 
     hostname = validate_hostname(hostname, field="hostname")
+    name = validate_name(human_readable_name, field="human_readable_name")
 
     _check_references(
         db,
@@ -190,9 +217,11 @@ def update(
         location_id,
     )
     _check_hostname_unique(db, hostname, device.site_id, exclude_id=device_id)
+    _check_name_unique(db, name, device.site_id, exclude_id=device_id)
 
     device.hostname = hostname
-    device.human_readable_name = human_readable_name or None
+    device.human_readable_name = name
+    device.description = description or None
     device.remarks = remarks or None
     device.device_type_id = device_type_id
     device.vendor_id = vendor_id

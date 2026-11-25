@@ -9,7 +9,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}{% if is_edit %}{{ t('devices.form.edit_title') }} {{ form_data.hostname or '' }}{% else %}{{ t('devices.add') }}{% endif %}{% endblock %}
+{% block title %}{% if is_edit %}{{ t('devices.form.edit_title') }} {{ form_data.human_readable_name or '' }}{% else %}{{ t('devices.add') }}{% endif %}{% endblock %}
 
 {% block content %}
 {% set fd = form_data or {} %}
@@ -44,16 +44,21 @@
         </div>
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-12 col-md-6">
-                    <label for="hostname" class="form-label">{{ t('devices.list.hostname') }} *</label>
-                    <input type="text" class="form-control" id="hostname" name="hostname"
-                           value="{{ fd.hostname or '' }}" required maxlength="100">
-                </div>
-                <div class="col-12 col-md-6">
-                    <label for="human_readable_name" class="form-label">{{ t('devices.form.field.human_readable_name') }}</label>
+                <div class="col-12 col-md-4">
+                    <label for="human_readable_name" class="form-label">{{ t('devices.list.name') }} *</label>
                     <input type="text" class="form-control" id="human_readable_name"
                            name="human_readable_name"
-                           value="{{ fd.human_readable_name or '' }}" maxlength="60">
+                           value="{{ fd.human_readable_name or '' }}" required maxlength="60">
+                </div>
+                <div class="col-12 col-md-3">
+                    <label for="hostname" class="form-label">{{ t('devices.list.hostname') }}</label>
+                    <input type="text" class="form-control" id="hostname" name="hostname"
+                           value="{{ fd.hostname or '' }}" maxlength="100">
+                </div>
+                <div class="col-12 col-md-5">
+                    <label for="description" class="form-label">{{ t('devices.form.field.description') }}</label>
+                    <input type="text" class="form-control" id="description" name="description"
+                           value="{{ fd.description or '' }}" maxlength="255">
                 </div>
                 <div class="col-12 col-md-6">
                     <label for="device_type_id" class="form-label">{{ t('devices.form.field.device_type') }}</label>

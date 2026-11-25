@@ -76,7 +76,7 @@
     <h2 class="h4 border-bottom pb-2"><i class="fa-solid fa-desktop me-2 text-primary"></i>5. Devices</h2>
 
     <h3 class="h6 mt-3">5.1. Device list</h3>
-    <p>Shows all devices of the <strong>current home</strong> as a table (desktop) or cards (mobile). Columns: Hostname, Name, Type, Vendor, Model, Location, IP Addresses, Gateway, MAC, Actions. Click any column header to sort; click again to reverse.</p>
+    <p>Shows all devices of the <strong>current home</strong> as a table (desktop) or cards (mobile). Columns: Name, Description, Type, Vendor, Model, Location, IP Addresses, Gateway, MAC, Actions. Click any column header to sort; click again to reverse.</p>
     <p>Inactive devices are greyed out with an <code>inactive</code> badge.</p>
     <p>A <strong>device type icon</strong> is shown next to the hostname — it is configured in the device type reference (section 9. Reference).</p>
     <p>The <strong>Export</strong> button (next to <strong>Add device</strong>) exports the data to Excel (<code>.xlsx</code>) or a CSV archive (<code>.zip</code>). The XLSX has two sheets — "Devices" and "Connections"; the CSV archive has two files. Rows follow the current list sort order, and IP/MAC addresses are placed on separate lines within a cell.</p>
@@ -105,8 +105,8 @@
 
     <p><strong>Basic (grey):</strong></p>
     <ul>
-        <li><strong>Hostname</strong> — required. No spaces, unique <em>within a home</em>.</li>
-        <li><strong>Human readable name</strong> — a short, friendly name.</li>
+        <li><strong>Hostname</strong> — optional. No spaces, unique <em>within a home</em>.</li>
+        <li><strong>Name</strong> — required. A short, friendly name, unique <em>within a home</em>.</li>
         <li><strong>Device type</strong> — a type from the reference data. Types can be <em>active</em> (must have an IP) or <em>passive</em> (hub, unmanaged switch).</li>
         <li><strong>Vendor</strong> and <strong>Model</strong> — manufacturer and model. After choosing a vendor, the model list is refreshed automatically.</li>
         <li><strong>Location</strong> — where the device physically is <em>in this home</em>.</li>
@@ -441,7 +441,7 @@
         <li><strong>External IP of a modem</strong> is added as a separate interface of type <code>wan</code> with address type <code>external</code>. Mask, gateway, and MAC can be left blank.</li>
         <li><strong>Wi-Fi: broadcasting vs connecting.</strong> Networks the device broadcasts go into the Wi-Fi networks block. Connections to an existing network go into a <code>wifi</code> interface via the Connected Wi-Fi network field.</li>
         <li><strong>DHCP warning.</strong> If a <code>static</code> IP falls into a pool range, a yellow banner appears. This is a warning, not an error, but check for conflicts.</li>
-        <li><strong>Uniqueness within a home.</strong> Hostname, Local IP, location names, and network names are unique within a home. MAC is globally unique.</li>
+        <li><strong>Uniqueness within a home.</strong> Name, Hostname, Local IP, location names, and network names are unique within a home. MAC is globally unique.</li>
     </ul>
 </section>
 
