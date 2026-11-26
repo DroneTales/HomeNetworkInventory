@@ -43,11 +43,10 @@ scripts/
 
 # Ruff cache
 .ruff_cache/
-release.sh
-sync.sh
 
 # Dev tooling (not distributed)
 tests/
 pytest.ini
 requirements-dev.txt
 ruff.toml
+sync.sh
