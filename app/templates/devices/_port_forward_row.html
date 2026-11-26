@@ -49,7 +49,7 @@
                 <option value="ip" {% if cur_target == 'ip' %}selected{% endif %}>IP</option>
             </select>
         </div>
-        <div class="col-12 col-md-3 pf-target-device-block">
+        <div class="col-12 col-md-2 pf-target-device-block">
             <label class="form-label small mb-0">{{ t('devices.form.field.internal_device') }}</label>
             <select class="form-select form-select-sm pf-internal-device-id px-1" name="pf_internal_device_id">
                 <option value="">—</option>
@@ -61,7 +61,7 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="col-12 col-md-3 pf-target-ip-block d-none">
+        <div class="col-12 col-md-2 pf-target-ip-block d-none">
             <label class="form-label small mb-0">{{ t('devices.form.field.internal_ip') }}</label>
             <input type="text" class="form-control form-control-sm pf-internal-ip-manual px-1"
                    name="pf_internal_ip_manual"
@@ -81,6 +81,15 @@
                    class="form-control form-control-sm pf-internal-end px-1"
                    name="pf_internal_end"
                    value="{{ pf.internal_port_end if pf and pf.internal_port_end else '' }}">
+        </div>
+        <div class="col-6 col-md-1">
+            <label class="form-label small mb-0" title="NAT Loopback">NAT Loopback</label>
+            {% set cur_nat = pf.nat_loopback if pf and pf.nat_loopback else 'None' %}
+            <select class="form-select form-select-sm pf-nat-loopback px-1" name="pf_nat_loopback">
+                <option value="None" {% if cur_nat == 'None' %}selected{% endif %}>None</option>
+                <option value="Off" {% if cur_nat == 'Off' %}selected{% endif %}>Off</option>
+                <option value="On" {% if cur_nat == 'On' %}selected{% endif %}>On</option>
+            </select>
         </div>
         <div class="col-6 col-md-1">
             <div class="form-check mb-0">

@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.constants import CONNECTION_TYPE_PHYSICAL, VALID_CONNECTION_TYPES
 from app.core.exceptions import ValidationError
@@ -21,6 +21,16 @@ from app.models.port import Port
 def list_all(db: Session, site_id: int) -> list[Connection]:
     return (
         db.query(Connection)
+        .options(
+            selectinload(Connection.source_port)
+            .selectinload(Port.device)
+            .selectinload(Device.device_type),
+            selectinload(Connection.source_port).selectinload(Port.interface),
+            selectinload(Connection.target_port)
+            .selectinload(Port.device)
+            .selectinload(Device.device_type),
+            selectinload(Connection.target_port).selectinload(Port.interface),
+        )
         .join(Port, Connection.source_port_id == Port.id)
         .join(Device, Port.device_id == Device.id)
         .filter(Device.site_id == site_id)

@@ -148,7 +148,7 @@
   "users.form.field.role": "Role",
   "users.form.field.language": "Language",
   "users.form.field.theme": "Theme",
-  "users.form.hint.password_min": "Minimum 5 characters is recommended.",
+  "users.form.hint.password_min": "Minimum 8 characters.",
   "users.form.hint.must_change": "Must change password on next login",
   "users.form.section.permissions": "Permissions (only for role=user)",
   "users.form.perm.can_edit": "Can edit devices and connections",
@@ -345,5 +345,8 @@
   "connections.gateways.title": "Devices by gateway",
   "connections.gateways.undefined": "No gateway",
   "connections.gateways.empty": "No devices yet.",
-  "devices.list.description": "Description"
+  "devices.list.description": "Description",
+  "devices.list.device": "Device",
+  "auth.password_too_short": "Password must be at least {n} characters.",
+  "auth.too_many_attempts": "Too many login attempts. Try again later."
 }

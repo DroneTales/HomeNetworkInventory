@@ -19,6 +19,11 @@ class CurrentSiteMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         request.state.current_site = None
 
+        # Static assets never need the site context
+        path = request.url.path
+        if path.startswith("/static/") or path in ("/favicon.ico", "/apple-touch-icon.png"):
+            return await call_next(request)
+
         user_id = None
         try:
             user_id = request.session.get("user_id")

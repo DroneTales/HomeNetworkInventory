@@ -106,8 +106,7 @@
             <th data-sort="name" data-type="text">{{ t('devices.list.name') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="description" data-type="text">{{ t('devices.list.description') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="type" data-type="text">{{ t('devices.list.type') }} <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="vendor" data-type="text">{{ t('devices.list.vendor') }} <span class="sort-arrow text-muted"></span></th>
-            <th data-sort="model" data-type="text">{{ t('devices.list.model') }} <span class="sort-arrow text-muted"></span></th>
+            <th data-sort="device" data-type="text">{{ t('devices.list.device') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="location" data-type="text">{{ t('devices.list.location') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="ip" data-type="ip">{{ t('devices.list.local_ip') }} <span class="sort-arrow text-muted"></span></th>
             <th data-sort="gateway" data-type="ip">{{ t('devices.list.gateway') }} <span class="sort-arrow text-muted"></span></th>
@@ -128,8 +127,7 @@
             </td>
             <td>{{ dash(d.description) }}</td>
             <td>{{ d.device_type.name if d.device_type else '—' }}</td>
-            <td>{{ d.vendor.name if d.vendor else '—' }}</td>
-            <td>{{ d.model.name if d.model else '—' }}</td>
+            <td>{{ row.device_label or '—' }}</td>
             <td>{{ d.location.name if d.location else '—' }}</td>
             {% set sort_ip = namespace(v='') %}
             {% for ip in row.ips %}
@@ -204,6 +202,9 @@
                 <div class="col-5 text-muted"><i class="fa-solid fa-globe me-1"></i>IP</div>
                 <div class="col-7">—</div>
                 {% endif %}
+
+                <div class="col-5 text-muted"><i class="fa-solid fa-microchip me-1"></i>{{ t('devices.list.device') }}</div>
+                <div class="col-7">{{ row.device_label or '—' }}</div>
 
                 <div class="col-5 text-muted"><i class="fa-solid fa-list me-1"></i>Type</div>
                 <div class="col-7">{{ d.device_type.name if d.device_type else '—' }}</div>

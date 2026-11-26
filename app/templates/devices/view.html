@@ -619,6 +619,7 @@
                     <th>{{ t('devices.form.field.protocol') }}</th>
                     <th>{{ t('devices.form.field.target') }}</th>
                     <th>{{ t('devices.view.field.internal') }}</th>
+                    <th>NAT Loopback</th>
                     <th>{{ t('devices.form.field.active') }}</th>
                 </tr>
                 </thead>
@@ -650,6 +651,7 @@
                             {{ pf.internal_port_start }}–{{ pf.internal_port_end }}
                         {% endif %}
                     </td>
+                    <td>{{ pf.nat_loopback }}</td>
                     <td>{{ check(pf.is_active) }}</td>
                 </tr>
                 {% endfor %}
@@ -681,6 +683,7 @@
                     <th>{{ t('devices.view.field.external') }}</th>
                     <th>{{ t('devices.form.field.protocol') }}</th>
                     <th>{{ t('devices.view.field.internal') }}</th>
+                    <th>NAT Loopback</th>
                     <th>{{ t('devices.form.field.active') }}</th>
                 </tr>
                 </thead>
@@ -712,6 +715,7 @@
                             <span class="text-muted small">({{ item.matched_ip }})</span>
                         {% endif %}
                     </td>
+                    <td>{{ item.pf.nat_loopback }}</td>
                     <td>{{ check(item.pf.is_active) }}</td>
                 </tr>
                 {% endfor %}

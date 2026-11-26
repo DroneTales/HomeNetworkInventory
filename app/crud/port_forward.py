@@ -10,7 +10,12 @@
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.core.constants import PF_PROTOCOL_BOTH, VALID_PF_PROTOCOLS
+from app.core.constants import (
+    NAT_LOOPBACK_NONE,
+    PF_PROTOCOL_BOTH,
+    VALID_NAT_LOOPBACK,
+    VALID_PF_PROTOCOLS,
+)
 from app.core.exceptions import ValidationError
 from app.core.validation import require_found, validate_choice, validate_ipv4
 from app.models.device import Device
@@ -132,6 +137,7 @@ def _validate(
     internal_ip_manual: str | None,
     internal_port_start,
     internal_port_end,
+    nat_loopback: str = NAT_LOOPBACK_NONE,
     exclude_id: int | None = None,
 ) -> tuple:
     device = require_found(db.get(Device, device_id), "Device", field="device_id")
@@ -151,6 +157,12 @@ def _validate(
 
     protocol = validate_choice(
         (protocol or "").strip().lower(), VALID_PF_PROTOCOLS, "protocol", "protocol"
+    )
+    nat_loopback = validate_choice(
+        (nat_loopback or NAT_LOOPBACK_NONE).strip(),
+        VALID_NAT_LOOPBACK,
+        "NAT loopback",
+        "nat_loopback",
     )
 
     has_device_target = internal_device_id is not None
@@ -202,6 +214,7 @@ def _validate(
         internal_ip_manual,
         internal_port_start,
         internal_port_end,
+        nat_loopback,
     )
 
 
@@ -217,6 +230,7 @@ def create(
     internal_ip_manual: str | None = None,
     description: str | None = None,
     is_active: bool = True,
+    nat_loopback: str = NAT_LOOPBACK_NONE,
 ) -> PortForward:
     (
         external_port_start,
@@ -226,6 +240,7 @@ def create(
         internal_ip_manual,
         internal_port_start,
         internal_port_end,
+        nat_loopback,
     ) = _validate(
         db,
         device_id,
@@ -236,6 +251,7 @@ def create(
         internal_ip_manual,
         internal_port_start,
         internal_port_end,
+        nat_loopback=nat_loopback,
     )
 
     pf = PortForward(
@@ -249,6 +265,7 @@ def create(
         internal_port_end=internal_port_end,
         description=description or None,
         is_active=is_active,
+        nat_loopback=nat_loopback,
     )
     db.add(pf)
     db.flush()
@@ -267,6 +284,7 @@ def update(
     internal_ip_manual: str | None = None,
     description: str | None = None,
     is_active: bool = True,
+    nat_loopback: str = NAT_LOOPBACK_NONE,
 ) -> PortForward:
     pf = require_found(get_by_id(db, pf_id), "Port forward rule")
 
@@ -278,6 +296,7 @@ def update(
         internal_ip_manual,
         internal_port_start,
         internal_port_end,
+        nat_loopback,
     ) = _validate(
         db,
         pf.device_id,
@@ -288,6 +307,7 @@ def update(
         internal_ip_manual,
         internal_port_start,
         internal_port_end,
+        nat_loopback=nat_loopback,
         exclude_id=pf_id,
     )
 
@@ -300,6 +320,7 @@ def update(
     pf.internal_port_end = internal_port_end
     pf.description = description or None
     pf.is_active = is_active
+    pf.nat_loopback = nat_loopback
     db.flush()
     return pf
 

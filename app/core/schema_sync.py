@@ -164,7 +164,20 @@ def apply_missing_columns(engine: Engine, diff: SchemaDiff) -> list[str]:
     return applied
 
 
-def _devices_needs_rebuild(engine: Engine) -> bool:
+def apply_missing_indexes(engine: Engine) -> list[str]:
+    applied = []
+    inspector = sa_inspect(engine)
+    with engine.begin() as conn:
+        for table in Base.metadata.tables.values():
+            existing = {i["name"] for i in inspector.get_indexes(table.name)}
+            for index in table.indexes:
+                if index.name and index.name not in existing:
+                    index.create(bind=conn, checkfirst=True)
+                    applied.append(f"{table.name}.{index.name}")
+    return applied
+
+
+def devices_needs_rebuild(engine: Engine) -> bool:
     with engine.connect() as conn:
         rows = conn.exec_driver_sql("PRAGMA table_info(devices)").fetchall()
     cols = {r[1]: r for r in rows}
@@ -175,7 +188,7 @@ def _devices_needs_rebuild(engine: Engine) -> bool:
     return hostname_notnull or name_nullable
 
 
-def _backup_database(engine: Engine) -> str | None:
+def backup_database(engine: Engine) -> str | None:
     db_path = engine.url.database
     if not db_path or db_path == ":memory:":
         return None
@@ -260,12 +273,8 @@ def _rebuild_devices(conn) -> None:
 
 def apply_data_migrations(engine: Engine) -> list[str]:
     applied: list[str] = []
-    if not _devices_needs_rebuild(engine):
+    if not devices_needs_rebuild(engine):
         return applied
-
-    backup = _backup_database(engine)
-    if backup:
-        applied.append(f"backup: {backup}")
 
     with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
         conn.exec_driver_sql("PRAGMA foreign_keys=OFF")

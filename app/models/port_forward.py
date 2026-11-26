@@ -25,6 +25,7 @@ class PortForward(Base):
     external_port_start: Mapped[int] = mapped_column(Integer, nullable=False)
     external_port_end: Mapped[int] = mapped_column(Integer, nullable=False)
     protocol: Mapped[str] = mapped_column(String(8), nullable=False)
+    nat_loopback: Mapped[str] = mapped_column(String(10), nullable=False, default="None")
     internal_device_id: Mapped[int | None] = mapped_column(
         ForeignKey("devices.id", ondelete="SET NULL"), index=True
     )

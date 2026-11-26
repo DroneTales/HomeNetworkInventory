@@ -7,12 +7,16 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import logging
+
 from sqlalchemy.orm import Session
 
 from app.core.constants import ROLE_ADMIN
 from app.core.security import hash_password
 from app.database import SessionLocal
 from app.models.user import User
+
+logger = logging.getLogger(__name__)
 
 
 def ensure_default_admin() -> None:
@@ -35,6 +39,6 @@ def ensure_default_admin() -> None:
         )
         db.add(admin)
         db.commit()
-        print("[bootstrap] Default admin user created: Admin / Admin")
+        logger.info("Default admin user created: Admin / Admin")
     finally:
         db.close()

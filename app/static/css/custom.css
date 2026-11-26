@@ -815,3 +815,13 @@
     width: 1em;
     text-align: center;
 }
+
+/* Sticky top navigation (desktop only) */
+@media (min-width: 992px) {
+    .app-navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    }
+}

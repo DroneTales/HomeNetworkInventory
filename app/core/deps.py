@@ -10,7 +10,7 @@
 import time
 
 from fastapi import Depends, HTTPException, Request, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 from app.config import settings
 from app.core.constants import ROLE_ADMIN
@@ -103,7 +103,14 @@ def get_current_site(request: Request, user: User, db: Session) -> Site | None:
     except (TypeError, ValueError):
         return None
 
-    site = db.get(Site, site_id)
+    # Only the fields needed for the site context are loaded;
+    # the large photo blob stays deferred.
+    site = (
+        db.query(Site)
+        .options(load_only(Site.id, Site.name, Site.is_active))
+        .filter(Site.id == site_id)
+        .first()
+    )
     if site is None or not site.is_active:
         return None
 
@@ -117,7 +124,10 @@ def require_site(
     user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ) -> Site:
-    site = get_current_site(request, user, db)
+    # The middleware already resolved the site for this request
+    site = getattr(request.state, "current_site", None)
+    if site is None:
+        site = get_current_site(request, user, db)
     if site is None:
         raise HTTPException(
             status_code=status.HTTP_307_TEMPORARY_REDIRECT,

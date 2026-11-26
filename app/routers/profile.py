@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
-from app.core.constants import ROLE_ADMIN
+from app.core.constants import MIN_PASSWORD_LENGTH, ROLE_ADMIN
 from app.core.deps import require_user
 from app.core.exceptions import ValidationError
 from app.core.templating import render
@@ -89,19 +89,20 @@ async def change_password(
 
     from app.core.i18n import translate
 
-    def render_error(msg_key: str):
+    def render_error(msg_key: str, **fmt):
+        message = translate(msg_key, user.language)
         return render(
             request,
             "profile/view.html",
             user=user,
-            error=translate(msg_key, user.language),
+            error=message.format(**fmt) if fmt else message,
         )
 
     if new_password != confirm_password:
         return render_error("auth.passwords_mismatch")
 
-    if len(new_password) < 1:
-        return render_error("auth.passwords_mismatch")
+    if len(new_password) < MIN_PASSWORD_LENGTH:
+        return render_error("auth.password_too_short", n=MIN_PASSWORD_LENGTH)
 
     try:
         crud_user.change_own_password(
@@ -115,9 +116,5 @@ async def change_password(
         db.rollback()
         return render_error("auth.wrong_old_password")
 
-    warning = None
-    if len(new_password) < 5:
-        warning = "Password changed. Warning: it is shorter than 5 characters."
-
-    request.session["warning"] = warning or "Password changed."
+    request.session["warning"] = "Password changed."
     return RedirectResponse("/profile", status_code=303)

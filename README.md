@@ -170,28 +170,17 @@ actual SQLite database and **applies any missing tables or columns
 automatically** — new tables are created and missing columns are added, so an
 upgrade normally needs no manual step.
 
-For a controlled upgrade with an explicit timestamped backup, run the
-standalone migration script:
-
-1. Stop the application.
-2. Run the migration script:
-   - local distribution: `migrate.bat` (Windows) or `./migrate.command`
-     (Linux/macOS), next to `start.bat` / `start.command`;
-   - from source: `python -m app.migrate` inside the activated venv.
-3. The script prints the diff, asks for confirmation, and writes a
-   timestamped backup of the database (`home_network.db.before-migrate-...`)
-   before applying changes.
-4. Start the application again.
+Before any destructive migration (rebuilding a table) the database is backed
+up next to itself (`home_network.db.bak-YYYYMMDD-HHMMSS`).
 
 The migration only **adds** missing columns. Extra columns that are no
-longer used by the model are listed but never dropped automatically -
+longer used by the model are listed in the log but never dropped automatically —
 remove them manually if you want. Databases are never recreated, so
 existing data is preserved.
 
 To upgrade a local installation without losing data: keep the old
 `data/` folder, unpack the new build into a fresh folder, and copy
-`data/` over. Then run `start.bat` / `start.command` and migrate if
-prompted.
+`data/` over. Then run `start.bat` / `start.command`.
 
 ## Project structure
 

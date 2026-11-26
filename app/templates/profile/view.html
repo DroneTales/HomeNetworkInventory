@@ -107,12 +107,12 @@
                 <div class="col-12 col-md-4">
                     <label for="new_password" class="form-label">{{ t('auth.new_password') }}</label>
                     <input type="password" class="form-control" id="new_password" name="new_password"
-                           required autocomplete="new-password">
+                           required minlength="8" autocomplete="new-password">
                 </div>
                 <div class="col-12 col-md-4">
                     <label for="confirm_password" class="form-label">{{ t('auth.confirm_password') }}</label>
                     <input type="password" class="form-control" id="confirm_password" name="confirm_password"
-                           required autocomplete="new-password">
+                           required minlength="8" autocomplete="new-password">
                 </div>
             </div>
             <button type="submit" class="btn btn-primary mt-3">{{ t('auth.change_password') }}</button>

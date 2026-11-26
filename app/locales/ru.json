@@ -148,7 +148,7 @@
   "users.form.field.role": "Роль",
   "users.form.field.language": "Язык",
   "users.form.field.theme": "Тема",
-  "users.form.hint.password_min": "Рекомендуется минимум 5 символов.",
+  "users.form.hint.password_min": "Минимум 8 символов.",
   "users.form.hint.must_change": "Сменить пароль при следующем входе",
   "users.form.section.permissions": "Права (только для role=user)",
   "users.form.perm.can_edit": "Может редактировать устройства и связи",
@@ -345,5 +345,8 @@
   "connections.gateways.title": "Устройства по шлюзам",
   "connections.gateways.undefined": "Без шлюза",
   "connections.gateways.empty": "Устройств пока нет.",
-  "devices.list.description": "Описание"
+  "devices.list.description": "Описание",
+  "devices.list.device": "Устройство",
+  "auth.password_too_short": "Пароль должен быть не короче {n} символов.",
+  "auth.too_many_attempts": "Слишком много попыток входа. Попробуйте позже."
 }

@@ -9,7 +9,7 @@
 
 from sqlalchemy.orm import Session
 
-from app.core.constants import ROLE_ADMIN, ROLE_USER, VALID_ROLES
+from app.core.constants import MIN_PASSWORD_LENGTH, ROLE_ADMIN, ROLE_USER, VALID_ROLES
 from app.core.exceptions import ValidationError
 from app.core.security import hash_password
 from app.core.validation import require_found
@@ -36,8 +36,13 @@ def _validate_username(username: str) -> str:
     return username
 
 def _validate_password(password: str) -> None:
-    if password is None or len(password) < 1:
+    if password is None or not password.strip():
         raise ValidationError("Password is required", field="password")
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise ValidationError(
+            f"Password must be at least {MIN_PASSWORD_LENGTH} characters",
+            field="password",
+        )
 
 def _validate_flags(
     role: str,
@@ -148,8 +153,13 @@ def reset_password(
 ) -> User:
     user = require_found(get_by_id(db, user_id), "User")
 
-    if not new_password or len(new_password) < 1:
+    if not new_password or not new_password.strip():
         raise ValidationError("Password is required", field="password")
+    if len(new_password) < MIN_PASSWORD_LENGTH:
+        raise ValidationError(
+            f"Password must be at least {MIN_PASSWORD_LENGTH} characters",
+            field="password",
+        )
 
     user.password_hash = hash_password(new_password)
     user.must_change_password = must_change_password
@@ -164,8 +174,13 @@ def change_own_password(db: Session, user_id: int, old_password: str, new_passwo
     if not verify_password(old_password, user.password_hash):
         raise ValidationError("Current password is incorrect", field="old_password")
 
-    if not new_password or len(new_password) < 1:
+    if not new_password or not new_password.strip():
         raise ValidationError("New password is required", field="new_password")
+    if len(new_password) < MIN_PASSWORD_LENGTH:
+        raise ValidationError(
+            f"New password must be at least {MIN_PASSWORD_LENGTH} characters",
+            field="new_password",
+        )
 
     user.password_hash = hash_password(new_password)
     user.must_change_password = False

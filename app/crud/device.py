@@ -7,7 +7,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.core.constants import IFACE_TYPE_PORT
 from app.core.exceptions import ValidationError
@@ -38,6 +38,20 @@ def list_all(db: Session, site_id: int) -> list[Device]:
         .order_by(Device.hostname)
         .all()
     )
+
+def list_for_connections(db: Session, site_id: int) -> list[Device]:
+    return (
+        db.query(Device)
+        .options(
+            selectinload(Device.interfaces).selectinload(Interface.ip_addresses),
+            joinedload(Device.device_type),
+            joinedload(Device.location),
+        )
+        .filter(Device.site_id == site_id)
+        .order_by(Device.hostname)
+        .all()
+    )
+
 
 def get_by_id(db: Session, device_id: int, site_id: int | None = None) -> Device | None:
     device = db.get(Device, device_id)

@@ -7,6 +7,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import logging
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -21,8 +22,16 @@ from app.config import settings
 from app.core.bootstrap import ensure_default_admin
 from app.core.deps import get_current_site, require_user
 from app.core.i18n import load_translations
+from app.core.logging import setup_logging
 from app.core.middleware import CurrentSiteMiddleware
-from app.core.schema_sync import apply_data_migrations, apply_missing_columns, get_schema_diff
+from app.core.schema_sync import (
+    apply_data_migrations,
+    apply_missing_columns,
+    apply_missing_indexes,
+    backup_database,
+    devices_needs_rebuild,
+    get_schema_diff,
+)
 from app.database import Base, check_database_path, engine, get_db
 from app.models.user import User
 from app.routers import (
@@ -40,9 +49,17 @@ from app.routers import (
 
 BASE_DIR = Path(__file__).resolve().parent
 
+logger = logging.getLogger(__name__)
+
 def _check_schema() -> None:
     diff = get_schema_diff(engine)
-    
+
+    # Back up the database before any schema change
+    if diff.missing_tables or diff.missing_columns or devices_needs_rebuild(engine):
+        backup = backup_database(engine)
+        if backup:
+            logger.info("Database backed up to %s", backup)
+
     # Auto-apply missing tables and columns
     applied = []
     if diff.missing_tables:
@@ -53,32 +70,29 @@ def _check_schema() -> None:
         applied_cols = apply_missing_columns(engine, diff)
         applied.extend(f"column: {c}" for c in applied_cols)
 
+    applied.extend(f"index: {i}" for i in apply_missing_indexes(engine))
     applied.extend(apply_data_migrations(engine))
     
     if applied:
-        print("")
-        print("=" * 64)
-        print("  DATABASE SCHEMA AUTO-MIGRATED")
-        print("=" * 64)
+        logger.info("Database schema auto-migrated:")
         for a in applied:
-            print(f"  + {a}")
-        print("=" * 64)
-        print("")
-        
+            logger.info("  + %s", a)
+
         # Re-check to ensure everything is ok now
         diff = get_schema_diff(engine)
         if not diff.is_ok:
-            print("ERROR: schema still out of date after auto-migration")
+            logger.error("Schema still out of date after auto-migration")
             sys.exit(1)
-    
+
     if diff.extra_columns:
-        print("WARNING: extra columns in database (not used by the current model):")
+        logger.warning("Extra columns in database (not used by the current model):")
         for c in diff.extra_columns:
-            print(f"  {c.table}.{c.name} {c.type_sql}")
+            logger.warning("  %s.%s %s", c.table, c.name, c.type_sql)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    setup_logging()
     check_database_path()
     Base.metadata.create_all(bind=engine)
     _check_schema()

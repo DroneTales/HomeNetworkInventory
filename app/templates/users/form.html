@@ -42,7 +42,7 @@
                 <div class="col-12 col-md-6">
                     <label for="password" class="form-label">{{ t('users.form.field.password') }} *</label>
                     <input type="password" class="form-control" id="password" name="password"
-                           required autocomplete="new-password">
+                           required minlength="8" autocomplete="new-password">
                     <div class="form-text">{{ t('users.form.hint.password_min') }}</div>
                 </div>
                 {% endif %}

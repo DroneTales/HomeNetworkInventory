@@ -97,11 +97,6 @@ async def new_user_submit(
             assigned_sites=[],
         )
 
-    if len(data["password"]) < 5:
-        request.session["warning"] = (
-            f"Saved. Password for user '{created_user.username}' is shorter than 5 characters."
-        )
-
     return RedirectResponse("/users", status_code=303)
 
 @router.get("/{user_id}/edit", response_class=HTMLResponse)
@@ -286,12 +281,6 @@ async def reset_password_submit(
             form_action=f"/users/{user_id}/reset-password",
             error=e.message,
             form_data={"new_password": new_password, "must_change_password": must_change},
-        )
-
-    if len(new_password) < 5:
-        request.session["warning"] = (
-            f"Password for '{target.username}' reset. "
-            f"Warning: it is shorter than 5 characters."
         )
 
     return RedirectResponse("/users", status_code=303)

@@ -83,7 +83,7 @@ def list_connections(
         group["connections"].sort(key=lambda e: _natural_key(e["local"].name))
 
     wifi_nets = crud_wifi.list_by_site(db, site.id)
-    devices = crud_device.list_all(db, site.id)
+    devices = crud_device.list_for_connections(db, site.id)
     location_groups_by_key: dict = {}
     location_groups: list[dict] = []
     for d in devices:

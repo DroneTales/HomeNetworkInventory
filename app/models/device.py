@@ -23,7 +23,7 @@ class Device(Base):
         ForeignKey("sites.id", ondelete="CASCADE"), nullable=False, index=True
     )
     hostname: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
-    human_readable_name: Mapped[str] = mapped_column(String(60), nullable=False)
+    human_readable_name: Mapped[str] = mapped_column(String(60), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(String(255))
     remarks: Mapped[str | None] = mapped_column(String)
 
