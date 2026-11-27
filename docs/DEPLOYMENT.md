@@ -55,25 +55,24 @@ sudo -u hni ./venv/bin/pip install -r requirements.txt
 
 ## 4. Configure the application
 
-Open `app/config.py` and adjust at least:
+Do not edit `app/config.py` — it is shared and contains no secrets. Provide
+the values through the systemd unit instead:
 
-```python
-class Settings:
-    app_name = "Home Network Inventory"
-    app_host = "127.0.0.1"
-    app_port = 8420
-    database_url = "sqlite:///./home_network.db"   # created next to the app
-    session_secret = "<paste a random string here>"
-    session_timeout_seconds = 2 * 60 * 60          # 2 hours
+```ini
+[Service]
+Environment=HNI_DATABASE_URL=sqlite:////var/lib/hni/home_network.db
+EnvironmentFile=/etc/hni-network.env
 ```
 
-Generate a strong `session_secret`:
+`/etc/hni-network.env` (mode 0600, outside the repository):
 
-```bash
-python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+HNI_SESSION_SECRET=<paste the output of: python -c "import secrets; print(secrets.token_urlsafe(48))">
 ```
 
-Paste the output into `session_secret`.
+If `HNI_DATABASE_URL` is not set, the database is created next to the app in
+`data/home_network.db`. If `HNI_SESSION_SECRET` is not set, it is generated on
+first start and stored in `data/settings.json`.
 
 By default the SQLite database lives in the project directory. If you want it
 on a different disk (for example, an external drive), change `database_url`
@@ -294,7 +293,7 @@ where the database lives. Check:
 
 ```bash
 sudo ls -ld /opt/hni
-sudo ls -ld "$(dirname "$(grep database_url /opt/hni/app/config.py)")"
+sudo ls -ld /var/lib/hni        # or <app>/data when HNI_DATABASE_URL is unset
 ```
 
 ### Wrong time in logs

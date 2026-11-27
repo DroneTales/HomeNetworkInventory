@@ -109,9 +109,6 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-# Edit app/config.py and change session_secret to a random value
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-
 python run.py
 ```
 
@@ -132,21 +129,24 @@ TLS. Example configuration files are in [`docs/`](docs/).
 
 ## Configuration
 
-All configuration lives in [`app/config.py`](app/config.py). The most important
-values:
+Nothing secret lives in the source tree. Every setting is resolved at startup
+in this order:
 
-| Setting | Description |
-|---|---|
-| `app_host` / `app_port` | Bind address and port for Uvicorn. Default `127.0.0.1:8420`. |
-| `database_url` | SQLAlchemy database URL. Default `sqlite:///./home_network.db` (file next to the app). |
-| `session_secret` | Random string used to sign session cookies. **Change this before deploying.** |
-| `session_timeout_seconds` | Session inactivity timeout in seconds. Default 2 hours. |
+1. environment variable,
+2. `data/settings.json` (created on first run),
+3. built-in default.
 
-To generate a strong `session_secret`:
+| Setting | Environment variable | Default |
+|---|---|---|
+| Bind address | `HNI_HOST` | `127.0.0.1` |
+| Bind port | `HNI_PORT` | `8420` |
+| Database URL | `HNI_DATABASE_URL` | `sqlite:///<app>/data/home_network.db` |
+| Session secret | `HNI_SESSION_SECRET` | generated on first run into `data/settings.json` |
+| Session timeout | — | 2 hours (fixed) |
 
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
+`data/` is created on first start and is never committed. If
+`HNI_SESSION_SECRET` is not set anywhere, a strong value is generated
+automatically and stored in `data/settings.json` (mode 0600).
 
 ## First run
 

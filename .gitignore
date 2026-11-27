@@ -38,15 +38,15 @@ Thumbs.db
 .uv/
 data/
 
-# Build/dev scripts (not distributed)
-scripts/
 
 # Ruff cache
 .ruff_cache/
 
-# Dev tooling (not distributed)
+# Build/dev scripts (not published)
+scripts/
 tests/
 pytest.ini
 requirements-dev.txt
 ruff.toml
 sync.sh
+
